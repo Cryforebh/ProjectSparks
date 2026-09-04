@@ -1,3 +1,4 @@
+using ProjectSparks.Missions;
 using UnityEngine;
 using Zenject;
 
@@ -12,6 +13,10 @@ namespace ProjectSparks.Core
                 .BindInterfacesAndSelfTo<PauseService>()
                 .AsSingle()
                 .NonLazy();
+
+            Container
+                .Bind<IMissionService>().To<MissionService>()
+                .AsSingle();
         }
     }
 }

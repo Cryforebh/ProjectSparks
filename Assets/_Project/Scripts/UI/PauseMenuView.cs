@@ -1,3 +1,5 @@
+using System;
+using Cysharp.Threading.Tasks;
 using ProjectSparks.Core;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,19 +14,28 @@ namespace ProjectSparks.UI
         [SerializeField] private GameObject _panel;
         [Tooltip("Кнопка продолжения игры.")]
         [SerializeField] private Button _resumeButton;
+        [Tooltip("Кнопка возврата в главное меню.")]
+        [SerializeField] private Button _mainMenuButton;
+        [Tooltip("Имя сцены главного меню.")]
+        [SerializeField] private string _mainMenuSceneName = "MainMenu";
 
         private IPauseService _pauseService;
+        private ISceneLoader _sceneLoader;
 
         [Inject]
-        private void Construct(IPauseService pauseService)
+        private void Construct(
+            IPauseService pauseService,
+            ISceneLoader sceneLoader)
         {
             _pauseService = pauseService;
+            _sceneLoader = sceneLoader;
         }
 
         private void Start()
         {
             _pauseService.PauseChanged += HandlePauseChanged;
             _resumeButton.onClick.AddListener(HandleResumeClicked);
+            _mainMenuButton.onClick.AddListener(HandleMainMenuClicked);
             SetVisible(_pauseService.IsPaused);
         }
 
@@ -39,6 +50,11 @@ namespace ProjectSparks.UI
             {
                 _resumeButton.onClick.RemoveListener(HandleResumeClicked);
             }
+
+            if (_mainMenuButton != null)
+            {
+                _mainMenuButton.onClick.RemoveListener(HandleMainMenuClicked);
+            }
         }
 
         private void HandlePauseChanged(bool isPaused)
@@ -49,6 +65,35 @@ namespace ProjectSparks.UI
         private void HandleResumeClicked()
         {
             _pauseService.SetPaused(false);
+        }
+
+        private void HandleMainMenuClicked()
+        {
+            ReturnToMainMenuAsync().Forget();
+        }
+
+        private async UniTask ReturnToMainMenuAsync()
+        {
+            _mainMenuButton.interactable = false;
+
+            try
+            {
+                await _sceneLoader.LoadAsync(
+                    _mainMenuSceneName,
+                    this.GetCancellationTokenOnDestroy());
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception, this);
+
+                if (_mainMenuButton != null)
+                {
+                    _mainMenuButton.interactable = true;
+                }
+            }
         }
 
         private void SetVisible(bool isVisible)
