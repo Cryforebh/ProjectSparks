@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using ProjectSparks.Collectibles;
+using ProjectSparks.Companions;
 using ProjectSparks.Core;
 using UnityEngine;
 
@@ -10,20 +12,29 @@ namespace ProjectSparks.Infrastructure
     {
         private readonly ISaveService _saveService;
         private readonly IEconomyService _economyService;
+        private readonly ICompanionService _companionService;
+        private readonly ISparkProgressService _sparkProgressService;
+        private readonly IResourceInventoryService _resourceInventoryService;
         private readonly CancellationTokenSource _lifetimeCancellation = new CancellationTokenSource();
         private readonly SemaphoreSlim _saveOperationLock = new SemaphoreSlim(1, 1);
 
         private bool _isSubscribed;
         private bool _isSaving;
         private bool _saveRequested;
-        private bool _ignoreBalanceChanges;
+        private bool _ignoreProgressChanges;
 
         public ProgressService(
             ISaveService saveService,
-            IEconomyService economyService)
+            IEconomyService economyService,
+            ICompanionService companionService,
+            ISparkProgressService sparkProgressService,
+            IResourceInventoryService resourceInventoryService)
         {
             _saveService = saveService;
             _economyService = economyService;
+            _companionService = companionService;
+            _sparkProgressService = sparkProgressService;
+            _resourceInventoryService = resourceInventoryService;
         }
 
         public bool IsLoaded { get; private set; }
@@ -52,10 +63,23 @@ namespace ProjectSparks.Infrastructure
             catch (Exception exception)
             {
                 Debug.LogException(exception);
-                progress = new GameProgressData(0);
+                progress = new GameProgressData(0, CompanionType.None, 0, 0);
             }
 
             _economyService.Restore(progress.Balance);
+            _companionService.Restore(progress.SelectedCompanion);
+            _sparkProgressService.Reset();
+            _sparkProgressService.Restore(progress.CollectorSpark);
+            _sparkProgressService.Restore(progress.MechanicSpark);
+            _resourceInventoryService.Restore(
+                progress.FruitCount,
+                progress.CapsuleCount);
+            _resourceInventoryService.RestoreFruits(
+                progress.SwimFruitCount,
+                progress.FlyFruitCount,
+                progress.RunFruitCount,
+                progress.PowerFruitCount,
+                progress.StaminaFruitCount);
             IsLoaded = true;
             Subscribe();
         }
@@ -70,14 +94,17 @@ namespace ProjectSparks.Infrastructure
             await _saveOperationLock.WaitAsync(linkedCancellation.Token);
             try
             {
-                _ignoreBalanceChanges = true;
+                _ignoreProgressChanges = true;
                 _economyService.Restore(0);
+                _companionService.Restore(CompanionType.None);
+                _sparkProgressService.Reset();
+                _resourceInventoryService.Reset();
                 _saveRequested = false;
                 await _saveService.DeleteAsync(linkedCancellation.Token);
             }
             finally
             {
-                _ignoreBalanceChanges = false;
+                _ignoreProgressChanges = false;
                 _saveOperationLock.Release();
             }
         }
@@ -97,6 +124,9 @@ namespace ProjectSparks.Infrastructure
             }
 
             _economyService.BalanceChanged += OnBalanceChanged;
+            _companionService.SelectedCompanionChanged += OnSelectedCompanionChanged;
+            _sparkProgressService.SparkChanged += OnSparkChanged;
+            _resourceInventoryService.AmountChanged += OnResourceAmountChanged;
             _isSubscribed = true;
         }
 
@@ -108,12 +138,35 @@ namespace ProjectSparks.Infrastructure
             }
 
             _economyService.BalanceChanged -= OnBalanceChanged;
+            _companionService.SelectedCompanionChanged -= OnSelectedCompanionChanged;
+            _sparkProgressService.SparkChanged -= OnSparkChanged;
+            _resourceInventoryService.AmountChanged -= OnResourceAmountChanged;
             _isSubscribed = false;
         }
 
         private void OnBalanceChanged(int balance)
         {
-            if (_ignoreBalanceChanges)
+            RequestSave();
+        }
+
+        private void OnSelectedCompanionChanged(CompanionType companionType)
+        {
+            RequestSave();
+        }
+
+        private void OnResourceAmountChanged(ResourceType resourceType, int amount)
+        {
+            RequestSave();
+        }
+
+        private void OnSparkChanged(CompanionType companionType)
+        {
+            RequestSave();
+        }
+
+        private void RequestSave()
+        {
+            if (_ignoreProgressChanges)
             {
                 return;
             }
@@ -136,7 +189,18 @@ namespace ProjectSparks.Infrastructure
                     await _saveOperationLock.WaitAsync(_lifetimeCancellation.Token);
                     try
                     {
-                        GameProgressData progress = new GameProgressData(_economyService.Balance);
+                        GameProgressData progress = new GameProgressData(
+                            _economyService.Balance,
+                            _companionService.SelectedCompanion,
+                            _resourceInventoryService.FruitCount,
+                            _resourceInventoryService.CapsuleCount,
+                            _sparkProgressService.GetProgress(CompanionType.Collector),
+                            _sparkProgressService.GetProgress(CompanionType.Mechanic),
+                            _resourceInventoryService.GetFruitAmount(FruitType.Swim),
+                            _resourceInventoryService.GetFruitAmount(FruitType.Fly),
+                            _resourceInventoryService.GetFruitAmount(FruitType.Run),
+                            _resourceInventoryService.GetFruitAmount(FruitType.Power),
+                            _resourceInventoryService.GetFruitAmount(FruitType.Stamina));
                         await _saveService.SaveAsync(progress, _lifetimeCancellation.Token);
                     }
                     finally

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using ProjectSparks.Companions;
 using UnityEngine;
 
 namespace ProjectSparks.Infrastructure
@@ -32,10 +33,10 @@ namespace ProjectSparks.Infrastructure
 
             if (string.IsNullOrWhiteSpace(json))
             {
-                return new GameProgressData(0);
+                return CreateDefaultProgress();
             }
 
-            return JsonUtility.FromJson<GameProgressData>(json) ?? new GameProgressData(0);
+            return JsonUtility.FromJson<GameProgressData>(json) ?? CreateDefaultProgress();
         }
 
         public async UniTask SaveAsync(
@@ -79,6 +80,11 @@ namespace ProjectSparks.Infrastructure
             {
                 File.Delete(_saveFilePath);
             }
+        }
+
+        private static GameProgressData CreateDefaultProgress()
+        {
+            return new GameProgressData(0, CompanionType.None, 0, 0);
         }
     }
 }

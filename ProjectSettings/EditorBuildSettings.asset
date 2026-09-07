@@ -9,6 +9,12 @@ EditorBuildSettings:
     path: Assets/_Project/Scenes/MainMenu.unity
     guid: 5720d88034cd1c04fbe5067f001b3597
   - enabled: 1
+    path: Assets/_Project/Scenes/Shelter.unity
+    guid: 1d134501eb9df06499796281cbc8cbd5
+  - enabled: 1
+    path: Assets/_Project/Scenes/Garage.unity
+    guid: 92d33d75bb5879b4f9219d65bc86d0f8
+  - enabled: 1
     path: Assets/_Project/Scenes/DrivingSandbox.unity
     guid: 083447f290c72d047b65c434c620f24e
   m_configObjects:

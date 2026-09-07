@@ -1,3 +1,4 @@
+using ProjectSparks.Companions;
 using UnityEngine;
 using Zenject;
 
@@ -66,6 +67,7 @@ namespace ProjectSparks.Driving
         private readonly RaycastHit[] _groundHits = new RaycastHit[8];
         private Rigidbody _body;
         private IVehicleInputSource _input;
+        private ICompanionService _companionService;
         private Vector3 _lastSafePosition;
         private Quaternion _lastSafeRotation;
         private float _nextSafePoseTime;
@@ -84,9 +86,12 @@ namespace ProjectSparks.Driving
         public bool IsGrounded => _grounded;
 
         [Inject]
-        private void Construct(IVehicleInputSource inputSource)
+        private void Construct(
+            IVehicleInputSource inputSource,
+            ICompanionService companionService)
         {
             _input = inputSource;
+            _companionService = companionService;
         }
 
         private void Awake()
@@ -204,7 +209,9 @@ namespace ProjectSparks.Driving
             if (_input.BoostHeld && drive > 0.1f && _boostCharge > 0f)
             {
                 _body.AddForce(transform.forward * _boostAcceleration, ForceMode.Acceleration);
-                _boostCharge = Mathf.Max(0f, _boostCharge - Time.fixedDeltaTime / _boostDuration);
+                float baseConsumption = Time.fixedDeltaTime / _boostDuration;
+                float consumption = _companionService.ModifyBoostConsumption(baseConsumption);
+                _boostCharge = Mathf.Max(0f, _boostCharge - consumption);
             }
             else
             {
