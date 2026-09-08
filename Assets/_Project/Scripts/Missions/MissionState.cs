@@ -26,8 +26,7 @@ namespace ProjectSparks.Missions
 
         public override bool TryStart(MissionService context, MissionDefinition mission)
         {
-            context.BeginMission(mission);
-            return true;
+            return context.BeginMission(mission);
         }
     }
 
@@ -58,8 +57,7 @@ namespace ProjectSparks.Missions
                 return false;
             }
 
-            context.MarkMissionCompleted();
-            return true;
+            return context.MarkMissionCompleted();
         }
     }
 
@@ -69,8 +67,7 @@ namespace ProjectSparks.Missions
 
         public override bool TryStart(MissionService context, MissionDefinition mission)
         {
-            context.BeginMission(mission);
-            return true;
+            return context.BeginMission(mission);
         }
     }
 }

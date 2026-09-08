@@ -1,3 +1,4 @@
+using ProjectSparks.Missions;
 using UnityEngine;
 using Zenject;
 
@@ -13,13 +14,13 @@ namespace ProjectSparks.Collectibles
         [Tooltip("Тип фрукта. Используется только для ресурса Fruit.")]
         [SerializeField] private FruitType _fruitType = FruitType.Fly;
 
-        private IResourceInventoryService _inventoryService;
+        private ITripSessionService _tripSession;
         private bool _isCollected;
 
         [Inject]
-        private void Construct(IResourceInventoryService inventoryService)
+        private void Construct(ITripSessionService tripSession)
         {
-            _inventoryService = inventoryService;
+            _tripSession = tripSession;
         }
 
         private void OnEnable()
@@ -35,14 +36,19 @@ namespace ProjectSparks.Collectibles
             }
 
             _isCollected = true;
-            if (_resourceType == ResourceType.Fruit)
+            bool added = _resourceType switch
             {
-                _inventoryService.AddFruit(_fruitType, _amount);
-            }
-            else
+                ResourceType.Fruit => _tripSession.TryAddFruit(_fruitType, _amount),
+                ResourceType.Capsule => _tripSession.TryAddCapsules(_amount),
+                _ => false
+            };
+
+            if (!added)
             {
-                _inventoryService.Add(_resourceType, _amount);
+                _isCollected = false;
+                return false;
             }
+
             gameObject.SetActive(false);
             return true;
         }

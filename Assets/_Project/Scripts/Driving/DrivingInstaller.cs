@@ -18,6 +18,17 @@ namespace ProjectSparks.Driving
                 throw new ZenjectException("DrivingInstaller: не назначены компоненты машины.");
             }
 
+            VehicleCargoPoints cargoPoints = _vehicleController.GetComponent<VehicleCargoPoints>();
+            if (cargoPoints == null)
+            {
+                throw new ZenjectException("DrivingInstaller: на машине нет VehicleCargoPoints.");
+            }
+
+            Container
+                .Bind<VehicleCargoPoints>()
+                .FromInstance(cargoPoints)
+                .AsSingle();
+
             Container
                 .Bind<IVehicleInputSource>()
                 .FromInstance(_vehicleInput)

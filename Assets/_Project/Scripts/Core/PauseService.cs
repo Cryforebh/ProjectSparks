@@ -12,6 +12,7 @@ namespace ProjectSparks.Core
         public event Action<bool> PauseChanged;
 
         public bool IsPaused { get; private set; }
+        public bool IsPauseMenuVisible { get; private set; }
 
         public PauseService(IPauseInputSource input)
         {
@@ -26,26 +27,28 @@ namespace ProjectSparks.Core
             }
         }
 
-        public void SetPaused(bool isPaused)
+        public void SetPaused(bool isPaused, bool showMenu = true)
         {
-            if (IsPaused == isPaused)
+            bool menuVisible = isPaused && showMenu;
+            if (IsPaused == isPaused && IsPauseMenuVisible == menuVisible)
             {
                 return;
             }
 
-            IsPaused = isPaused;
-            if (isPaused)
+            if (isPaused && !IsPaused)
             {
                 _resumeTimeScale = Mathf.Approximately(Time.timeScale, 0f)
                     ? 1f
                     : Time.timeScale;
                 Time.timeScale = 0f;
             }
-            else
+            else if (!isPaused && IsPaused)
             {
                 Time.timeScale = _resumeTimeScale;
             }
 
+            IsPaused = isPaused;
+            IsPauseMenuVisible = menuVisible;
             PauseChanged?.Invoke(IsPaused);
         }
 
@@ -62,6 +65,7 @@ namespace ProjectSparks.Core
             }
 
             IsPaused = false;
+            IsPauseMenuVisible = false;
             Time.timeScale = _resumeTimeScale;
         }
     }

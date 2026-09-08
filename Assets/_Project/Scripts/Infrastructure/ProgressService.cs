@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using ProjectSparks.Collectibles;
 using ProjectSparks.Companions;
 using ProjectSparks.Core;
+using ProjectSparks.Missions;
 using UnityEngine;
 
 namespace ProjectSparks.Infrastructure
@@ -22,6 +23,8 @@ namespace ProjectSparks.Infrastructure
         private bool _isSaving;
         private bool _saveRequested;
         private bool _ignoreProgressChanges;
+        private string _lastCommittedTripId;
+        private GameProgressData _pendingTripCommit;
 
         public ProgressService(
             ISaveService saveService,
@@ -66,6 +69,7 @@ namespace ProjectSparks.Infrastructure
                 progress = new GameProgressData(0, CompanionType.None, 0, 0);
             }
 
+            _lastCommittedTripId = progress.LastCommittedTripId;
             _economyService.Restore(progress.Balance);
             _companionService.Restore(progress.SelectedCompanion);
             _sparkProgressService.Reset();
@@ -99,6 +103,8 @@ namespace ProjectSparks.Infrastructure
                 _companionService.Restore(CompanionType.None);
                 _sparkProgressService.Reset();
                 _resourceInventoryService.Reset();
+                _lastCommittedTripId = null;
+                _pendingTripCommit = null;
                 _saveRequested = false;
                 await _saveService.DeleteAsync(linkedCancellation.Token);
             }
@@ -114,6 +120,65 @@ namespace ProjectSparks.Infrastructure
             Unsubscribe();
             _lifetimeCancellation.Cancel();
             _lifetimeCancellation.Dispose();
+        }
+
+        public async UniTask CommitTripAsync(TripResult result, CancellationToken cancellationToken)
+        {
+            if (result == null)
+            {
+                throw new ArgumentNullException(nameof(result));
+            }
+
+            await LoadAsync(cancellationToken);
+            using CancellationTokenSource linkedCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+                cancellationToken, _lifetimeCancellation.Token);
+            await _saveOperationLock.WaitAsync(linkedCancellation.Token);
+            try
+            {
+                if (string.Equals(_lastCommittedTripId, result.SessionId, StringComparison.Ordinal))
+                {
+                    return;
+                }
+
+                if (_pendingTripCommit == null)
+                {
+                    GameProgressData progress = new GameProgressData(
+                        checked(_economyService.Balance + result.Coins),
+                        _companionService.SelectedCompanion,
+                        checked(_resourceInventoryService.FruitCount + result.FruitCount),
+                        checked(_resourceInventoryService.CapsuleCount + result.CapsuleCount),
+                        _sparkProgressService.GetProgress(CompanionType.Collector),
+                        _sparkProgressService.GetProgress(CompanionType.Mechanic),
+                        checked(_resourceInventoryService.GetFruitAmount(FruitType.Swim) + result.GetFruitAmount(FruitType.Swim)),
+                        checked(_resourceInventoryService.GetFruitAmount(FruitType.Fly) + result.GetFruitAmount(FruitType.Fly)),
+                        checked(_resourceInventoryService.GetFruitAmount(FruitType.Run) + result.GetFruitAmount(FruitType.Run)),
+                        checked(_resourceInventoryService.GetFruitAmount(FruitType.Power) + result.GetFruitAmount(FruitType.Power)),
+                        checked(_resourceInventoryService.GetFruitAmount(FruitType.Stamina) + result.GetFruitAmount(FruitType.Stamina)),
+                        result.SessionId);
+                    await _saveService.SaveAsync(progress, linkedCancellation.Token);
+                    _pendingTripCommit = progress;
+                }
+
+                if (_pendingTripCommit.LastCommittedTripId != result.SessionId)
+                {
+                    throw new InvalidOperationException("Нужно завершить применение предыдущего сохраненного результата.");
+                }
+
+                _ignoreProgressChanges = true;
+                _economyService.Restore(_pendingTripCommit.Balance);
+                _resourceInventoryService.Restore(_pendingTripCommit.FruitCount, _pendingTripCommit.CapsuleCount);
+                _resourceInventoryService.RestoreFruits(
+                    _pendingTripCommit.SwimFruitCount, _pendingTripCommit.FlyFruitCount,
+                    _pendingTripCommit.RunFruitCount, _pendingTripCommit.PowerFruitCount,
+                    _pendingTripCommit.StaminaFruitCount);
+                _lastCommittedTripId = result.SessionId;
+                _pendingTripCommit = null;
+            }
+            finally
+            {
+                _ignoreProgressChanges = false;
+                _saveOperationLock.Release();
+            }
         }
 
         private void Subscribe()
@@ -189,7 +254,7 @@ namespace ProjectSparks.Infrastructure
                     await _saveOperationLock.WaitAsync(_lifetimeCancellation.Token);
                     try
                     {
-                        GameProgressData progress = new GameProgressData(
+                        GameProgressData progress = _pendingTripCommit ?? new GameProgressData(
                             _economyService.Balance,
                             _companionService.SelectedCompanion,
                             _resourceInventoryService.FruitCount,
@@ -200,7 +265,8 @@ namespace ProjectSparks.Infrastructure
                             _resourceInventoryService.GetFruitAmount(FruitType.Fly),
                             _resourceInventoryService.GetFruitAmount(FruitType.Run),
                             _resourceInventoryService.GetFruitAmount(FruitType.Power),
-                            _resourceInventoryService.GetFruitAmount(FruitType.Stamina));
+                            _resourceInventoryService.GetFruitAmount(FruitType.Stamina),
+                            _lastCommittedTripId);
                         await _saveService.SaveAsync(progress, _lifetimeCancellation.Token);
                     }
                     finally

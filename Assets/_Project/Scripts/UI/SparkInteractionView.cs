@@ -73,6 +73,7 @@ namespace ProjectSparks.UI
         private IProgressService _progressService;
         private ISparkProfile _currentSpark;
         private IFruitItem _currentFruit;
+        private TMP_Text _putDownButtonText;
         private bool _isReady;
         private bool _isFeedingMode;
 
@@ -122,6 +123,7 @@ namespace ProjectSparks.UI
             _sparkProgressService.SparkChanged += HandleSparkChanged;
             _requestService.SparkFeedingRequested += HandleSparkFeedingRequested;
 
+            _putDownButtonText = _putDownButton.GetComponentInChildren<TMP_Text>(true);
             ClosePanel();
             InitializeAsync().Forget();
         }
@@ -259,9 +261,8 @@ namespace ProjectSparks.UI
 
         private void HandlePutDownClicked()
         {
-            if (_isFeedingMode && _currentFruit is PhysicalFruitItem)
+            if (_isFeedingMode)
             {
-                _fruitWorldService.TryDropHeldFruit();
                 ClosePanel();
                 return;
             }
@@ -281,12 +282,21 @@ namespace ProjectSparks.UI
 
             CompanionType companionType = _currentSpark.CompanionType;
             FruitType fruitType = _currentFruit.FruitType;
-            if (_feedingService.CanFeed(companionType, fruitType)
-                && _fruitWorldService.TryConsumeHeldFruit()
-                && _feedingService.TryFeed(companionType, fruitType))
+            if (!_feedingService.CanFeed(companionType, fruitType)
+                || _currentSpark is not ISparkStateController stateController
+                || !stateController.TryStartEating())
             {
-                ClosePanel();
+                return;
             }
+
+            if (!_fruitWorldService.TryConsumeHeldFruit()
+                || !_feedingService.TryFeed(companionType, fruitType))
+            {
+                stateController.CompleteEating();
+                return;
+            }
+
+            ClosePanel();
         }
 
         private void HandleRenameClicked()
@@ -362,6 +372,14 @@ namespace ProjectSparks.UI
             _renameButton.gameObject.SetActive(!isFeedingMode);
             _selectButton.gameObject.SetActive(!isFeedingMode);
             _feedButton.gameObject.SetActive(isFeedingMode);
+            _putDownButton.gameObject.SetActive(true);
+            if (_putDownButtonText != null)
+            {
+                _putDownButtonText.text = isFeedingMode
+                    ? "ОТМЕНА"
+                    : "ОПУСТИТЬ";
+            }
+
             SetIncreaseTextsActive(isFeedingMode);
         }
 

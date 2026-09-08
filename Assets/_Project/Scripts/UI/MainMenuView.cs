@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using ProjectSparks.Core;
+using ProjectSparks.Levels;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -10,29 +11,36 @@ namespace ProjectSparks.UI
     [DisallowMultipleComponent]
     public sealed class MainMenuView : MonoBehaviour
     {
-        [Tooltip("Кнопка запуска игры.")]
+        [Tooltip("Кнопка входа в убежище.")]
         [SerializeField] private Button _playButton;
+        [Tooltip("Кнопка открытия выбора локации для доставки.")]
+        [SerializeField] private Button _tripButton;
         [Tooltip("Кнопка выхода из игры.")]
         [SerializeField] private Button _exitButton;
         [Tooltip("Имя сцены, которая открывается кнопкой запуска игры.")]
-        [SerializeField] private string _gameSceneName = "DrivingSandbox";
+        [SerializeField] private string _gameSceneName = "Shelter";
 
         private ISceneLoader _sceneLoader;
+        private LevelSelectionService _levelSelection;
 
         [Inject]
-        private void Construct(ISceneLoader sceneLoader)
+        private void Construct(ISceneLoader sceneLoader, LevelSelectionService levelSelection)
         {
             _sceneLoader = sceneLoader;
+            _levelSelection = levelSelection;
         }
 
         private void Start()
         {
             _playButton.onClick.AddListener(HandlePlayClicked);
+            _tripButton.onClick.AddListener(_levelSelection.Open);
             _exitButton.onClick.AddListener(HandleExitClicked);
         }
 
         private void OnDestroy()
         {
+            if (_tripButton != null)
+                _tripButton.onClick.RemoveListener(_levelSelection.Open);
             if (_playButton != null)
             {
                 _playButton.onClick.RemoveListener(HandlePlayClicked);
@@ -57,6 +65,7 @@ namespace ProjectSparks.UI
         private async UniTask LoadGameAsync()
         {
             _playButton.interactable = false;
+            _tripButton.interactable = false;
 
             try
             {
@@ -74,6 +83,7 @@ namespace ProjectSparks.UI
                 if (_playButton != null)
                 {
                     _playButton.interactable = true;
+                    _tripButton.interactable = true;
                 }
             }
         }

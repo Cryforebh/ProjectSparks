@@ -1,5 +1,4 @@
 using System;
-using ProjectSparks.Core;
 
 namespace ProjectSparks.Missions
 {
@@ -9,13 +8,13 @@ namespace ProjectSparks.Missions
         private readonly MissionState _awaitingPickupState = new AwaitingPickupMissionState();
         private readonly MissionState _deliveringState = new DeliveringMissionState();
         private readonly MissionState _completedState = new CompletedMissionState();
-        private readonly IEconomyService _economyService;
+        private readonly ITripSessionService _tripSession;
 
         private MissionState _currentState;
 
-        public MissionService(IEconomyService economyService)
+        public MissionService(ITripSessionService tripSession)
         {
-            _economyService = economyService;
+            _tripSession = tripSession;
             _currentState = _inactiveState;
         }
 
@@ -50,10 +49,16 @@ namespace ProjectSparks.Missions
             return ReferenceEquals(ActiveMission, mission);
         }
 
-        internal void BeginMission(MissionDefinition mission)
+        internal bool BeginMission(MissionDefinition mission)
         {
+            if (!_tripSession.TryBeginDelivery(mission.Id))
+            {
+                return false;
+            }
+
             ActiveMission = mission;
             TransitionTo(_awaitingPickupState);
+            return true;
         }
 
         internal void MarkCargoPickedUp()
@@ -61,16 +66,17 @@ namespace ProjectSparks.Missions
             TransitionTo(_deliveringState);
         }
 
-        internal void MarkMissionCompleted()
+        internal bool MarkMissionCompleted()
         {
-            if (ReferenceEquals(_currentState, _completedState))
+            if (!ReferenceEquals(_currentState, _deliveringState) ||
+                !_tripSession.TryCompleteDelivery(ActiveMission.Id, ActiveMission.Reward))
             {
-                return;
+                return false;
             }
 
             _currentState = _completedState;
-            _economyService.Add(ActiveMission.Reward);
             StateChanged?.Invoke();
+            return true;
         }
 
         private void TransitionTo(MissionState nextState)

@@ -1,3 +1,5 @@
+using System;
+using Cysharp.Threading.Tasks;
 using ProjectSparks.Collectibles;
 using ProjectSparks.Player;
 using UnityEngine;
@@ -5,8 +7,29 @@ using Zenject;
 
 namespace ProjectSparks.Companions
 {
+    public enum SparkBehaviourState
+    {
+        Standing = 0,
+        Held = 1,
+        Eating = 2
+    }
+
+    public interface ISparkStateController
+    {
+        event Action<SparkBehaviourState> StateChanged;
+
+        SparkBehaviourState State { get; }
+
+        bool TryStartEating();
+        void CompleteEating();
+    }
+
     [DisallowMultipleComponent]
-    public sealed class SparkInteractable : MonoBehaviour, IInteractable, IHoldableItem, ISparkProfile
+    public sealed class SparkInteractable : MonoBehaviour,
+        IInteractable,
+        IHoldableItem,
+        ISparkProfile,
+        ISparkStateController
     {
         [Header("Искра")]
         [Tooltip("Имя Искры, которое отображается в интерфейсе осмотра.")]
@@ -15,13 +38,20 @@ namespace ProjectSparks.Companions
         [SerializeField] private CompanionType _companionType = CompanionType.Collector;
         [Tooltip("Краткое описание способности Искры.")]
         [SerializeField, TextArea] private string _abilityDescription = "Увеличивает радиус сбора ресурсов на 50%.";
-        [Tooltip("Коллайдеры Искры, отключаемые на время нахождения в руках.")]
+        [Tooltip("Коллайдеры Искры, активные только в состоянии Стоит.")]
         [SerializeField] private Collider[] _colliders;
+
+        [Header("Состояния")]
+        [Tooltip("Длительность состояния Кушает без подключенной анимации.")]
+        [SerializeField, Min(0f)] private float _eatingDuration = 1f;
+        [Tooltip("Автоматически завершать состояние Кушает. Отключается после подключения Animation Event.")]
+        [SerializeField] private bool _completeEatingAutomatically = true;
 
         private IPlayerHandsService _handsService;
         private ISparkProgressService _sparkProgressService;
         private IShelterInteractionRequestService _requestService;
-        private bool _isHeld;
+
+        public event Action<SparkBehaviourState> StateChanged;
 
         public string DisplayName => _sparkProgressService != null
             ? _sparkProgressService.GetProgress(_companionType).DisplayName
@@ -30,11 +60,13 @@ namespace ProjectSparks.Companions
         public CompanionType CompanionType => _companionType;
         public HeldItemType ItemType => HeldItemType.Spark;
         public Transform ItemTransform => transform;
+        public SparkBehaviourState State { get; private set; } =
+            SparkBehaviourState.Standing;
         public string InteractionPrompt =>
             _handsService.HeldItem is IFruitItem
                 ? "Покормить Искру"
                 : "Взять Искру";
-        public bool CanInteract => !_isHeld
+        public bool CanInteract => State == SparkBehaviourState.Standing
             && (!_handsService.HasItem
                 || _handsService.HeldItem is IFruitItem);
 
@@ -55,6 +87,8 @@ namespace ProjectSparks.Companions
             {
                 _colliders = GetComponentsInChildren<Collider>(true);
             }
+
+            ApplyState();
         }
 
         public void Interact()
@@ -76,8 +110,81 @@ namespace ProjectSparks.Companions
 
         public void SetHeld(bool isHeld)
         {
-            _isHeld = isHeld;
-            SetCollidersEnabled(!isHeld);
+            TransitionTo(isHeld
+                ? SparkBehaviourState.Held
+                : SparkBehaviourState.Standing);
+        }
+
+        public bool TryStartEating()
+        {
+            if (!TransitionTo(SparkBehaviourState.Eating))
+            {
+                return false;
+            }
+
+            if (_completeEatingAutomatically)
+            {
+                CompleteEatingAfterDelayAsync().Forget();
+            }
+
+            return true;
+        }
+
+        public void CompleteEating()
+        {
+            if (State == SparkBehaviourState.Eating)
+            {
+                TransitionTo(SparkBehaviourState.Standing);
+            }
+        }
+
+        private async UniTask CompleteEatingAfterDelayAsync()
+        {
+            try
+            {
+                await UniTask.Delay(
+                    TimeSpan.FromSeconds(_eatingDuration),
+                    cancellationToken: this.GetCancellationTokenOnDestroy());
+                CompleteEating();
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        private bool TransitionTo(SparkBehaviourState nextState)
+        {
+            if (State == nextState || !CanTransition(State, nextState))
+            {
+                return false;
+            }
+
+            State = nextState;
+            ApplyState();
+            StateChanged?.Invoke(State);
+            return true;
+        }
+
+        private void ApplyState()
+        {
+            SetCollidersEnabled(State == SparkBehaviourState.Standing);
+        }
+
+        private static bool CanTransition(
+            SparkBehaviourState currentState,
+            SparkBehaviourState nextState)
+        {
+            return currentState switch
+            {
+                SparkBehaviourState.Standing =>
+                    nextState == SparkBehaviourState.Held
+                    || nextState == SparkBehaviourState.Eating,
+                SparkBehaviourState.Held =>
+                    nextState == SparkBehaviourState.Standing,
+                SparkBehaviourState.Eating =>
+                    nextState == SparkBehaviourState.Standing,
+                _ => false
+            };
         }
 
         private void SetCollidersEnabled(bool isEnabled)

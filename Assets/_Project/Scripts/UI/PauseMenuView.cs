@@ -18,6 +18,8 @@ namespace ProjectSparks.UI
         [SerializeField] private Button _mainMenuButton;
         [Tooltip("Имя сцены главного меню.")]
         [SerializeField] private string _mainMenuSceneName = "MainMenu";
+        [Tooltip("Подтверждение выхода из поездки. В сценах без поездки можно не назначать.")]
+        [SerializeField] private TripExitView _tripExitView;
 
         private IPauseService _pauseService;
         private ISceneLoader _sceneLoader;
@@ -36,7 +38,7 @@ namespace ProjectSparks.UI
             _pauseService.PauseChanged += HandlePauseChanged;
             _resumeButton.onClick.AddListener(HandleResumeClicked);
             _mainMenuButton.onClick.AddListener(HandleMainMenuClicked);
-            SetVisible(_pauseService.IsPaused);
+            SetVisible(_pauseService.IsPauseMenuVisible);
         }
 
         private void OnDestroy()
@@ -59,7 +61,7 @@ namespace ProjectSparks.UI
 
         private void HandlePauseChanged(bool isPaused)
         {
-            SetVisible(isPaused);
+            SetVisible(_pauseService.IsPauseMenuVisible);
         }
 
         private void HandleResumeClicked()
@@ -69,6 +71,12 @@ namespace ProjectSparks.UI
 
         private void HandleMainMenuClicked()
         {
+            if (_tripExitView != null)
+            {
+                _tripExitView.RequestExit();
+                return;
+            }
+
             ReturnToMainMenuAsync().Forget();
         }
 

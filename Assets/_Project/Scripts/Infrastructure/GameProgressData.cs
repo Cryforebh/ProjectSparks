@@ -30,6 +30,8 @@ namespace ProjectSparks.Infrastructure
         [SerializeField] private int _powerFruitCount;
         [Tooltip("Сохраненное количество фруктов выносливости.")]
         [SerializeField] private int _staminaFruitCount;
+        [Tooltip("Идентификатор последней сохраненной поездки для защиты от повторной награды.")]
+        [SerializeField] private string _lastCommittedTripId;
 
         public GameProgressData(
             int balance,
@@ -42,7 +44,8 @@ namespace ProjectSparks.Infrastructure
             int flyFruitCount = 0,
             int runFruitCount = 0,
             int powerFruitCount = 0,
-            int staminaFruitCount = 0)
+            int staminaFruitCount = 0,
+            string lastCommittedTripId = null)
         {
             _balance = Math.Max(0, balance);
             _selectedCompanion = selectedCompanion;
@@ -55,6 +58,7 @@ namespace ProjectSparks.Infrastructure
             _runFruitCount = Math.Max(0, runFruitCount);
             _powerFruitCount = Math.Max(0, powerFruitCount);
             _staminaFruitCount = Math.Max(0, staminaFruitCount);
+            _lastCommittedTripId = lastCommittedTripId;
         }
 
         public int Balance => _balance;
@@ -68,5 +72,6 @@ namespace ProjectSparks.Infrastructure
         public int RunFruitCount => _runFruitCount;
         public int PowerFruitCount => _powerFruitCount;
         public int StaminaFruitCount => _staminaFruitCount;
+        public string LastCommittedTripId => _lastCommittedTripId;
     }
 }

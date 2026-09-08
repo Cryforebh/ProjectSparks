@@ -1,4 +1,4 @@
-using ProjectSparks.Core;
+using ProjectSparks.Missions;
 using TMPro;
 using UnityEngine;
 using Zenject;
@@ -8,16 +8,16 @@ namespace ProjectSparks.UI
     [DisallowMultipleComponent]
     public sealed class EconomyHudView : MonoBehaviour
     {
-        [Tooltip("Текст текущего количества монет.")]
+        [Tooltip("Текст монет, полученных за текущую поездку.")]
         [SerializeField] private TMP_Text _balanceText;
 
-        private IEconomyService _economyService;
+        private ITripSessionService _tripSession;
         private bool _isSubscribed;
 
         [Inject]
-        public void Construct(IEconomyService economyService)
+        public void Construct(ITripSessionService tripSession)
         {
-            _economyService = economyService;
+            _tripSession = tripSession;
             Subscribe();
         }
 
@@ -33,14 +33,14 @@ namespace ProjectSparks.UI
 
         private void Subscribe()
         {
-            if (_isSubscribed || _economyService == null)
+            if (_isSubscribed || _tripSession == null)
             {
                 return;
             }
 
-            _economyService.BalanceChanged += Refresh;
+            _tripSession.Changed += Refresh;
             _isSubscribed = true;
-            Refresh(_economyService.Balance);
+            Refresh();
         }
 
         private void Unsubscribe()
@@ -50,15 +50,15 @@ namespace ProjectSparks.UI
                 return;
             }
 
-            _economyService.BalanceChanged -= Refresh;
+            _tripSession.Changed -= Refresh;
             _isSubscribed = false;
         }
 
-        private void Refresh(int balance)
+        private void Refresh()
         {
             if (_balanceText != null)
             {
-                _balanceText.text = $"Монеты: {balance}";
+                _balanceText.text = $"Монеты: {_tripSession.Coins}";
             }
         }
     }

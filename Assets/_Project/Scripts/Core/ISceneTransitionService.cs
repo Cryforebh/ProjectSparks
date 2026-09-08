@@ -7,6 +7,7 @@ namespace ProjectSparks.Core
     {
         bool IsTransitioning { get; }
 
+        // Пустая точка появления сохраняет стартовую позицию, заданную в сцене.
         UniTask TransitionAsync(
             string sceneName,
             string spawnPointId,

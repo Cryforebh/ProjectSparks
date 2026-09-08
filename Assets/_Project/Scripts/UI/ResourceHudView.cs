@@ -1,4 +1,4 @@
-using ProjectSparks.Collectibles;
+using ProjectSparks.Missions;
 using TMPro;
 using UnityEngine;
 using Zenject;
@@ -8,17 +8,17 @@ namespace ProjectSparks.UI
     [DisallowMultipleComponent]
     public sealed class ResourceHudView : MonoBehaviour
     {
-        [Tooltip("Текст количества собранных фруктов.")]
+        [Tooltip("Текст фруктов, собранных за текущую поездку.")]
         [SerializeField] private TMP_Text _fruitCountText;
-        [Tooltip("Текст количества найденных капсул.")]
+        [Tooltip("Текст капсул, найденных за текущую поездку.")]
         [SerializeField] private TMP_Text _capsuleCountText;
 
-        private IResourceInventoryService _inventoryService;
+        private ITripSessionService _tripSession;
 
         [Inject]
-        private void Construct(IResourceInventoryService inventoryService)
+        private void Construct(ITripSessionService tripSession)
         {
-            _inventoryService = inventoryService;
+            _tripSession = tripSession;
         }
 
         private void Start()
@@ -30,36 +30,22 @@ namespace ProjectSparks.UI
                 return;
             }
 
-            _inventoryService.AmountChanged += HandleAmountChanged;
+            _tripSession.Changed += RefreshAll;
             RefreshAll();
         }
 
         private void OnDestroy()
         {
-            if (_inventoryService != null)
+            if (_tripSession != null)
             {
-                _inventoryService.AmountChanged -= HandleAmountChanged;
-            }
-        }
-
-        private void HandleAmountChanged(ResourceType resourceType, int amount)
-        {
-            switch (resourceType)
-            {
-                case ResourceType.Fruit:
-                    _fruitCountText.text = $"Фрукты: {amount}";
-                    break;
-
-                case ResourceType.Capsule:
-                    _capsuleCountText.text = $"Капсулы: {amount}";
-                    break;
+                _tripSession.Changed -= RefreshAll;
             }
         }
 
         private void RefreshAll()
         {
-            _fruitCountText.text = $"Фрукты: {_inventoryService.FruitCount}";
-            _capsuleCountText.text = $"Капсулы: {_inventoryService.CapsuleCount}";
+            _fruitCountText.text = $"Фрукты: {_tripSession.FruitCount}";
+            _capsuleCountText.text = $"Капсулы: {_tripSession.CapsuleCount}";
         }
     }
 }

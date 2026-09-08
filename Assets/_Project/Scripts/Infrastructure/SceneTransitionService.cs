@@ -54,7 +54,14 @@ namespace ProjectSparks.Infrastructure
                 await _fadeView.FadeOutAsync(fadeCancellation.Token);
                 fadeCancellation.Token.ThrowIfCancellationRequested();
 
-                _entryPointService.SetPending(spawnPointId);
+                if (string.IsNullOrWhiteSpace(spawnPointId))
+                {
+                    _entryPointService.Clear();
+                }
+                else
+                {
+                    _entryPointService.SetPending(spawnPointId);
+                }
 
                 await _sceneLoader.LoadAsync(
                     sceneName,

@@ -15,8 +15,15 @@ namespace ProjectSparks.Core
                 .NonLazy();
 
             Container
+                .Bind<ITripSessionService>().To<TripSessionService>()
+                .AsSingle();
+
+            Container
                 .Bind<IMissionService>().To<MissionService>()
                 .AsSingle();
+
+            Container.Bind<TripCompletionService>().AsSingle();
+            Container.Bind<TripExitService>().AsSingle();
         }
     }
 }

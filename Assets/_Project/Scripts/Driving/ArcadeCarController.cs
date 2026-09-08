@@ -105,7 +105,13 @@ namespace ProjectSparks.Driving
 
         private void Update()
         {
-            if (_input.ConsumeReset() || transform.position.y < -5f)
+            bool resetRequested = _input.ConsumeReset();
+            if (Time.timeScale <= 0f)
+            {
+                return;
+            }
+
+            if (resetRequested || transform.position.y < -5f)
             {
                 Recover();
             }

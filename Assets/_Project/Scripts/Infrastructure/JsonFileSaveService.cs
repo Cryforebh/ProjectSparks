@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Text;
 using Cysharp.Threading.Tasks;
 using ProjectSparks.Companions;
 using UnityEngine;
@@ -49,9 +50,10 @@ namespace ProjectSparks.Infrastructure
             }
 
             string json = JsonUtility.ToJson(data, true);
+            cancellationToken.ThrowIfCancellationRequested();
             await UniTask.RunOnThreadPool(
                 () => WriteSaveFile(json),
-                cancellationToken: cancellationToken);
+                cancellationToken: CancellationToken.None);
         }
 
         public async UniTask DeleteAsync(CancellationToken cancellationToken)
@@ -71,7 +73,22 @@ namespace ProjectSparks.Infrastructure
         private void WriteSaveFile(string json)
         {
             Directory.CreateDirectory(_saveDirectoryPath);
-            File.WriteAllText(_saveFilePath, json);
+            string temporaryPath = _saveFilePath + ".tmp";
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            using (var stream = new FileStream(temporaryPath, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                stream.Write(bytes, 0, bytes.Length);
+                stream.Flush(true);
+            }
+
+            if (File.Exists(_saveFilePath))
+            {
+                File.Replace(temporaryPath, _saveFilePath, null);
+            }
+            else
+            {
+                File.Move(temporaryPath, _saveFilePath);
+            }
         }
 
         private void DeleteSaveFile()

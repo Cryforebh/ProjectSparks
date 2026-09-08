@@ -7,8 +7,9 @@ namespace ProjectSparks.Core
         event Action<bool> PauseChanged;
 
         bool IsPaused { get; }
+        bool IsPauseMenuVisible { get; }
 
-        void SetPaused(bool isPaused);
+        void SetPaused(bool isPaused, bool showMenu = true);
         void TogglePause();
     }
 }
