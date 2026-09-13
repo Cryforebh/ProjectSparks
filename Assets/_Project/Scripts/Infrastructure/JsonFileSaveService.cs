@@ -101,7 +101,7 @@ namespace ProjectSparks.Infrastructure
 
         private static GameProgressData CreateDefaultProgress()
         {
-            return new GameProgressData(0, CompanionType.None, 0, 0);
+            return new GameProgressData(0, string.Empty, 0);
         }
     }
 }

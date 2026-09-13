@@ -15,7 +15,7 @@ namespace ProjectSparks.Collectibles
         void Add(ResourceType resourceType, int amount);
         void AddFruit(FruitType fruitType, int amount);
         bool TryRemoveFruit(FruitType fruitType, int amount);
-        void Restore(int fruitCount, int capsuleCount);
+        void RestoreCapsules(int capsuleCount);
         void RestoreFruits(
             int swimFruitCount,
             int flyFruitCount,

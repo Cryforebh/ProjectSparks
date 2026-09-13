@@ -16,6 +16,10 @@ namespace ProjectSparks.UI
         [SerializeField] private GameObject _panel;
         [Tooltip("Кнопка открытия итогов после последней доставки.")]
         [SerializeField] private Button _openButton;
+        [Tooltip("Показывать кнопку возврата поверх игры. Для ПК можно выключить: возврат останется в меню паузы.")]
+        [SerializeField] private bool _showGameplayReturnButton = true;
+        [Tooltip("Кнопка возврата из меню паузы. До завершения доставок открывает предупреждение о потере наград.")]
+        [SerializeField] private Button _pauseOpenButton;
         [Tooltip("Кнопка закрытия итогов и продолжения поездки.")]
         [SerializeField] private Button _continueButton;
         [Tooltip("Текст доставок и временных наград поездки.")]
@@ -27,14 +31,15 @@ namespace ProjectSparks.UI
         [Tooltip("Имя сцены убежища.")]
         [SerializeField] private string _shelterSceneName = "Shelter";
 
+        [Tooltip("Общее окно подтверждения выхода без сохранения наград.")]
+        [SerializeField] private TripExitView _tripExitView;
+
         private ITripSessionService _tripSession;
         private IPauseService _pauseService;
         private TripCompletionService _completionService;
         private bool _isBusy;
         private bool _isSubscribed;
         private bool _isOpen;
-        private CursorLockMode _previousCursorLock;
-        private bool _previousCursorVisible;
 
         [Zenject.Inject]
         private void Construct(ITripSessionService tripSession, IPauseService pauseService,
@@ -77,6 +82,8 @@ namespace ProjectSparks.UI
             _tripSession.Changed += Refresh;
             _pauseService.PauseChanged += HandlePauseChanged;
             _openButton.onClick.AddListener(Open);
+            if (_pauseOpenButton != null)
+                _pauseOpenButton.onClick.AddListener(RequestReturn);
             _continueButton.onClick.AddListener(Close);
             _confirmButton.onClick.AddListener(Confirm);
             _isSubscribed = true;
@@ -94,6 +101,11 @@ namespace ProjectSparks.UI
             _tripSession.Changed -= Refresh;
             _pauseService.PauseChanged -= HandlePauseChanged;
             _openButton.onClick.RemoveListener(Open);
+            if (_pauseOpenButton != null)
+            {
+                _pauseOpenButton.onClick.RemoveListener(RequestReturn);
+                _pauseOpenButton.gameObject.SetActive(false);
+            }
             _continueButton.onClick.RemoveListener(Close);
             _confirmButton.onClick.RemoveListener(Confirm);
             _isSubscribed = false;
@@ -101,24 +113,31 @@ namespace ProjectSparks.UI
             _openButton.gameObject.SetActive(false);
         }
 
+        public void RequestReturn()
+        {
+            if (!isActiveAndEnabled || _isOpen || _isBusy ||
+                (_pauseService.IsPaused && !_pauseService.IsPauseMenuVisible))
+                return;
+            if (_tripSession.State == TripSessionState.Succeeded || _tripSession.State == TripSessionState.Confirmed)
+                Open();
+            else if (_tripExitView != null)
+                _tripExitView.RequestExitTo(_shelterSceneName);
+        }
+
         private void Open()
         {
-            if (_isOpen || _pauseService.IsPaused ||
+            if (_isOpen || (_pauseService.IsPaused && !_pauseService.IsPauseMenuVisible) ||
                 (_tripSession.State != TripSessionState.Succeeded && _tripSession.State != TripSessionState.Confirmed))
             {
                 return;
             }
 
-            _previousCursorLock = Cursor.lockState;
-            _previousCursorVisible = Cursor.visible;
             _isOpen = true;
             _statusText.text = _tripSession.State == TripSessionState.Confirmed
                 ? "Награды сохранены. Можно повторить переход в убежище."
                 : "Подтвердите возврат, чтобы сохранить награды поездки.";
             _panel.SetActive(true);
             _pauseService.SetPaused(true, false);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
             Refresh();
             _continueButton.Select();
         }
@@ -146,8 +165,6 @@ namespace ProjectSparks.UI
                 _panel.SetActive(false);
             }
 
-            Cursor.lockState = _previousCursorLock;
-            Cursor.visible = _previousCursorVisible;
             if (_pauseService.IsPaused && !_pauseService.IsPauseMenuVisible)
             {
                 _pauseService.SetPaused(false);
@@ -188,7 +205,7 @@ namespace ProjectSparks.UI
                 Close();
             }
 
-            _openButton.gameObject.SetActive(succeeded && !_isOpen && !_pauseService.IsPaused);
+            RefreshReturnButtons(succeeded);
             if (!_isOpen)
             {
                 return;
@@ -206,6 +223,20 @@ namespace ProjectSparks.UI
                 $"Фрукты бега: {_tripSession.GetFruitAmount(FruitType.Run)}\n" +
                 $"Фрукты силы: {_tripSession.GetFruitAmount(FruitType.Power)}\n" +
                 $"Фрукты выносливости: {_tripSession.GetFruitAmount(FruitType.Stamina)}";
+        }
+
+        private void LateUpdate()
+        {
+            if (_isSubscribed)
+                RefreshReturnButtons(_tripSession.State == TripSessionState.Succeeded ||
+                    _tripSession.State == TripSessionState.Confirmed);
+        }
+
+        private void RefreshReturnButtons(bool succeeded)
+        {
+            _openButton.gameObject.SetActive(_showGameplayReturnButton && succeeded && !_isOpen && !_pauseService.IsPaused);
+            if (_pauseOpenButton != null)
+                _pauseOpenButton.gameObject.SetActive(!_isOpen);
         }
 
         private void Confirm()

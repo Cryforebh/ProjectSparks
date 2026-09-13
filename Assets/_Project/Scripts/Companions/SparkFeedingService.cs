@@ -4,40 +4,35 @@ namespace ProjectSparks.Companions
 {
     public sealed class SparkFeedingService : ISparkFeedingService
     {
-        private const int PrimaryIncrease = 5;
-        private const int SecondaryIncrease = 2;
+        private readonly SparkBalanceSettings _settings;
 
         private readonly ISparkProgressService _sparkProgressService;
 
-        public SparkFeedingService(ISparkProgressService sparkProgressService)
+        public SparkFeedingService(ISparkProgressService sparkProgressService, SparkBalanceSettings settings)
         {
             _sparkProgressService = sparkProgressService;
+            _settings = settings;
         }
 
         public SparkStatValues GetIncrease(FruitType fruitType)
         {
-            return new SparkStatValues(
-                fruitType == FruitType.Swim ? PrimaryIncrease : SecondaryIncrease,
-                fruitType == FruitType.Fly ? PrimaryIncrease : SecondaryIncrease,
-                fruitType == FruitType.Run ? PrimaryIncrease : SecondaryIncrease,
-                fruitType == FruitType.Power ? PrimaryIncrease : SecondaryIncrease,
-                fruitType == FruitType.Stamina ? PrimaryIncrease : SecondaryIncrease);
+            return _settings.GetFruitIncrease(fruitType);
         }
 
-        public bool CanFeed(CompanionType companionType, FruitType fruitType)
+        public bool CanFeed(string sparkId, FruitType fruitType)
         {
-            return companionType != CompanionType.None;
+            return _sparkProgressService.Contains(sparkId) && System.Enum.IsDefined(typeof(FruitType), fruitType);
         }
 
-        public bool TryFeed(CompanionType companionType, FruitType fruitType)
+        public bool TryFeed(string sparkId, FruitType fruitType)
         {
-            if (!CanFeed(companionType, fruitType))
+            if (!CanFeed(sparkId, fruitType))
             {
                 return false;
             }
 
             return _sparkProgressService.AddStats(
-                companionType,
+                sparkId,
                 GetIncrease(fruitType));
         }
     }

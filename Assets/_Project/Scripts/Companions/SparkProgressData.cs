@@ -6,8 +6,8 @@ namespace ProjectSparks.Companions
     [Serializable]
     public sealed class SparkProgressData
     {
-        [Tooltip("Тип Искры, которой принадлежат данные.")]
-        [SerializeField] private CompanionType _companionType;
+        [Tooltip("Постоянный идентификатор конкретной Искры.")]
+        [SerializeField] private string _id;
         [Tooltip("Пользовательское имя Искры.")]
         [SerializeField] private string _displayName;
         [Tooltip("Значение характеристики плавания.")]
@@ -22,7 +22,7 @@ namespace ProjectSparks.Companions
         [SerializeField] private int _stamina;
 
         public SparkProgressData(
-            CompanionType companionType,
+            string id,
             string displayName,
             int swim,
             int fly,
@@ -30,7 +30,7 @@ namespace ProjectSparks.Companions
             int power,
             int stamina)
         {
-            _companionType = companionType;
+            _id = id;
             _displayName = displayName ?? string.Empty;
             _swim = Math.Max(0, swim);
             _fly = Math.Max(0, fly);
@@ -39,7 +39,8 @@ namespace ProjectSparks.Companions
             _stamina = Math.Max(0, stamina);
         }
 
-        public CompanionType CompanionType => _companionType;
+        public string Id => _id;
+        public SparkStatValues Stats => new SparkStatValues(_swim, _fly, _run, _power, _stamina);
         public string DisplayName => _displayName;
 
         public int GetStat(SparkStatType statType)

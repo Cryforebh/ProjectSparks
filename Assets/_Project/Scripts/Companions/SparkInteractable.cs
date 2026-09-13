@@ -34,10 +34,8 @@ namespace ProjectSparks.Companions
         [Header("Искра")]
         [Tooltip("Имя Искры, которое отображается в интерфейсе осмотра.")]
         [SerializeField] private string _displayName = "Искра";
-        [Tooltip("Игровой тип способности этой Искры.")]
-        [SerializeField] private CompanionType _companionType = CompanionType.Collector;
-        [Tooltip("Краткое описание способности Искры.")]
-        [SerializeField, TextArea] private string _abilityDescription = "Увеличивает радиус сбора ресурсов на 50%.";
+        [Tooltip("Постоянный уникальный ID Искры, совпадающий с ее записью прогресса.")]
+        [SerializeField] private string _sparkId = SparkIds.First;
         [Tooltip("Коллайдеры Искры, активные только в состоянии Стоит.")]
         [SerializeField] private Collider[] _colliders;
 
@@ -54,14 +52,12 @@ namespace ProjectSparks.Companions
         public event Action<SparkBehaviourState> StateChanged;
 
         public string DisplayName => _sparkProgressService != null
-            ? _sparkProgressService.GetProgress(_companionType).DisplayName
+            ? _sparkProgressService.GetProgress(_sparkId).DisplayName
             : _displayName;
-        public string AbilityDescription => _abilityDescription;
-        public CompanionType CompanionType => _companionType;
+        public string Id => _sparkId;
         public HeldItemType ItemType => HeldItemType.Spark;
         public Transform ItemTransform => transform;
-        public SparkBehaviourState State { get; private set; } =
-            SparkBehaviourState.Standing;
+        public SparkBehaviourState State { get; private set; } = SparkBehaviourState.Standing;
         public string InteractionPrompt =>
             _handsService.HeldItem is IFruitItem
                 ? "Покормить Искру"
@@ -71,10 +67,7 @@ namespace ProjectSparks.Companions
                 || _handsService.HeldItem is IFruitItem);
 
         [Inject]
-        private void Construct(
-            IPlayerHandsService handsService,
-            ISparkProgressService sparkProgressService,
-            IShelterInteractionRequestService requestService)
+        private void Construct(IPlayerHandsService handsService, ISparkProgressService sparkProgressService, IShelterInteractionRequestService requestService)
         {
             _handsService = handsService;
             _sparkProgressService = sparkProgressService;
@@ -170,9 +163,7 @@ namespace ProjectSparks.Companions
             SetCollidersEnabled(State == SparkBehaviourState.Standing);
         }
 
-        private static bool CanTransition(
-            SparkBehaviourState currentState,
-            SparkBehaviourState nextState)
+        private static bool CanTransition(SparkBehaviourState currentState, SparkBehaviourState nextState)
         {
             return currentState switch
             {

@@ -56,7 +56,7 @@ namespace ProjectSparks.Collectibles
             }
         }
 
-        private void HandleSelectedCompanionChanged(CompanionType companionType)
+        private void HandleSelectedCompanionChanged(string sparkId)
         {
             ApplyPickupRadius();
         }

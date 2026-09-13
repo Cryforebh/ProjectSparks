@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ccb43198fb345ccafe0c9daf353c1a6, type: 3}
+  m_Name: SparkBalanceSettings
+  m_EditorClassIdentifier: 
+  _pickupRadius:
+    _stat: 3
+    _unlockAt: 10
+    _maximumAt: 50
+    _initialBonus: 0.5
+    _maximumBonus: 1
+  _boostSaving:
+    _stat: 4
+    _unlockAt: 10
+    _maximumAt: 50
+    _initialBonus: 0.25
+    _maximumBonus: 0.5
+  _primaryFruitIncrease: 5
+  _secondaryFruitIncrease: 2

@@ -14,9 +14,9 @@ namespace ProjectSparks.UI
     public sealed class ShelterView : MonoBehaviour
     {
         [Header("Выбор компаньона")]
-        [Tooltip("Кнопка выбора Собирателя.")]
+        [Tooltip("Кнопка выбора первой стартовой Искры.")]
         [SerializeField] private Button _collectorButton;
-        [Tooltip("Кнопка выбора Механика.")]
+        [Tooltip("Кнопка выбора второй стартовой Искры.")]
         [SerializeField] private Button _mechanicButton;
         [Tooltip("Текст текущего выбранного компаньона.")]
         [SerializeField] private TMP_Text _selectedCompanionText;
@@ -130,7 +130,7 @@ namespace ProjectSparks.UI
         {
             if (_isReady)
             {
-                _companionService.Select(CompanionType.Collector);
+                _companionService.Select(SparkIds.First);
             }
         }
 
@@ -138,13 +138,13 @@ namespace ProjectSparks.UI
         {
             if (_isReady)
             {
-                _companionService.Select(CompanionType.Mechanic);
+                _companionService.Select(SparkIds.Second);
             }
         }
 
         private void HandleStartTripClicked()
         {
-            if (_isReady && _companionService.SelectedCompanion != CompanionType.None)
+            if (_isReady && _companionService.SelectedCompanion != string.Empty)
             {
                 LoadSceneAsync(_gameSceneName).Forget();
             }
@@ -155,7 +155,7 @@ namespace ProjectSparks.UI
             LoadSceneAsync(_mainMenuSceneName).Forget();
         }
 
-        private void HandleSelectedCompanionChanged(CompanionType companionType)
+        private void HandleSelectedCompanionChanged(string sparkId)
         {
             RefreshCompanionSelection();
         }
@@ -200,11 +200,11 @@ namespace ProjectSparks.UI
 
         private void RefreshCompanionSelection()
         {
-            CompanionType selectedCompanion = _companionService.SelectedCompanion;
+            string selectedCompanion = _companionService.SelectedCompanion;
             _selectedCompanionText.text = selectedCompanion switch
             {
-                CompanionType.Collector => "Выбран: Собиратель",
-                CompanionType.Mechanic => "Выбран: Механик",
+                SparkIds.First => "Выбрана Искра 1",
+                SparkIds.Second => "Выбрана Искра 2",
                 _ => "Выберите компаньона"
             };
 
@@ -226,10 +226,10 @@ namespace ProjectSparks.UI
                 return;
             }
 
-            CompanionType selectedCompanion = _companionService.SelectedCompanion;
-            _collectorButton.interactable = selectedCompanion != CompanionType.Collector;
-            _mechanicButton.interactable = selectedCompanion != CompanionType.Mechanic;
-            _startTripButton.interactable = selectedCompanion != CompanionType.None;
+            string selectedCompanion = _companionService.SelectedCompanion;
+            _collectorButton.interactable = selectedCompanion != SparkIds.First;
+            _mechanicButton.interactable = selectedCompanion != SparkIds.Second;
+            _startTripButton.interactable = selectedCompanion != string.Empty;
             _mainMenuButton.interactable = true;
         }
 

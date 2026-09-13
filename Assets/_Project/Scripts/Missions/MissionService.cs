@@ -21,21 +21,21 @@ namespace ProjectSparks.Missions
         public event Action StateChanged;
 
         public MissionPhase Phase => _currentState.Phase;
-        public MissionDefinition ActiveMission { get; private set; }
+        public MissionAssignment ActiveMission { get; private set; }
 
-        public bool TryStart(MissionDefinition mission)
+        public bool TryStart(MissionAssignment mission)
         {
             return mission != null && _currentState.TryStart(this, mission);
         }
 
-        public bool TryPickup(MissionDefinition mission)
+        public bool TryPickup(string pointId)
         {
-            return mission != null && _currentState.TryPickup(this, mission);
+            return !string.IsNullOrWhiteSpace(pointId) && _currentState.TryPickup(this, pointId);
         }
 
-        public bool TryComplete(MissionDefinition mission)
+        public bool TryComplete(string pointId)
         {
-            return mission != null && _currentState.TryComplete(this, mission);
+            return !string.IsNullOrWhiteSpace(pointId) && _currentState.TryComplete(this, pointId);
         }
 
         public void Reset()
@@ -44,12 +44,13 @@ namespace ProjectSparks.Missions
             TransitionTo(_inactiveState);
         }
 
-        internal bool IsActiveMission(MissionDefinition mission)
-        {
-            return ReferenceEquals(ActiveMission, mission);
-        }
+        internal bool IsPickupPoint(string pointId) => ActiveMission != null &&
+            string.Equals(ActiveMission.PickupPointId, pointId, StringComparison.Ordinal);
 
-        internal bool BeginMission(MissionDefinition mission)
+        internal bool IsDeliveryPoint(string pointId) => ActiveMission != null &&
+            string.Equals(ActiveMission.DeliveryPointId, pointId, StringComparison.Ordinal);
+
+        internal bool BeginMission(MissionAssignment mission)
         {
             if (!_tripSession.TryBeginDelivery(mission.Id))
             {

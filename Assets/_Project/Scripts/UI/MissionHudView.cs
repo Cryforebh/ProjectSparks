@@ -60,7 +60,7 @@ namespace ProjectSparks.UI
 
         private void Refresh()
         {
-            MissionDefinition mission = _missionService.ActiveMission;
+            MissionAssignment mission = _missionService.ActiveMission;
             bool hasMission = mission != null && _missionService.Phase != MissionPhase.Inactive;
 
             SetPanelVisible(hasMission);
@@ -80,7 +80,7 @@ namespace ProjectSparks.UI
             }
         }
 
-        private string GetObjectiveText(MissionDefinition mission)
+        private string GetObjectiveText(MissionAssignment mission)
         {
             switch (_missionService.Phase)
             {

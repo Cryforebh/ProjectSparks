@@ -4081,10 +4081,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _displayName: "\u0418\u0441\u043A\u0440\u0430"
-  _companionType: 1
-  _abilityDescription: "\u0423\u0432\u0435\u043B\u0438\u0447\u0438\u0432\u0430\u0435\u0442
-    \u0440\u0430\u0434\u0438\u0443\u0441 \u0441\u0431\u043E\u0440\u0430 \u0440\u0435\u0441\u0443\u0440\u0441\u043E\u0432
-    \u043D\u0430 50%."
+  _sparkId: spark_starter_01
   _colliders:
   - {fileID: 858484858}
   _eatingDuration: 1
@@ -7360,10 +7357,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _displayName: "\u041C\u0435\u0445\u0430\u043D\u0438\u043A"
-  _companionType: 2
-  _abilityDescription: "\u0421\u043D\u0438\u0436\u0430\u0435\u0442 \u0440\u0430\u0441\u0445\u043E\u0434
-    \u0437\u0430\u0440\u044F\u0434\u0430 \u0443\u0441\u043A\u043E\u0440\u0435\u043D\u0438\u044F
-    \u043D\u0430 25%."
+  _sparkId: spark_starter_02
   _colliders:
   - {fileID: 210518663}
   _eatingDuration: 1

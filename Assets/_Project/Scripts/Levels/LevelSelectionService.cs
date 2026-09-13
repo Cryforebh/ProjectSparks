@@ -15,7 +15,7 @@ namespace ProjectSparks.Levels
         public event Action OpenRequested;
         public LevelCatalog Catalog { get; }
         public bool IsBusy { get; private set; }
-        public bool HasCompanion => _progress.IsLoaded && _companions.SelectedCompanion != CompanionType.None;
+        public bool HasCompanion => _progress.IsLoaded && _companions.SelectedCompanion != string.Empty;
 
         public LevelSelectionService(LevelCatalog catalog, IProgressService progress,
             ICompanionService companions, ISceneTransitionService transition)

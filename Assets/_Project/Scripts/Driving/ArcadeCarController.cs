@@ -77,6 +77,7 @@ namespace ProjectSparks.Driving
         private float _smoothedSteer;
 
         public Rigidbody Body => _body;
+        public Vector3 Position => transform.position;
         public float SpeedKph => _body == null ? 0f : _body.linearVelocity.magnitude * 3.6f;
         public float ForwardSpeed => _body == null ? 0f : Vector3.Dot(_body.linearVelocity, transform.forward);
         public float MaxForwardSpeed => _maxForwardSpeed;

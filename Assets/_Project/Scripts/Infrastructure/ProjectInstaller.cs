@@ -12,22 +12,22 @@ namespace ProjectSparks.Infrastructure
     {
         [Tooltip("Общий список локаций для главного меню и убежища.")]
         [SerializeField] private LevelCatalog _levelCatalog;
+        [Tooltip("Общие настройки роста способностей и прибавок от фруктов для всех Искр.")]
+        [SerializeField] private SparkBalanceSettings _sparkBalance;
 
         public override void InstallBindings()
         {
+            if (_sparkBalance == null)
+                throw new ZenjectException("В ProjectInstaller назначьте Spark Balance Settings.");
+            if (!_sparkBalance.TryValidate(out string balanceError))
+                throw new ZenjectException(balanceError);
+            Container.Bind<SparkBalanceSettings>().FromInstance(_sparkBalance).AsSingle();
+            Container.Bind<SparkDevelopmentCalculator>().AsSingle();
             Container.Bind<LevelCatalog>().FromInstance(_levelCatalog).AsSingle();
             Container.Bind<LevelSelectionService>().AsSingle();
 
             Container
-                .Bind<ICompanionAbility>().To<CollectorCompanionAbility>()
-                .AsSingle();
-
-            Container
-                .Bind<ICompanionAbility>().To<MechanicCompanionAbility>()
-                .AsSingle();
-
-            Container
-                .Bind<ICompanionService>().To<CompanionService>()
+                .BindInterfacesTo<CompanionService>()
                 .AsSingle();
 
             Container

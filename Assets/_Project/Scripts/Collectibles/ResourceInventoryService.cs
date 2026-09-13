@@ -84,16 +84,9 @@ namespace ProjectSparks.Collectibles
             return true;
         }
 
-        public void Restore(int fruitCount, int capsuleCount)
+        public void RestoreCapsules(int capsuleCount)
         {
-            int restoredFruitCount = Math.Max(0, fruitCount);
             int restoredCapsuleCount = Math.Max(0, capsuleCount);
-
-            if (FruitCount != restoredFruitCount)
-            {
-                FruitCount = restoredFruitCount;
-                AmountChanged?.Invoke(ResourceType.Fruit, FruitCount);
-            }
 
             if (CapsuleCount != restoredCapsuleCount)
             {
@@ -124,12 +117,6 @@ namespace ProjectSparks.Collectibles
                 restoredTotal = checked(restoredTotal + restoredAmounts[index]);
             }
 
-            if (restoredTotal == 0 && FruitCount > 0)
-            {
-                restoredAmounts[(int)FruitType.Fly] = FruitCount;
-                restoredTotal = FruitCount;
-            }
-
             for (int index = 0; index < _fruitAmounts.Length; index++)
             {
                 if (_fruitAmounts[index] == restoredAmounts[index])
@@ -152,18 +139,8 @@ namespace ProjectSparks.Collectibles
 
         public void Reset()
         {
-            for (int index = 0; index < _fruitAmounts.Length; index++)
-            {
-                if (_fruitAmounts[index] == 0)
-                {
-                    continue;
-                }
-
-                _fruitAmounts[index] = 0;
-                FruitAmountChanged?.Invoke((FruitType)index, 0);
-            }
-
-            Restore(0, 0);
+            RestoreFruits(0, 0, 0, 0, 0);
+            RestoreCapsules(0);
         }
 
         private static int GetFruitIndex(FruitType fruitType)

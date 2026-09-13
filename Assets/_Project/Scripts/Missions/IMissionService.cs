@@ -7,11 +7,11 @@ namespace ProjectSparks.Missions
         event Action StateChanged;
 
         MissionPhase Phase { get; }
-        MissionDefinition ActiveMission { get; }
+        MissionAssignment ActiveMission { get; }
 
-        bool TryStart(MissionDefinition mission);
-        bool TryPickup(MissionDefinition mission);
-        bool TryComplete(MissionDefinition mission);
+        bool TryStart(MissionAssignment mission);
+        bool TryPickup(string pointId);
+        bool TryComplete(string pointId);
         void Reset();
     }
 }

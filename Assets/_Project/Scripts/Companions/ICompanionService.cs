@@ -4,12 +4,12 @@ namespace ProjectSparks.Companions
 {
     public interface ICompanionService
     {
-        event Action<CompanionType> SelectedCompanionChanged;
+        event Action<string> SelectedCompanionChanged;
 
-        CompanionType SelectedCompanion { get; }
+        string SelectedCompanion { get; }
 
-        bool Select(CompanionType companionType);
-        void Restore(CompanionType companionType);
+        bool Select(string sparkId);
+        void Restore(string sparkId);
         float ModifyPickupRadius(float baseRadius);
         float ModifyBoostConsumption(float baseConsumption);
     }

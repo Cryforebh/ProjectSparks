@@ -70,6 +70,7 @@ namespace ProjectSparks.UI
         private ISparkFeedingService _feedingService;
         private IFruitWorldService _fruitWorldService;
         private IShelterInteractionRequestService _requestService;
+        private SparkBalanceSettings _balance;
         private IProgressService _progressService;
         private ISparkProfile _currentSpark;
         private IFruitItem _currentFruit;
@@ -86,7 +87,7 @@ namespace ProjectSparks.UI
             ISparkFeedingService feedingService,
             IFruitWorldService fruitWorldService,
             IShelterInteractionRequestService requestService,
-            IProgressService progressService)
+            IProgressService progressService, SparkBalanceSettings balance)
         {
             _handsService = handsService;
             _controlService = controlService;
@@ -96,6 +97,7 @@ namespace ProjectSparks.UI
             _fruitWorldService = fruitWorldService;
             _requestService = requestService;
             _progressService = progressService;
+            _balance = balance;
         }
 
         private void Start()
@@ -213,7 +215,6 @@ namespace ProjectSparks.UI
 
             _currentFruit = null;
             _isFeedingMode = false;
-            _abilityText.text = _currentSpark.AbilityDescription;
             OpenPanels();
             RefreshView();
         }
@@ -237,15 +238,15 @@ namespace ProjectSparks.UI
             RefreshView();
         }
 
-        private void HandleSelectedCompanionChanged(CompanionType companionType)
+        private void HandleSelectedCompanionChanged(string sparkId)
         {
             RefreshSelection();
         }
 
-        private void HandleSparkChanged(CompanionType companionType)
+        private void HandleSparkChanged(string sparkId)
         {
             if (_currentSpark != null
-                && _currentSpark.CompanionType == companionType)
+                && _currentSpark.Id == sparkId)
             {
                 RefreshView();
             }
@@ -255,7 +256,7 @@ namespace ProjectSparks.UI
         {
             if (_isReady && _currentSpark != null)
             {
-                _companionService.Select(_currentSpark.CompanionType);
+                _companionService.Select(_currentSpark.Id);
             }
         }
 
@@ -280,9 +281,9 @@ namespace ProjectSparks.UI
                 return;
             }
 
-            CompanionType companionType = _currentSpark.CompanionType;
+            string sparkId = _currentSpark.Id;
             FruitType fruitType = _currentFruit.FruitType;
-            if (!_feedingService.CanFeed(companionType, fruitType)
+            if (!_feedingService.CanFeed(sparkId, fruitType)
                 || _currentSpark is not ISparkStateController stateController
                 || !stateController.TryStartEating())
             {
@@ -290,7 +291,7 @@ namespace ProjectSparks.UI
             }
 
             if (!_fruitWorldService.TryConsumeHeldFruit()
-                || !_feedingService.TryFeed(companionType, fruitType))
+                || !_feedingService.TryFeed(sparkId, fruitType))
             {
                 stateController.CompleteEating();
                 return;
@@ -304,7 +305,7 @@ namespace ProjectSparks.UI
             if (_isReady && _currentSpark != null)
             {
                 _sparkProgressService.Rename(
-                    _currentSpark.CompanionType,
+                    _currentSpark.Id,
                     _nameInputField.text);
             }
         }
@@ -319,7 +320,7 @@ namespace ProjectSparks.UI
             }
 
             SparkProgressData progress = _sparkProgressService.GetProgress(
-                _currentSpark.CompanionType);
+                _currentSpark.Id);
             _nameText.text = progress.DisplayName;
             _nameInputField.SetTextWithoutNotify(progress.DisplayName);
             _swimValueText.text = progress
@@ -338,6 +339,11 @@ namespace ProjectSparks.UI
                 .GetStat(SparkStatType.Stamina)
                 .ToString();
 
+            _abilityText.enableAutoSizing = true;
+            _abilityText.fontSizeMin = 16f;
+            _abilityText.fontSizeMax = 30f;
+            _abilityText.text = DescribeAbility("Радиус сбора", _balance.PickupRadius, progress)
+                + "\n\n" + DescribeAbility("Экономия ускорения", _balance.BoostSaving, progress);
             SetFeedingMode(_isFeedingMode);
             if (_isFeedingMode && _currentFruit != null)
             {
@@ -350,10 +356,32 @@ namespace ProjectSparks.UI
             }
         }
 
+        private static string DescribeAbility(string title, SparkAbilityGrowth growth, SparkProgressData progress)
+        {
+            string stat = growth.Stat switch
+            {
+                SparkStatType.Swim => "Плавание", SparkStatType.Fly => "Полет",
+                SparkStatType.Run => "Бег", SparkStatType.Power => "Сила", _ => "Выносливость"
+            };
+            int value = progress.GetStat(growth.Stat);
+            return value < growth.UnlockAt
+                ? $"{title}: закрыто\n{stat}: {value}/{growth.UnlockAt}"
+                : $"{title}: +{growth.Evaluate(progress.Stats) * 100f:0.#}%";
+        }
+
         private void RefreshFeedingPreview()
         {
             SparkStatValues increase = _feedingService.GetIncrease(
                 _currentFruit.FruitType);
+            SparkProgressData current = _sparkProgressService.GetProgress(_currentSpark.Id);
+            int Add(SparkStatType stat) => (int)System.Math.Min(int.MaxValue,
+                (long)current.GetStat(stat) + increase.GetValue(stat));
+            var future = new SparkProgressData(current.Id, current.DisplayName,
+                Add(SparkStatType.Swim), Add(SparkStatType.Fly), Add(SparkStatType.Run),
+                Add(SparkStatType.Power), Add(SparkStatType.Stamina));
+            _abilityText.text += "\n\nПосле кормления:\n"
+                + DescribeAbility("Сбор", _balance.PickupRadius, future) + "\n"
+                + DescribeAbility("Экономия", _balance.BoostSaving, future);
             _swimIncreaseText.text = $"+{increase.Swim}";
             _flyIncreaseText.text = $"+{increase.Fly}";
             _runIncreaseText.text = $"+{increase.Run}";
@@ -361,7 +389,7 @@ namespace ProjectSparks.UI
             _staminaIncreaseText.text = $"+{increase.Stamina}";
             _feedButton.interactable = _isReady
                 && _feedingService.CanFeed(
-                    _currentSpark.CompanionType,
+                    _currentSpark.Id,
                     _currentFruit.FruitType);
         }
 
@@ -408,7 +436,7 @@ namespace ProjectSparks.UI
             }
 
             bool isSelected =
-                _companionService.SelectedCompanion == _currentSpark.CompanionType;
+                _companionService.SelectedCompanion == _currentSpark.Id;
             _selectionStateText.text = isSelected
                 ? "Выбрана активным компаньоном"
                 : "Можно выбрать активным компаньоном";

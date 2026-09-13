@@ -4,13 +4,15 @@ namespace ProjectSparks.Companions
 {
     public interface ISparkProgressService
     {
-        event Action<CompanionType> SparkChanged;
+        event Action<string> SparkChanged;
 
-        SparkProgressData GetProgress(CompanionType companionType);
-        bool Rename(CompanionType companionType, string displayName);
-        bool AddStat(CompanionType companionType, SparkStatType statType, int amount);
-        bool AddStats(CompanionType companionType, SparkStatValues amounts);
+        SparkProgressData GetProgress(string sparkId);
+        bool Rename(string sparkId, string displayName);
+        bool AddStat(string sparkId, SparkStatType statType, int amount);
+        bool AddStats(string sparkId, SparkStatValues amounts);
         void Restore(SparkProgressData progress);
         void Reset();
+        bool Contains(string id);
+        SparkProgressData[] GetAll();
     }
 }

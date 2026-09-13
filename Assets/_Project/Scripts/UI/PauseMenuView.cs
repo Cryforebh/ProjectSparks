@@ -21,6 +21,9 @@ namespace ProjectSparks.UI
         [Tooltip("Подтверждение выхода из поездки. В сценах без поездки можно не назначать.")]
         [SerializeField] private TripExitView _tripExitView;
 
+        [Tooltip("Управлять курсором в автомобильной сцене: скрывать во время езды и показывать при любой паузе.")]
+        [SerializeField] private bool _manageDrivingCursor;
+
         private IPauseService _pauseService;
         private ISceneLoader _sceneLoader;
 
@@ -39,6 +42,17 @@ namespace ProjectSparks.UI
             _resumeButton.onClick.AddListener(HandleResumeClicked);
             _mainMenuButton.onClick.AddListener(HandleMainMenuClicked);
             SetVisible(_pauseService.IsPauseMenuVisible);
+        }
+
+        private void LateUpdate()
+        {
+            if (!_manageDrivingCursor || _pauseService == null)
+                return;
+            CursorLockMode mode = _pauseService.IsPaused ? CursorLockMode.None : CursorLockMode.Locked;
+            if (Cursor.lockState != mode)
+                Cursor.lockState = mode;
+            if (Cursor.visible != _pauseService.IsPaused)
+                Cursor.visible = _pauseService.IsPaused;
         }
 
         private void OnDestroy()

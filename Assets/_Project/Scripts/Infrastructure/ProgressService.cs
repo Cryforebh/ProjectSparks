@@ -66,18 +66,18 @@ namespace ProjectSparks.Infrastructure
             catch (Exception exception)
             {
                 Debug.LogException(exception);
-                progress = new GameProgressData(0, CompanionType.None, 0, 0);
+                progress = new GameProgressData(0, string.Empty, 0);
             }
 
             _lastCommittedTripId = progress.LastCommittedTripId;
             _economyService.Restore(progress.Balance);
-            _companionService.Restore(progress.SelectedCompanion);
             _sparkProgressService.Reset();
-            _sparkProgressService.Restore(progress.CollectorSpark);
-            _sparkProgressService.Restore(progress.MechanicSpark);
-            _resourceInventoryService.Restore(
-                progress.FruitCount,
-                progress.CapsuleCount);
+            if (progress.Sparks != null)
+            {
+                foreach (SparkProgressData spark in progress.Sparks) _sparkProgressService.Restore(spark);
+            }
+            _companionService.Restore(progress.SelectedCompanion);
+            _resourceInventoryService.RestoreCapsules(progress.CapsuleCount);
             _resourceInventoryService.RestoreFruits(
                 progress.SwimFruitCount,
                 progress.FlyFruitCount,
@@ -100,7 +100,7 @@ namespace ProjectSparks.Infrastructure
             {
                 _ignoreProgressChanges = true;
                 _economyService.Restore(0);
-                _companionService.Restore(CompanionType.None);
+                _companionService.Restore(string.Empty);
                 _sparkProgressService.Reset();
                 _resourceInventoryService.Reset();
                 _lastCommittedTripId = null;
@@ -145,16 +145,13 @@ namespace ProjectSparks.Infrastructure
                     GameProgressData progress = new GameProgressData(
                         checked(_economyService.Balance + result.Coins),
                         _companionService.SelectedCompanion,
-                        checked(_resourceInventoryService.FruitCount + result.FruitCount),
                         checked(_resourceInventoryService.CapsuleCount + result.CapsuleCount),
-                        _sparkProgressService.GetProgress(CompanionType.Collector),
-                        _sparkProgressService.GetProgress(CompanionType.Mechanic),
                         checked(_resourceInventoryService.GetFruitAmount(FruitType.Swim) + result.GetFruitAmount(FruitType.Swim)),
                         checked(_resourceInventoryService.GetFruitAmount(FruitType.Fly) + result.GetFruitAmount(FruitType.Fly)),
                         checked(_resourceInventoryService.GetFruitAmount(FruitType.Run) + result.GetFruitAmount(FruitType.Run)),
                         checked(_resourceInventoryService.GetFruitAmount(FruitType.Power) + result.GetFruitAmount(FruitType.Power)),
                         checked(_resourceInventoryService.GetFruitAmount(FruitType.Stamina) + result.GetFruitAmount(FruitType.Stamina)),
-                        result.SessionId);
+                        result.SessionId, _sparkProgressService.GetAll());
                     await _saveService.SaveAsync(progress, linkedCancellation.Token);
                     _pendingTripCommit = progress;
                 }
@@ -166,7 +163,7 @@ namespace ProjectSparks.Infrastructure
 
                 _ignoreProgressChanges = true;
                 _economyService.Restore(_pendingTripCommit.Balance);
-                _resourceInventoryService.Restore(_pendingTripCommit.FruitCount, _pendingTripCommit.CapsuleCount);
+                _resourceInventoryService.RestoreCapsules(_pendingTripCommit.CapsuleCount);
                 _resourceInventoryService.RestoreFruits(
                     _pendingTripCommit.SwimFruitCount, _pendingTripCommit.FlyFruitCount,
                     _pendingTripCommit.RunFruitCount, _pendingTripCommit.PowerFruitCount,
@@ -214,7 +211,7 @@ namespace ProjectSparks.Infrastructure
             RequestSave();
         }
 
-        private void OnSelectedCompanionChanged(CompanionType companionType)
+        private void OnSelectedCompanionChanged(string sparkId)
         {
             RequestSave();
         }
@@ -224,7 +221,7 @@ namespace ProjectSparks.Infrastructure
             RequestSave();
         }
 
-        private void OnSparkChanged(CompanionType companionType)
+        private void OnSparkChanged(string sparkId)
         {
             RequestSave();
         }
@@ -257,16 +254,13 @@ namespace ProjectSparks.Infrastructure
                         GameProgressData progress = _pendingTripCommit ?? new GameProgressData(
                             _economyService.Balance,
                             _companionService.SelectedCompanion,
-                            _resourceInventoryService.FruitCount,
                             _resourceInventoryService.CapsuleCount,
-                            _sparkProgressService.GetProgress(CompanionType.Collector),
-                            _sparkProgressService.GetProgress(CompanionType.Mechanic),
                             _resourceInventoryService.GetFruitAmount(FruitType.Swim),
                             _resourceInventoryService.GetFruitAmount(FruitType.Fly),
                             _resourceInventoryService.GetFruitAmount(FruitType.Run),
                             _resourceInventoryService.GetFruitAmount(FruitType.Power),
                             _resourceInventoryService.GetFruitAmount(FruitType.Stamina),
-                            _lastCommittedTripId);
+                            _lastCommittedTripId, _sparkProgressService.GetAll());
                         await _saveService.SaveAsync(progress, _lifetimeCancellation.Token);
                     }
                     finally

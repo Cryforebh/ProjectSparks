@@ -48,21 +48,6 @@ Transform:
   - {fileID: 9087232794557804149}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8197314617584429031
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 709484240605264831}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d1c33544f244bdba3d8d9f2bc06956a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _points:
-  - {fileID: 4888699675212964627}
-  - {fileID: 9087232794557804149}
 --- !u!54 &6177084053944925811
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -220,14 +205,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80a0e32408e49e543811ad1581b4870e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxForwardSpeed: 18
-  _maxReverseSpeed: 3
-  _forwardAcceleration: 6
+  _maxForwardSpeed: 25
+  _maxReverseSpeed: 6
+  _forwardAcceleration: 5
   _reverseAcceleration: 5
-  _brakingAcceleration: 15
+  _brakingAcceleration: 20
   _rollingResistance: 1.6
   _lowSpeedSteering: 75
-  _highSpeedSteering: 45
+  _highSpeedSteering: 55
   _steeringInputResponse: 6.5
   _steeringResponse: 7.5
   _maxSteeringAcceleration: 10
@@ -268,8 +253,8 @@ MonoBehaviour:
   _wheelRearLeft: {fileID: 1257852947758957970}
   _wheelRearRight: {fileID: 4401139810165263899}
   _wheelRadius: 0.38
-  _maxVisualSteer: 40
-  _highSpeedVisualSteer: 8
+  _maxVisualSteer: 42
+  _highSpeedVisualSteer: 16
   _maxBodyRoll: 3.5
 --- !u!114 &7694400296817734484
 MonoBehaviour:
@@ -305,6 +290,21 @@ MonoBehaviour:
     m_Bits: 64
   _disableRigidWheelColliders: 1
   _wheelVisualResponse: 16
+--- !u!114 &8197314617584429031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 709484240605264831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d1c33544f244bdba3d8d9f2bc06956a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _points:
+  - {fileID: 4888699675212964627}
+  - {fileID: 9087232794557804149}
 --- !u!1 &2468447994892186724
 GameObject:
   m_ObjectHideFlags: 0

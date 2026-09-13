@@ -26,6 +26,7 @@ namespace ProjectSparks.UI
         private TripExitService _exitService;
         private ITripSessionService _session;
         private IPauseService _pauseService;
+        private string _destinationScene;
         private bool _isOpen;
         private bool _isBusy;
         private CursorLockMode _previousCursorLock;
@@ -69,13 +70,16 @@ namespace ProjectSparks.UI
             if (_cancelButton != null) _cancelButton.onClick.RemoveListener(Cancel);
         }
 
-        public void RequestExit()
+        public void RequestExit() => RequestExitTo(_mainMenuSceneName);
+
+        public void RequestExitTo(string sceneName)
         {
             if (!isActiveAndEnabled || _isOpen || _isBusy)
             {
                 return;
             }
 
+            _destinationScene = sceneName;
             _previousCursorLock = Cursor.lockState;
             _previousCursorVisible = Cursor.visible;
             _isOpen = true;
@@ -151,16 +155,16 @@ namespace ProjectSparks.UI
         {
             _isBusy = true;
             SetButtonsEnabled(false);
-            _messageText.text = "Возврат в главное меню...";
+            _messageText.text = "Переход...";
             try
             {
-                await _exitService.ExitAsync(_mainMenuSceneName, this.GetCancellationTokenOnDestroy());
+                await _exitService.ExitAsync(_destinationScene, this.GetCancellationTokenOnDestroy());
             }
             catch (Exception exception)
             {
                 if (this != null && _messageText != null)
                 {
-                    _messageText.text = "Не удалось открыть главное меню. Результат поездки не удален. Повторите выход или продолжите игру.";
+                    _messageText.text = "Не удалось выполнить переход. Результат поездки не удален. Повторите выход или продолжите игру.";
                     Debug.LogException(exception, this);
                 }
             }

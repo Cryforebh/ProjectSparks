@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using ProjectSparks.Core;
 using ProjectSparks.Levels;
@@ -11,13 +10,17 @@ namespace ProjectSparks.Missions
     [DisallowMultipleComponent]
     public sealed class MissionSceneStarter : MonoBehaviour
     {
-        [Tooltip("Миссии уровня в порядке выполнения. Каждая должна иметь уникальный идентификатор.")]
-        [SerializeField] private MissionDefinition[] _missions = Array.Empty<MissionDefinition>();
+        [Tooltip("Список складов и мест доставки этой сцены.")]
+        [SerializeField] private MissionScenePoints _scenePoints;
+        [Tooltip("Число доставок, название и награда для случайного режима.")]
+        [SerializeField] private RandomMissionSettings _randomSettings;
+
 
         private IMissionService _missionService;
         private IProgressService _progressService;
         private ITripSessionService _tripSession;
         private LevelCatalog _levelCatalog;
+        private MissionAssignment[] _assignments;
         private int _currentMissionIndex;
         private bool _isSubscribed;
 
@@ -35,12 +38,12 @@ namespace ProjectSparks.Missions
 
         private void Start()
         {
-            if (!ValidateMissions())
+            if (!PrepareAssignments())
             {
                 return;
             }
 
-            if (!_tripSession.TryBegin(_levelCatalog.GetLocationId(gameObject.scene.name), _missions.Length))
+            if (!_tripSession.TryBegin(_levelCatalog.GetLocationId(gameObject.scene.name), _assignments.Length))
             {
                 Debug.LogError("Не удалось начать поездку: сессия уже активна.", this);
                 return;
@@ -57,40 +60,35 @@ namespace ProjectSparks.Missions
             }
         }
 
-        private bool ValidateMissions()
+        private bool PrepareAssignments()
         {
-            if (_missions == null || _missions.Length == 0)
+            if (_scenePoints == null || _scenePoints.gameObject.scene != gameObject.scene)
             {
-                Debug.LogError("В MissionSceneStarter список миссий пуст.", this);
+                Debug.LogError("В MissionSceneStarter назначьте список точек этой сцены.", this);
                 return false;
             }
 
-            var identifiers = new HashSet<string>(StringComparer.Ordinal);
-            for (int index = 0; index < _missions.Length; index++)
+            var random = new System.Random(Guid.NewGuid().GetHashCode());
+            if (!RandomMissionGenerator.TryGenerate(_randomSettings, _scenePoints, random,
+                out _assignments, out string generationError))
             {
-                MissionDefinition mission = _missions[index];
-                if (mission == null || string.IsNullOrWhiteSpace(mission.Id) ||
-                    !identifiers.Add(mission.Id) || mission.Reward < 0)
-                {
-                    Debug.LogError($"Миссия {index + 1}: назначьте задание с уникальным непустым идентификатором и неотрицательной наградой.", this);
-                    return false;
-                }
+                Debug.LogError(generationError, this);
+                return false;
             }
-
             return true;
         }
 
         private void HandleMissionStateChanged()
         {
             if (_missionService.Phase != MissionPhase.Completed ||
-                _currentMissionIndex >= _missions.Length ||
-                !ReferenceEquals(_missionService.ActiveMission, _missions[_currentMissionIndex]))
+                _currentMissionIndex >= _assignments.Length ||
+                !ReferenceEquals(_missionService.ActiveMission, _assignments[_currentMissionIndex]))
             {
                 return;
             }
 
             _currentMissionIndex++;
-            if (_currentMissionIndex < _missions.Length)
+            if (_currentMissionIndex < _assignments.Length)
             {
                 StartCurrentMission();
             }
@@ -98,7 +96,7 @@ namespace ProjectSparks.Missions
 
         private void StartCurrentMission()
         {
-            if (!_missionService.TryStart(_missions[_currentMissionIndex]))
+            if (!_missionService.TryStart(_assignments[_currentMissionIndex]))
             {
                 Debug.LogError($"Не удалось начать миссию {_currentMissionIndex + 1}. Проверьте состояние поездки.", this);
             }

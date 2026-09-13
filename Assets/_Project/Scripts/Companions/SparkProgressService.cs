@@ -7,29 +7,39 @@ namespace ProjectSparks.Companions
     {
         private const int MaxNameLength = 24;
 
-        private readonly Dictionary<CompanionType, SparkProgressData> _progressByType =
-            new Dictionary<CompanionType, SparkProgressData>();
+        private readonly Dictionary<string, SparkProgressData> _progressById =
+            new Dictionary<string, SparkProgressData>();
 
-        public SparkProgressService()
+        private readonly SparkBalanceSettings _balance;
+
+        public SparkProgressService(SparkBalanceSettings balance)
         {
+            _balance = balance;
             ResetValues();
         }
 
-        public event Action<CompanionType> SparkChanged;
-
-        public SparkProgressData GetProgress(CompanionType companionType)
+        public event Action<string> SparkChanged;
+        public bool Contains(string id) => !string.IsNullOrEmpty(id) && _progressById.ContainsKey(id);
+        public SparkProgressData[] GetAll()
         {
-            if (!_progressByType.TryGetValue(companionType, out SparkProgressData progress))
+            var values = new SparkProgressData[_progressById.Count];
+            _progressById.Values.CopyTo(values, 0);
+            return values;
+        }
+
+        public SparkProgressData GetProgress(string sparkId)
+        {
+            if (!_progressById.TryGetValue(sparkId, out SparkProgressData progress))
             {
-                throw new ArgumentOutOfRangeException(nameof(companionType));
+                throw new ArgumentOutOfRangeException(nameof(sparkId));
             }
 
             return progress;
         }
 
-        public bool Rename(CompanionType companionType, string displayName)
+        public bool Rename(string sparkId, string displayName)
         {
-            SparkProgressData current = GetProgress(companionType);
+            SparkProgressData current = GetProgress(sparkId);
             string normalizedName = NormalizeName(displayName);
             if (string.IsNullOrEmpty(normalizedName)
                 || current.DisplayName == normalizedName)
@@ -37,16 +47,16 @@ namespace ProjectSparks.Companions
                 return false;
             }
 
-            _progressByType[companionType] = CopyWith(
+            _progressById[sparkId] = CopyWith(
                 current,
                 normalizedName,
                 new SparkStatValues());
-            SparkChanged?.Invoke(companionType);
+            SparkChanged?.Invoke(sparkId);
             return true;
         }
 
         public bool AddStat(
-            CompanionType companionType,
+            string sparkId,
             SparkStatType statType,
             int amount)
         {
@@ -55,8 +65,8 @@ namespace ProjectSparks.Companions
                 return false;
             }
 
-            SparkProgressData current = GetProgress(companionType);
-            _progressByType[companionType] = CopyWith(
+            SparkProgressData current = GetProgress(sparkId);
+            _progressById[sparkId] = CopyWith(
                 current,
                 current.DisplayName,
                 new SparkStatValues(
@@ -65,12 +75,12 @@ namespace ProjectSparks.Companions
                     statType == SparkStatType.Run ? amount : 0,
                     statType == SparkStatType.Power ? amount : 0,
                     statType == SparkStatType.Stamina ? amount : 0));
-            SparkChanged?.Invoke(companionType);
+            SparkChanged?.Invoke(sparkId);
             return true;
         }
 
         public bool AddStats(
-            CompanionType companionType,
+            string sparkId,
             SparkStatValues amounts)
         {
             if (amounts.Swim == 0
@@ -82,20 +92,20 @@ namespace ProjectSparks.Companions
                 return false;
             }
 
-            SparkProgressData current = GetProgress(companionType);
-            _progressByType[companionType] = CopyWith(
+            SparkProgressData current = GetProgress(sparkId);
+            _progressById[sparkId] = CopyWith(
                 current,
                 current.DisplayName,
                 amounts);
-            SparkChanged?.Invoke(companionType);
+            SparkChanged?.Invoke(sparkId);
             return true;
         }
 
         public void Restore(SparkProgressData progress)
         {
             if (progress == null
-                || progress.CompanionType == CompanionType.None
-                || !_progressByType.ContainsKey(progress.CompanionType))
+                || string.IsNullOrWhiteSpace(progress.Id)
+)
             {
                 return;
             }
@@ -103,25 +113,25 @@ namespace ProjectSparks.Companions
             string restoredName = NormalizeName(progress.DisplayName);
             if (string.IsNullOrEmpty(restoredName))
             {
-                restoredName = GetDefaultName(progress.CompanionType);
+                restoredName = GetDefaultName(progress.Id);
             }
 
-            _progressByType[progress.CompanionType] = new SparkProgressData(
-                progress.CompanionType,
+            _progressById[progress.Id] = new SparkProgressData(
+                progress.Id,
                 restoredName,
                 progress.GetStat(SparkStatType.Swim),
                 progress.GetStat(SparkStatType.Fly),
                 progress.GetStat(SparkStatType.Run),
                 progress.GetStat(SparkStatType.Power),
                 progress.GetStat(SparkStatType.Stamina));
-            SparkChanged?.Invoke(progress.CompanionType);
+            SparkChanged?.Invoke(progress.Id);
         }
 
         public void Reset()
         {
             ResetValues();
-            SparkChanged?.Invoke(CompanionType.Collector);
-            SparkChanged?.Invoke(CompanionType.Mechanic);
+            SparkChanged?.Invoke(SparkIds.First);
+            SparkChanged?.Invoke(SparkIds.Second);
         }
 
         private static SparkProgressData CopyWith(
@@ -137,7 +147,7 @@ namespace ProjectSparks.Companions
             }
 
             return new SparkProgressData(
-                current.CompanionType,
+                current.Id,
                 displayName,
                 GetValue(SparkStatType.Swim),
                 GetValue(SparkStatType.Fly),
@@ -148,30 +158,28 @@ namespace ProjectSparks.Companions
 
         private void ResetValues()
         {
-            _progressByType[CompanionType.Collector] = CreateDefault(
-                CompanionType.Collector);
-            _progressByType[CompanionType.Mechanic] = CreateDefault(
-                CompanionType.Mechanic);
+            _progressById.Clear();
+            _progressById[SparkIds.First] = CreateDefault(
+                SparkIds.First);
+            _progressById[SparkIds.Second] = CreateDefault(
+                SparkIds.Second);
         }
 
-        private static SparkProgressData CreateDefault(CompanionType companionType)
+        private SparkProgressData CreateDefault(string sparkId)
         {
-            return new SparkProgressData(
-                companionType,
-                GetDefaultName(companionType),
-                0,
-                0,
-                0,
-                0,
-                0);
+            SparkAbilityGrowth growth = sparkId == SparkIds.First ? _balance.PickupRadius : _balance.BoostSaving;
+            int Value(SparkStatType stat) => growth.Stat == stat ? growth.UnlockAt : 0;
+            return new SparkProgressData(sparkId, GetDefaultName(sparkId),
+                Value(SparkStatType.Swim), Value(SparkStatType.Fly), Value(SparkStatType.Run),
+                Value(SparkStatType.Power), Value(SparkStatType.Stamina));
         }
 
-        private static string GetDefaultName(CompanionType companionType)
+        private static string GetDefaultName(string sparkId)
         {
-            return companionType switch
+            return sparkId switch
             {
-                CompanionType.Collector => "Искра-Собиратель",
-                CompanionType.Mechanic => "Искра-Механик",
+                SparkIds.First => "Искра 1",
+                SparkIds.Second => "Искра 2",
                 _ => "Искра"
             };
         }

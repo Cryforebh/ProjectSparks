@@ -1,89 +1,41 @@
 using System;
-using System.Collections.Generic;
-
 namespace ProjectSparks.Companions
 {
-    public sealed class CompanionService : ICompanionService
+    public sealed class CompanionService : ICompanionService, IDisposable
     {
-        private readonly Dictionary<CompanionType, ICompanionAbility> _abilities;
-
-        public CompanionService(List<ICompanionAbility> abilities)
+        private readonly ISparkProgressService _progress;
+        private readonly SparkDevelopmentCalculator _calculator;
+        public CompanionService(ISparkProgressService progress, SparkDevelopmentCalculator calculator)
         {
-            _abilities = new Dictionary<CompanionType, ICompanionAbility>();
-
-            foreach (ICompanionAbility ability in abilities)
-            {
-                if (ability == null || ability.CompanionType == CompanionType.None)
-                {
-                    throw new ArgumentException(
-                        "Способность компаньона должна иметь допустимый тип.",
-                        nameof(abilities));
-                }
-
-                if (_abilities.ContainsKey(ability.CompanionType))
-                {
-                    throw new ArgumentException(
-                        $"Для компаньона {ability.CompanionType} зарегистрировано несколько способностей.",
-                        nameof(abilities));
-                }
-
-                _abilities.Add(ability.CompanionType, ability);
-            }
+            _progress = progress;
+            _calculator = calculator;
+            _progress.SparkChanged += HandleSparkChanged;
         }
-
-        public event Action<CompanionType> SelectedCompanionChanged;
-
-        public CompanionType SelectedCompanion { get; private set; }
-
-        public bool Select(CompanionType companionType)
+        public event Action<string> SelectedCompanionChanged;
+        public string SelectedCompanion { get; private set; } = string.Empty;
+        public bool Select(string sparkId)
         {
-            if (!IsAvailable(companionType) || SelectedCompanion == companionType)
-            {
-                return false;
-            }
-
-            SelectedCompanion = companionType;
-            SelectedCompanionChanged?.Invoke(SelectedCompanion);
+            if (!_progress.Contains(sparkId) || SelectedCompanion == sparkId) return false;
+            SelectedCompanion = sparkId;
+            SelectedCompanionChanged?.Invoke(sparkId);
             return true;
         }
-
-        public void Restore(CompanionType companionType)
+        public void Restore(string sparkId)
         {
-            CompanionType restoredCompanion = IsAvailable(companionType)
-                ? companionType
-                : CompanionType.None;
-
-            if (SelectedCompanion == restoredCompanion)
-            {
-                return;
-            }
-
-            SelectedCompanion = restoredCompanion;
-            SelectedCompanionChanged?.Invoke(SelectedCompanion);
+            string restored = _progress.Contains(sparkId) ? sparkId : string.Empty;
+            if (restored == SelectedCompanion) return;
+            SelectedCompanion = restored;
+            SelectedCompanionChanged?.Invoke(restored);
         }
-
-        public float ModifyPickupRadius(float baseRadius)
+        private SparkAbilityEffects Effects => _progress.Contains(SelectedCompanion)
+            ? _calculator.Evaluate(_progress.GetProgress(SelectedCompanion).Stats)
+            : new SparkAbilityEffects(1f, 1f);
+        public float ModifyPickupRadius(float baseRadius) => Math.Max(0f, baseRadius) * Effects.PickupRadiusMultiplier;
+        public float ModifyBoostConsumption(float baseConsumption) => Math.Max(0f, baseConsumption) * Effects.BoostConsumptionMultiplier;
+        private void HandleSparkChanged(string id)
         {
-            return TryGetSelectedAbility(out ICompanionAbility ability)
-                ? ability.ModifyPickupRadius(baseRadius)
-                : Math.Max(0f, baseRadius);
+            if (id == SelectedCompanion) SelectedCompanionChanged?.Invoke(id);
         }
-
-        public float ModifyBoostConsumption(float baseConsumption)
-        {
-            return TryGetSelectedAbility(out ICompanionAbility ability)
-                ? ability.ModifyBoostConsumption(baseConsumption)
-                : Math.Max(0f, baseConsumption);
-        }
-
-        private bool IsAvailable(CompanionType companionType)
-        {
-            return companionType == CompanionType.None || _abilities.ContainsKey(companionType);
-        }
-
-        private bool TryGetSelectedAbility(out ICompanionAbility ability)
-        {
-            return _abilities.TryGetValue(SelectedCompanion, out ability);
-        }
+        public void Dispose() => _progress.SparkChanged -= HandleSparkChanged;
     }
 }

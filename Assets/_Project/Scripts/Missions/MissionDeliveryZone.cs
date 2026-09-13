@@ -4,15 +4,19 @@ using Zenject;
 namespace ProjectSparks.Missions
 {
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(BoxCollider))]
+    [RequireComponent(typeof(BoxCollider), typeof(MissionScenePoint))]
     public sealed class MissionDeliveryZone : MonoBehaviour
     {
-        [Tooltip("Миссия, груз которой принимается в этой зоне.")]
-        [SerializeField] private MissionDefinition _mission;
         [Tooltip("Слой машины, способной активировать зону.")]
         [SerializeField] private LayerMask _vehicleMask;
 
         private IMissionService _missionService;
+        private MissionScenePoint _point;
+
+        private void Awake()
+        {
+            _point = GetComponent<MissionScenePoint>();
+        }
 
         [Inject]
         public void Construct(IMissionService missionService)
@@ -22,12 +26,12 @@ namespace ProjectSparks.Missions
 
         private void OnTriggerEnter(Collider other)
         {
-            if (_mission == null || !IsVehicle(other))
+            if (_point == null || _point.Kind != MissionPointKind.Delivery || !IsVehicle(other))
             {
                 return;
             }
 
-            _missionService.TryComplete(_mission);
+            _missionService.TryComplete(_point.Id);
         }
 
         private bool IsVehicle(Collider other)

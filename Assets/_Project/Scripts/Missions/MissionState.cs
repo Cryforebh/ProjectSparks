@@ -4,17 +4,17 @@ namespace ProjectSparks.Missions
     {
         public abstract MissionPhase Phase { get; }
 
-        public virtual bool TryStart(MissionService context, MissionDefinition mission)
+        public virtual bool TryStart(MissionService context, MissionAssignment mission)
         {
             return false;
         }
 
-        public virtual bool TryPickup(MissionService context, MissionDefinition mission)
+        public virtual bool TryPickup(MissionService context, string pointId)
         {
             return false;
         }
 
-        public virtual bool TryComplete(MissionService context, MissionDefinition mission)
+        public virtual bool TryComplete(MissionService context, string pointId)
         {
             return false;
         }
@@ -24,7 +24,7 @@ namespace ProjectSparks.Missions
     {
         public override MissionPhase Phase => MissionPhase.Inactive;
 
-        public override bool TryStart(MissionService context, MissionDefinition mission)
+        public override bool TryStart(MissionService context, MissionAssignment mission)
         {
             return context.BeginMission(mission);
         }
@@ -34,9 +34,9 @@ namespace ProjectSparks.Missions
     {
         public override MissionPhase Phase => MissionPhase.AwaitingPickup;
 
-        public override bool TryPickup(MissionService context, MissionDefinition mission)
+        public override bool TryPickup(MissionService context, string pointId)
         {
-            if (!context.IsActiveMission(mission))
+            if (!context.IsPickupPoint(pointId))
             {
                 return false;
             }
@@ -50,9 +50,9 @@ namespace ProjectSparks.Missions
     {
         public override MissionPhase Phase => MissionPhase.Delivering;
 
-        public override bool TryComplete(MissionService context, MissionDefinition mission)
+        public override bool TryComplete(MissionService context, string pointId)
         {
-            if (!context.IsActiveMission(mission))
+            if (!context.IsDeliveryPoint(pointId))
             {
                 return false;
             }
@@ -65,7 +65,7 @@ namespace ProjectSparks.Missions
     {
         public override MissionPhase Phase => MissionPhase.Completed;
 
-        public override bool TryStart(MissionService context, MissionDefinition mission)
+        public override bool TryStart(MissionService context, MissionAssignment mission)
         {
             return context.BeginMission(mission);
         }
