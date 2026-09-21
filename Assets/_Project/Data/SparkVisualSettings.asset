@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e01cc16e46ad458794d26530882559b2, type: 3}
+  m_Name: SparkVisualSettings
+  m_EditorClassIdentifier: 
+  _basePrefab: {fileID: 877839981, guid: 33d944c97be3410da1269a79e30b2d52, type: 3}

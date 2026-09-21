@@ -21,6 +21,10 @@ namespace ProjectSparks.Companions
         [Tooltip("Значение характеристики выносливости.")]
         [SerializeField] private int _stamina;
 
+        [Tooltip("Индивидуальный цвет тела Искры, одинаковый в убежище и поездке.")]
+        [SerializeField] private Color _bodyColor;
+        public Color BodyColor => _bodyColor;
+
         public SparkProgressData(
             string id,
             string displayName,
@@ -28,9 +32,10 @@ namespace ProjectSparks.Companions
             int fly,
             int run,
             int power,
-            int stamina)
+            int stamina, Color? bodyColor = null)
         {
             _id = id;
+            _bodyColor = bodyColor ?? Color.white;
             _displayName = displayName ?? string.Empty;
             _swim = Math.Max(0, swim);
             _fly = Math.Max(0, fly);

@@ -123,7 +123,7 @@ namespace ProjectSparks.Companions
                 progress.GetStat(SparkStatType.Fly),
                 progress.GetStat(SparkStatType.Run),
                 progress.GetStat(SparkStatType.Power),
-                progress.GetStat(SparkStatType.Stamina));
+                progress.GetStat(SparkStatType.Stamina), progress.BodyColor);
             SparkChanged?.Invoke(progress.Id);
         }
 
@@ -153,7 +153,7 @@ namespace ProjectSparks.Companions
                 GetValue(SparkStatType.Fly),
                 GetValue(SparkStatType.Run),
                 GetValue(SparkStatType.Power),
-                GetValue(SparkStatType.Stamina));
+                GetValue(SparkStatType.Stamina), current.BodyColor);
         }
 
         private void ResetValues()
@@ -171,7 +171,8 @@ namespace ProjectSparks.Companions
             int Value(SparkStatType stat) => growth.Stat == stat ? growth.UnlockAt : 0;
             return new SparkProgressData(sparkId, GetDefaultName(sparkId),
                 Value(SparkStatType.Swim), Value(SparkStatType.Fly), Value(SparkStatType.Run),
-                Value(SparkStatType.Power), Value(SparkStatType.Stamina));
+                Value(SparkStatType.Power), Value(SparkStatType.Stamina),
+                sparkId == SparkIds.First ? UnityEngine.Color.white : new UnityEngine.Color(0.1f, 0.75f, 0.75f, 1f));
         }
 
         private static string GetDefaultName(string sparkId)

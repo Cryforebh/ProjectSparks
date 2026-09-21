@@ -378,7 +378,7 @@ namespace ProjectSparks.UI
                 (long)current.GetStat(stat) + increase.GetValue(stat));
             var future = new SparkProgressData(current.Id, current.DisplayName,
                 Add(SparkStatType.Swim), Add(SparkStatType.Fly), Add(SparkStatType.Run),
-                Add(SparkStatType.Power), Add(SparkStatType.Stamina));
+                Add(SparkStatType.Power), Add(SparkStatType.Stamina), current.BodyColor);
             _abilityText.text += "\n\nПосле кормления:\n"
                 + DescribeAbility("Сбор", _balance.PickupRadius, future) + "\n"
                 + DescribeAbility("Экономия", _balance.BoostSaving, future);

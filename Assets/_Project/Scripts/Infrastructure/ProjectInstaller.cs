@@ -15,8 +15,15 @@ namespace ProjectSparks.Infrastructure
         [Tooltip("Общие настройки роста способностей и прибавок от фруктов для всех Искр.")]
         [SerializeField] private SparkBalanceSettings _sparkBalance;
 
+        [Tooltip("Общая модель Искры для всех сцен.")]
+        [SerializeField] private SparkVisualSettings _sparkVisualSettings;
+
         public override void InstallBindings()
         {
+            if (_sparkVisualSettings == null || _sparkVisualSettings.BasePrefab == null)
+                throw new ZenjectException("В ProjectInstaller назначьте настройки общего визуала Искры.");
+            Container.Bind<SparkVisualSettings>().FromInstance(_sparkVisualSettings).AsSingle();
+            Container.Bind<SparkVisualFactory>().AsSingle();
             if (_sparkBalance == null)
                 throw new ZenjectException("В ProjectInstaller назначьте Spark Balance Settings.");
             if (!_sparkBalance.TryValidate(out string balanceError))

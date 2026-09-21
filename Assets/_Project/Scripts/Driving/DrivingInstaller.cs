@@ -1,4 +1,5 @@
 using ProjectSparks.Core;
+using ProjectSparks.Companions;
 using UnityEngine;
 using Zenject;
 
@@ -17,6 +18,12 @@ namespace ProjectSparks.Driving
             {
                 throw new ZenjectException("DrivingInstaller: не назначены компоненты машины.");
             }
+
+            PassengerSeat seat = _vehicleController.GetComponent<PassengerSeat>();
+            if (seat == null || seat.Point == null || !seat.Point.IsChildOf(_vehicleController.transform))
+                throw new ZenjectException("DrivingInstaller: на машине назначьте PassengerSeat с дочерней точкой.");
+            Container.Bind<PassengerSeat>().FromInstance(seat).AsSingle();
+            Container.BindInterfacesTo<TripSparkPresenter>().AsSingle();
 
             VehicleCargoPoints cargoPoints = _vehicleController.GetComponent<VehicleCargoPoints>();
             if (cargoPoints == null)
