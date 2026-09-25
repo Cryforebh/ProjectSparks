@@ -9,10 +9,10 @@ namespace ProjectSparks.Companions
     {
         [Tooltip("Характеристика, открывающая и усиливающая способность у любой Искры.")]
         [SerializeField] private SparkStatType _stat;
-        [Tooltip("Минимальное значение характеристики для открытия способности.")]
-        [SerializeField, Min(0)] private int _unlockAt = 10;
-        [Tooltip("Значение характеристики, при котором эффект достигает максимума. Должно быть больше порога открытия.")]
-        [SerializeField, Min(1)] private int _maximumAt = 50;
+        [MinTooltip(0, "Минимальное значение характеристики для открытия способности.")]
+        [SerializeField] private int _unlockAt = 10;
+        [MinTooltip(1, "Значение характеристики, при котором эффект достигает максимума. Должно быть больше порога открытия.")]
+        [SerializeField] private int _maximumAt = 50;
         [Tooltip("Доля эффекта при открытии: 0.5 означает 50 процентов.")]
         [SerializeField, Range(0f, 1f)] private float _initialBonus;
         [Tooltip("Максимальная доля эффекта: 1 означает 100 процентов. Не меньше начального эффекта.")]
@@ -47,17 +47,32 @@ namespace ProjectSparks.Companions
     [CreateAssetMenu(fileName = "SparkBalanceSettings", menuName = "Project Sparks/Spark Balance Settings")]
     public sealed class SparkBalanceSettings : ScriptableObject
     {
-        [Tooltip("Рост радиуса сбора ресурсов. Одинаковые правила для всех Искр.")]
+        [Tooltip("Рост радиуса сбора ресурсов. Одинаковые правила для всех Искр."), Space]
         [SerializeField] private SparkAbilityGrowth _pickupRadius = new SparkAbilityGrowth(SparkStatType.Power, 0.5f, 1f);
-        [Tooltip("Снижение расхода ускорения. Одинаковые правила для всех Искр.")]
+        [Tooltip("Снижение расхода ускорения. Одинаковые правила для всех Искр."), Space]
         [SerializeField] private SparkAbilityGrowth _boostSaving = new SparkAbilityGrowth(SparkStatType.Stamina, 0.25f, 0.5f);
-        [Tooltip("Прибавка к основной характеристике съеденного фрукта.")]
-        [SerializeField, Min(0)] private int _primaryFruitIncrease = 5;
-        [Tooltip("Прибавка к каждой из остальных характеристик от съеденного фрукта.")]
-        [SerializeField, Min(0)] private int _secondaryFruitIncrease = 2;
+        [MinTooltip(0, "Прибавка к основной характеристике съеденного фрукта."), Space]
+        [SerializeField] private int _primaryFruitIncrease = 5;
+        [MinTooltip(0, "Прибавка к каждой из остальных характеристик от съеденного фрукта."), Space]
+        [SerializeField] private int _secondaryFruitIncrease = 2;
+        [MinTooltip(1, "Количество успешных кормлений от маленькой Искры до полностью взрослой."), Space]
+        [SerializeField] private int _feedingsToFullGrowth = 10;
+        [MinTooltip(1, "Значение характеристики полета, при котором уши Искры достигают максимального развития."), Space]
+        [SerializeField] private int _earDevelopmentMaximumAt = 100;
+
+        public int FeedingsToFullGrowth => _feedingsToFullGrowth;
+        public float GrowthPerFeeding => 1f / Mathf.Max(1, _feedingsToFullGrowth);
+        public int EarDevelopmentMaximumAt => _earDevelopmentMaximumAt;
 
         public SparkAbilityGrowth PickupRadius => _pickupRadius;
         public SparkAbilityGrowth BoostSaving => _boostSaving;
+
+        public float GetEarDevelopment(SparkStatValues stats)
+        {
+            return Mathf.Clamp01(
+                (float)stats.GetValue(SparkStatType.Fly)
+                / Mathf.Max(1, _earDevelopmentMaximumAt));
+        }
 
         public bool TryValidate(out string error)
         {
@@ -71,6 +86,17 @@ namespace ProjectSparks.Companions
                 error = "Прибавки характеристик от фруктов не могут быть отрицательными.";
                 return false;
             }
+            if (_feedingsToFullGrowth < 1)
+            {
+                error = "Количество кормлений до полного взросления должно быть не меньше 1.";
+                return false;
+            }
+            if (_earDevelopmentMaximumAt < 1)
+            {
+                error = "Порог полного развития ушей должен быть не меньше 1.";
+                return false;
+            }
+
             error = string.Empty;
             return true;
         }

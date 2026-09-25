@@ -10,11 +10,11 @@ namespace ProjectSparks.Companions
         private readonly Dictionary<string, SparkProgressData> _progressById =
             new Dictionary<string, SparkProgressData>();
 
-        private readonly SparkBalanceSettings _balance;
+        private readonly SparkStarterSettings _starterSettings;
 
-        public SparkProgressService(SparkBalanceSettings balance)
+        public SparkProgressService(SparkStarterSettings starterSettings)
         {
-            _balance = balance;
+            _starterSettings = starterSettings;
             ResetValues();
         }
 
@@ -55,10 +55,7 @@ namespace ProjectSparks.Companions
             return true;
         }
 
-        public bool AddStat(
-            string sparkId,
-            SparkStatType statType,
-            int amount)
+        public bool AddStat(string sparkId, SparkStatType statType, int amount)
         {
             if (amount <= 0)
             {
@@ -79,24 +76,34 @@ namespace ProjectSparks.Companions
             return true;
         }
 
-        public bool AddStats(
-            string sparkId,
-            SparkStatValues amounts)
+        public bool AddStats(string sparkId, SparkStatValues amounts, float growthIncrease = 0f)
         {
-            if (amounts.Swim == 0
-                && amounts.Fly == 0
-                && amounts.Run == 0
-                && amounts.Power == 0
-                && amounts.Stamina == 0)
+            SparkProgressData current = GetProgress(sparkId);
+
+            bool hasStatIncrease =
+                amounts.Swim != 0
+                || amounts.Fly != 0
+                || amounts.Run != 0
+                || amounts.Power != 0
+                || amounts.Stamina != 0;
+
+            float nextGrowth = Math.Min(
+                1f,
+                current.Growth + Math.Max(0f, growthIncrease));
+
+            bool hasGrowthIncrease = nextGrowth > current.Growth;
+
+            if (!hasStatIncrease && !hasGrowthIncrease)
             {
                 return false;
             }
 
-            SparkProgressData current = GetProgress(sparkId);
             _progressById[sparkId] = CopyWith(
                 current,
                 current.DisplayName,
-                amounts);
+                amounts,
+                nextGrowth);
+
             SparkChanged?.Invoke(sparkId);
             return true;
         }
@@ -123,21 +130,29 @@ namespace ProjectSparks.Companions
                 progress.GetStat(SparkStatType.Fly),
                 progress.GetStat(SparkStatType.Run),
                 progress.GetStat(SparkStatType.Power),
-                progress.GetStat(SparkStatType.Stamina), progress.BodyColor);
+                progress.GetStat(SparkStatType.Stamina),
+                progress.BodyColor,
+                progress.Growth,
+                progress.Emotion);
+
             SparkChanged?.Invoke(progress.Id);
         }
 
         public void Reset()
         {
             ResetValues();
-            SparkChanged?.Invoke(SparkIds.First);
-            SparkChanged?.Invoke(SparkIds.Second);
+
+            foreach (string sparkId in _progressById.Keys)
+            {
+                SparkChanged?.Invoke(sparkId);
+            }
         }
 
         private static SparkProgressData CopyWith(
             SparkProgressData current,
             string displayName,
-            SparkStatValues amounts)
+            SparkStatValues amounts,
+            float? growth = null)
         {
             int GetValue(SparkStatType statType)
             {
@@ -153,38 +168,69 @@ namespace ProjectSparks.Companions
                 GetValue(SparkStatType.Fly),
                 GetValue(SparkStatType.Run),
                 GetValue(SparkStatType.Power),
-                GetValue(SparkStatType.Stamina), current.BodyColor);
+                GetValue(SparkStatType.Stamina),
+                current.BodyColor,
+                growth ?? current.Growth,
+                current.Emotion);
         }
 
         private void ResetValues()
         {
             _progressById.Clear();
-            _progressById[SparkIds.First] = CreateDefault(
-                SparkIds.First);
-            _progressById[SparkIds.Second] = CreateDefault(
-                SparkIds.Second);
-        }
 
-        private SparkProgressData CreateDefault(string sparkId)
-        {
-            SparkAbilityGrowth growth = sparkId == SparkIds.First ? _balance.PickupRadius : _balance.BoostSaving;
-            int Value(SparkStatType stat) => growth.Stat == stat ? growth.UnlockAt : 0;
-            return new SparkProgressData(sparkId, GetDefaultName(sparkId),
-                Value(SparkStatType.Swim), Value(SparkStatType.Fly), Value(SparkStatType.Run),
-                Value(SparkStatType.Power), Value(SparkStatType.Stamina),
-                sparkId == SparkIds.First ? UnityEngine.Color.white : new UnityEngine.Color(0.1f, 0.75f, 0.75f, 1f));
-        }
-
-        private static string GetDefaultName(string sparkId)
-        {
-            return sparkId switch
+            foreach (SparkDefinition definition in _starterSettings.Definitions)
             {
-                SparkIds.First => "Искра 1",
-                SparkIds.Second => "Искра 2",
-                _ => "Искра"
-            };
+                if (definition == null)
+                {
+                    throw new InvalidOperationException(
+                        "В SparkStarterSettings обнаружен пустой SparkDefinition.");
+                }
+
+                if (string.IsNullOrWhiteSpace(definition.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"У SparkDefinition '{definition.name}' не задан ID.");
+                }
+
+                if (_progressById.ContainsKey(definition.Id))
+                {
+                    throw new InvalidOperationException(
+                        $"Дублирующийся ID Искры: '{definition.Id}'.");
+                }
+
+                _progressById.Add(definition.Id, CreateDefault(definition));
+            }
         }
 
+        private static SparkProgressData CreateDefault(SparkDefinition definition)
+        {
+            SparkStatValues stats = definition.InitialStats;
+
+            return new SparkProgressData(
+                definition.Id,
+                definition.DefaultName,
+                stats.Swim,
+                stats.Fly,
+                stats.Run,
+                stats.Power,
+                stats.Stamina,
+                definition.BodyColor,
+                growth: 0f,
+                emotion: definition.Emotion);
+        }
+
+        private string GetDefaultName(string sparkId)
+        {
+            foreach (SparkDefinition definition in _starterSettings.Definitions)
+            {
+                if (definition != null && definition.Id == sparkId)
+                {
+                    return definition.DefaultName;
+                }
+            }
+
+            return "Искра";
+        }
         private static string NormalizeName(string displayName)
         {
             string normalizedName = displayName?.Trim() ?? string.Empty;

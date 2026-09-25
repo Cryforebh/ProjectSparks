@@ -32,8 +32,6 @@ namespace ProjectSparks.Companions
         ISparkStateController
     {
         [Header("Искра")]
-        [Tooltip("Имя Искры, которое отображается в интерфейсе осмотра.")]
-        [SerializeField] private string _displayName = "Искра";
         [Tooltip("Постоянный уникальный ID Искры, совпадающий с ее записью прогресса.")]
         [SerializeField] private string _sparkId = SparkIds.First;
         [Tooltip("Коллайдеры Искры, активные только в состоянии Стоит.")]
@@ -51,9 +49,7 @@ namespace ProjectSparks.Companions
 
         public event Action<SparkBehaviourState> StateChanged;
 
-        public string DisplayName => _sparkProgressService != null
-            ? _sparkProgressService.GetProgress(_sparkId).DisplayName
-            : _displayName;
+        public string DisplayName => _sparkProgressService.GetProgress(_sparkId).DisplayName;
         public string Id => _sparkId;
         public HeldItemType ItemType => HeldItemType.Spark;
         public Transform ItemTransform => transform;

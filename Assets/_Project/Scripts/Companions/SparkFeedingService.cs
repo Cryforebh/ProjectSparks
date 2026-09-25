@@ -33,7 +33,8 @@ namespace ProjectSparks.Companions
 
             return _sparkProgressService.AddStats(
                 sparkId,
-                GetIncrease(fruitType));
+                GetIncrease(fruitType),
+                _settings.GrowthPerFeeding);
         }
     }
 }

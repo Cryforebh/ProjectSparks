@@ -23,7 +23,14 @@ namespace ProjectSparks.Companions
 
         [Tooltip("Индивидуальный цвет тела Искры, одинаковый в убежище и поездке.")]
         [SerializeField] private Color _bodyColor;
+        [Tooltip("Постоянное базовое выражение мордочки Искры.")]
+        [SerializeField] private SparkEmotion _emotion = SparkEmotion.Neutral;
+        [Tooltip("Степень взросления Искры: 0 — малыш, 1 — взрослая.")]
+        [SerializeField, Range(0f, 1f)] private float _growth;
+
         public Color BodyColor => _bodyColor;
+        public SparkEmotion Emotion => _emotion;
+        public float Growth => _growth;
 
         public SparkProgressData(
             string id,
@@ -32,16 +39,21 @@ namespace ProjectSparks.Companions
             int fly,
             int run,
             int power,
-            int stamina, Color? bodyColor = null)
+            int stamina,
+            Color? bodyColor = null,
+            float growth = 0f,
+            SparkEmotion emotion = SparkEmotion.Neutral)
         {
             _id = id;
             _bodyColor = bodyColor ?? Color.white;
+            _growth = Mathf.Clamp01(growth);
             _displayName = displayName ?? string.Empty;
             _swim = Math.Max(0, swim);
             _fly = Math.Max(0, fly);
             _run = Math.Max(0, run);
             _power = Math.Max(0, power);
             _stamina = Math.Max(0, stamina);
+            _emotion = emotion;
         }
 
         public string Id => _id;

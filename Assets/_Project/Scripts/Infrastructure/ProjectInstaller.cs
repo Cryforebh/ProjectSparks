@@ -17,15 +17,17 @@ namespace ProjectSparks.Infrastructure
 
         [Tooltip("Общая модель Искры для всех сцен.")]
         [SerializeField] private SparkVisualSettings _sparkVisualSettings;
+        [Tooltip("Стартовые обязательные Искры.")]
+        [SerializeField] private SparkStarterSettings _sparkStarterSettings;
 
         public override void InstallBindings()
         {
             if (_sparkVisualSettings == null || _sparkVisualSettings.BasePrefab == null)
-                throw new ZenjectException("В ProjectInstaller назначьте настройки общего визуала Искры.");
+                throw new ZenjectException("В ProjectInstaller нужны настройки общего визуала Искры.");
             Container.Bind<SparkVisualSettings>().FromInstance(_sparkVisualSettings).AsSingle();
             Container.Bind<SparkVisualFactory>().AsSingle();
             if (_sparkBalance == null)
-                throw new ZenjectException("В ProjectInstaller назначьте Spark Balance Settings.");
+                throw new ZenjectException("В ProjectInstaller нужны Spark Balance Settings.");
             if (!_sparkBalance.TryValidate(out string balanceError))
                 throw new ZenjectException(balanceError);
             Container.Bind<SparkBalanceSettings>().FromInstance(_sparkBalance).AsSingle();
@@ -65,6 +67,8 @@ namespace ProjectSparks.Infrastructure
             Container
                 .Bind<ISceneLoader>().To<SceneLoader>()
                 .AsSingle();
+
+            Container.BindInstance(_sparkStarterSettings);
         }
     }
 }
