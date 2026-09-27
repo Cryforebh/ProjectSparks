@@ -281,9 +281,7 @@ namespace ProjectSparks.UI
                 return;
             }
 
-            string sparkId = _currentSpark.Id;
-            FruitType fruitType = _currentFruit.FruitType;
-            if (!_feedingService.CanFeed(sparkId, fruitType)
+            if (!_feedingService.CanFeed(_currentSpark.Id, _currentFruit.FruitType)
                 || _currentSpark is not SparkInteractable stateController
                 || stateController.FruitHoldAnchor == null
                 || !stateController.TryStartEating())
@@ -294,14 +292,6 @@ namespace ProjectSparks.UI
             if (!_fruitWorldService.TryPresentHeldFruit(stateController.FruitHoldAnchor, stateController))
             {
                 stateController.CompleteEating();
-                return;
-            }
-
-            if (!_feedingService.TryFeed(sparkId, fruitType))
-            {
-                _fruitWorldService.CancelPresentedFruit(stateController);
-                stateController.CompleteEating();
-                ClosePanel();
                 return;
             }
 

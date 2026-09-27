@@ -20,6 +20,8 @@ namespace ProjectSparks.Companions
         private float _antennaBabyScale = 0.35f;
 
         private SparkGrowthBinding _binding;
+        private Transform _growthBody;
+        private Vector3 _modelBaseScale;
 
         private float _currentGrowth;
         private float _startGrowth;
@@ -37,6 +39,12 @@ namespace ProjectSparks.Companions
             if (_calibration != null && _model != null)
             {
                 _binding = _calibration.Bind(_model);
+                _modelBaseScale = _model.localScale;
+                _growthBody = _model.Find("SparkRoot/SparkRig/Root/GrowthBody");
+                if (_growthBody == null)
+                {
+                    Debug.LogError("Не найдена кость GrowthBody для настройки роста Искры.", this);
+                }
             }
         }
 
@@ -116,6 +124,13 @@ namespace ProjectSparks.Companions
                 _currentEarDevelopment,
 
                 _antennaBabyScale);
+
+            if (_growthBody != null)
+            {
+                // Scale the model root instead of an animated bone so the IK rig shares its scale.
+                _model.localScale = Vector3.Scale(_modelBaseScale, _growthBody.localScale);
+                _growthBody.localScale = Vector3.one;
+            }
         }
     }
 }

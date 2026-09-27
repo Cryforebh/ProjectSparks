@@ -13,6 +13,10 @@ namespace ProjectSparks.Collectibles
         [Tooltip("Название фрукта в подсказке взаимодействия.")]
         [SerializeField] private string _displayName = "Фрукт";
 
+        [Header("Точки обхвата")]
+        [SerializeField] private Transform _leftHandTarget;
+        [SerializeField] private Transform _rightHandTarget;
+
         [Header("Физика")]
         [Tooltip("Твердое тело физического фрукта.")]
         [SerializeField] private Rigidbody _rigidbody;
@@ -24,6 +28,8 @@ namespace ProjectSparks.Collectibles
         private bool _isAvailableInWorld;
 
         public FruitType FruitType => _fruitType;
+        public Transform LeftHandTarget => _leftHandTarget;
+        public Transform RightHandTarget => _rightHandTarget;
         public string DisplayName => string.IsNullOrWhiteSpace(_displayName)
             ? GetDefaultDisplayName(_fruitType)
             : _displayName;

@@ -34,10 +34,13 @@ namespace ProjectSparks.Collectibles
         private readonly Dictionary<PhysicalFruitItem, LinkedListNode<PhysicalFruitItem>>
             _droppedNodes = new();
         private readonly Dictionary<ISparkStateController, PhysicalFruitItem> _presentedFruits = new();
+        private readonly Dictionary<ISparkStateController, SparkFruitAttachment> _fruitAttachments = new();
         private readonly Dictionary<ISparkStateController, Action<SparkBehaviourState>> _presentationHandlers = new();
+        private readonly Dictionary<ISparkStateController, Action> _consumptionHandlers = new();
 
         private IPlayerHandsService _handsService;
         private IResourceInventoryService _inventoryService;
+        private ISparkFeedingService _feedingService;
         private Transform _poolRoot;
         private bool _isReady;
         private bool _isShuttingDown;
@@ -45,10 +48,12 @@ namespace ProjectSparks.Collectibles
         [Inject]
         private void Construct(
             IPlayerHandsService handsService,
-            IResourceInventoryService inventoryService)
+            IResourceInventoryService inventoryService,
+            ISparkFeedingService feedingService)
         {
             _handsService = handsService;
             _inventoryService = inventoryService;
+            _feedingService = feedingService;
         }
 
         private void Awake()
@@ -163,7 +168,14 @@ namespace ProjectSparks.Collectibles
             if (!_isReady || anchor == null || spark == null
                 || spark.State != SparkBehaviourState.Eating
                 || _presentedFruits.ContainsKey(spark)
-                || _handsService.HeldItem is not PhysicalFruitItem fruit
+                || _handsService.HeldItem is not PhysicalFruitItem fruit)
+            {
+                return false;
+            }
+
+            SparkFruitAttachment attachment = anchor.GetComponentInParent<SparkFruitAttachment>();
+            if (attachment == null || !attachment.isActiveAndEnabled
+                || fruit.LeftHandTarget == null || fruit.RightHandTarget == null
                 || !_handsService.TryRelease())
             {
                 return false;
@@ -172,42 +184,91 @@ namespace ProjectSparks.Collectibles
             fruit.transform.SetParent(anchor, false);
             fruit.transform.localPosition = Vector3.zero;
             fruit.transform.localRotation = Quaternion.identity;
+            _fruitAttachments.Add(spark, attachment);
+            attachment.SetFruit(fruit);
             _presentedFruits.Add(spark, fruit);
 
             Action<SparkBehaviourState> handler = state =>
             {
                 if (state != SparkBehaviourState.Eating)
                 {
-                    FinishPresentedFruit(spark);
+                    DropPresentedFruit(spark);
                 }
             };
+            Action consumedHandler = () => ConsumePresentedFruit(spark);
             _presentationHandlers.Add(spark, handler);
+            _consumptionHandlers.Add(spark, consumedHandler);
             spark.StateChanged += handler;
+            spark.EatingAnimationCompleted += consumedHandler;
             return true;
         }
 
-        public void CancelPresentedFruit(ISparkStateController spark)
+        private void ConsumePresentedFruit(ISparkStateController spark)
         {
-            if (!_presentedFruits.TryGetValue(spark, out PhysicalFruitItem fruit))
+            if (!TakePresentedFruit(spark, out PhysicalFruitItem fruit))
             {
                 return;
             }
 
-            _inventoryService.AddFruit(fruit.FruitType, 1);
-            FinishPresentedFruit(spark);
+            if (_feedingService.TryFeed(spark.Id, fruit.FruitType))
+            {
+                ReturnToPool(fruit);
+            }
+            else
+            {
+                DropFruitBesideSpark(spark, fruit);
+            }
         }
 
-        private void FinishPresentedFruit(ISparkStateController spark)
+        private void DropPresentedFruit(ISparkStateController spark)
         {
-            if (!_presentedFruits.TryGetValue(spark, out PhysicalFruitItem fruit))
+            if (TakePresentedFruit(spark, out PhysicalFruitItem fruit))
             {
-                return;
+                DropFruitBesideSpark(spark, fruit);
+            }
+        }
+
+        private bool TakePresentedFruit(ISparkStateController spark, out PhysicalFruitItem fruit)
+        {
+            if (!_presentedFruits.TryGetValue(spark, out fruit))
+            {
+                return false;
             }
 
             spark.StateChanged -= _presentationHandlers[spark];
+            spark.EatingAnimationCompleted -= _consumptionHandlers[spark];
             _presentationHandlers.Remove(spark);
+            _consumptionHandlers.Remove(spark);
             _presentedFruits.Remove(spark);
-            ReturnToPool(fruit);
+            if (_fruitAttachments.Remove(spark, out SparkFruitAttachment attachment)
+                && attachment != null)
+            {
+                attachment.SetFruit(null);
+            }
+            return true;
+        }
+
+        private void DropFruitBesideSpark(ISparkStateController spark, PhysicalFruitItem fruit)
+        {
+            Vector3 sparkPosition = spark is Component component && component != null
+                ? component.transform.position
+                : fruit.transform.position;
+            Vector3 outward = Vector3.ProjectOnPlane(
+                fruit.transform.position - sparkPosition, Vector3.up);
+            if (outward.sqrMagnitude < 0.0001f)
+            {
+                outward = spark is Component owner && owner != null
+                    ? owner.transform.forward
+                    : Vector3.forward;
+            }
+            outward = Vector3.ProjectOnPlane(outward, Vector3.up).normalized;
+
+            Vector3 position = sparkPosition + outward * _dropDistance;
+            position.y = Mathf.Max(fruit.transform.position.y, sparkPosition.y + 0.3f);
+            Vector3 velocity = outward * _dropSpeed + Vector3.up * _dropUpwardSpeed;
+            fruit.PlaceInWorld(_worldRoot, position, fruit.transform.rotation, velocity);
+            RegisterDropped(fruit);
+            EnforceDroppedLimit();
         }
 
         private bool BuildPrefabMap()
@@ -297,9 +358,18 @@ namespace ProjectSparks.Collectibles
             {
                 handler.Key.StateChanged -= handler.Value;
             }
+            foreach (var handler in _consumptionHandlers)
+            {
+                handler.Key.EatingAnimationCompleted -= handler.Value;
+            }
 
             _presentationHandlers.Clear();
-            _presentedFruits.Clear();
+            _consumptionHandlers.Clear();
+            foreach (SparkFruitAttachment attachment in _fruitAttachments.Values)
+            {
+                if (attachment != null) attachment.SetFruit(null);
+            }
+            _fruitAttachments.Clear();
 
             if (_isShuttingDown || _inventoryService == null)
             {
@@ -307,6 +377,14 @@ namespace ProjectSparks.Collectibles
             }
 
             _isShuttingDown = true;
+            foreach (PhysicalFruitItem presentedFruit in _presentedFruits.Values)
+            {
+                if (presentedFruit != null)
+                {
+                    _inventoryService.AddFruit(presentedFruit.FruitType, 1);
+                }
+            }
+            _presentedFruits.Clear();
             if (_handsService?.HeldItem is PhysicalFruitItem heldFruit)
             {
                 _inventoryService.AddFruit(heldFruit.FruitType, 1);

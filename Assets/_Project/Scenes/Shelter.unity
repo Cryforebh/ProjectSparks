@@ -7935,6 +7935,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff94e4eb9c9d5364c8c15024d0f14d70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _startingSwimFruits: 20
+  _startingFlyFruits: 20
+  _startingRunFruits: 20
+  _startingPowerFruits: 20
+  _startingStaminaFruits: 20
 --- !u!65 &1586255342
 BoxCollider:
   m_ObjectHideFlags: 0

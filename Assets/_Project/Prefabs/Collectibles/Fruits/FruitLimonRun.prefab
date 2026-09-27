@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1809792633984075876}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0775, y: 0.001879707, z: 0.012878618}
+  m_LocalPosition: {x: -0.0775, y: 0.001879707, z: -0.021}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -130,6 +130,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _fruitType: 2
   _displayName: "\u041B\u0438\u043C\u043E\u043D"
+  _leftHandTarget: {fileID: 1030242373848162014}
+  _rightHandTarget: {fileID: 3249607767381472991}
   _rigidbody: {fileID: 3870317775553206175}
   _colliders:
   - {fileID: 8330398136495630543}
@@ -158,7 +160,7 @@ Transform:
   m_GameObject: {fileID: 8199350116885489992}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0771, y: 0.001879707, z: 0.012878618}
+  m_LocalPosition: {x: 0.0771, y: 0.001879707, z: -0.021}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

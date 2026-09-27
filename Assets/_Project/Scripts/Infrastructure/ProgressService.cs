@@ -17,12 +17,14 @@ namespace ProjectSparks.Infrastructure
         private readonly ISparkProgressService _sparkProgressService;
         private readonly IResourceInventoryService _resourceInventoryService;
         private readonly CancellationTokenSource _lifetimeCancellation = new CancellationTokenSource();
+        private readonly SemaphoreSlim _loadOperationLock = new SemaphoreSlim(1, 1);
         private readonly SemaphoreSlim _saveOperationLock = new SemaphoreSlim(1, 1);
 
         private bool _isSubscribed;
         private bool _isSaving;
         private bool _saveRequested;
         private bool _ignoreProgressChanges;
+        private bool _starterFruitsPending;
         private string _lastCommittedTripId;
         private GameProgressData _pendingTripCommit;
 
@@ -41,6 +43,7 @@ namespace ProjectSparks.Infrastructure
         }
 
         public bool IsLoaded { get; private set; }
+        public event Action ResetCompleted;
 
         public async UniTask LoadAsync(CancellationToken cancellationToken)
         {
@@ -54,38 +57,76 @@ namespace ProjectSparks.Infrastructure
                     cancellationToken,
                     _lifetimeCancellation.Token);
 
-            GameProgressData progress;
+            await _loadOperationLock.WaitAsync(linkedCancellation.Token);
             try
             {
-                progress = await _saveService.LoadAsync(linkedCancellation.Token);
+                if (IsLoaded)
+                {
+                    return;
+                }
+
+                GameProgressData progress;
+                try
+                {
+                    progress = await _saveService.LoadAsync(linkedCancellation.Token);
+                    _starterFruitsPending = progress == null;
+                    progress ??= new GameProgressData(0, string.Empty, 0);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                    _starterFruitsPending = false;
+                    progress = new GameProgressData(0, string.Empty, 0);
+                }
+
+                _lastCommittedTripId = progress.LastCommittedTripId;
+                _economyService.Restore(progress.Balance);
+                _sparkProgressService.Reset();
+                if (progress.Sparks != null)
+                {
+                    foreach (SparkProgressData spark in progress.Sparks) _sparkProgressService.Restore(spark);
+                }
+                _companionService.Restore(progress.SelectedCompanion);
+                _resourceInventoryService.RestoreCapsules(progress.CapsuleCount);
+                _resourceInventoryService.RestoreFruits(
+                    progress.SwimFruitCount,
+                    progress.FlyFruitCount,
+                    progress.RunFruitCount,
+                    progress.PowerFruitCount,
+                    progress.StaminaFruitCount);
+                IsLoaded = true;
+                Subscribe();
             }
-            catch (OperationCanceledException)
+            finally
             {
-                throw;
+                _loadOperationLock.Release();
             }
-            catch (Exception exception)
+        }
+
+        public bool TryInitializeStarterFruits(
+            int swim, int fly, int run, int power, int stamina)
+        {
+            if (!IsLoaded || !_starterFruitsPending)
             {
-                Debug.LogException(exception);
-                progress = new GameProgressData(0, string.Empty, 0);
+                return false;
             }
 
-            _lastCommittedTripId = progress.LastCommittedTripId;
-            _economyService.Restore(progress.Balance);
-            _sparkProgressService.Reset();
-            if (progress.Sparks != null)
+            _starterFruitsPending = false;
+            _ignoreProgressChanges = true;
+            try
             {
-                foreach (SparkProgressData spark in progress.Sparks) _sparkProgressService.Restore(spark);
+                _resourceInventoryService.RestoreFruits(swim, fly, run, power, stamina);
             }
-            _companionService.Restore(progress.SelectedCompanion);
-            _resourceInventoryService.RestoreCapsules(progress.CapsuleCount);
-            _resourceInventoryService.RestoreFruits(
-                progress.SwimFruitCount,
-                progress.FlyFruitCount,
-                progress.RunFruitCount,
-                progress.PowerFruitCount,
-                progress.StaminaFruitCount);
-            IsLoaded = true;
-            Subscribe();
+            finally
+            {
+                _ignoreProgressChanges = false;
+            }
+            RequestSave();
+            return true;
         }
 
         public async UniTask ResetAsync(CancellationToken cancellationToken)
@@ -103,6 +144,7 @@ namespace ProjectSparks.Infrastructure
                 _companionService.Restore(string.Empty);
                 _sparkProgressService.Reset();
                 _resourceInventoryService.Reset();
+                _starterFruitsPending = true;
                 _lastCommittedTripId = null;
                 _pendingTripCommit = null;
                 _saveRequested = false;
@@ -113,6 +155,8 @@ namespace ProjectSparks.Infrastructure
                 _ignoreProgressChanges = false;
                 _saveOperationLock.Release();
             }
+
+            ResetCompleted?.Invoke();
         }
 
         public void Dispose()
@@ -120,6 +164,7 @@ namespace ProjectSparks.Infrastructure
             Unsubscribe();
             _lifetimeCancellation.Cancel();
             _lifetimeCancellation.Dispose();
+            _loadOperationLock.Dispose();
         }
 
         public async UniTask CommitTripAsync(TripResult result, CancellationToken cancellationToken)

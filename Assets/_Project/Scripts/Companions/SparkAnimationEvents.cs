@@ -11,7 +11,7 @@ namespace ProjectSparks.Companions
 
             if (spark != null)
             {
-                spark.CompleteEating();
+                spark.CompleteEatingFromAnimation();
             }
         }
     }

@@ -17,7 +17,9 @@ namespace ProjectSparks.Companions
     public interface ISparkStateController
     {
         event Action<SparkBehaviourState> StateChanged;
+        event Action EatingAnimationCompleted;
 
+        string Id { get; }
         SparkBehaviourState State { get; }
 
         bool TryStartEating();
@@ -50,6 +52,7 @@ namespace ProjectSparks.Companions
         private IShelterInteractionRequestService _requestService;
 
         public event Action<SparkBehaviourState> StateChanged;
+        public event Action EatingAnimationCompleted;
 
         public string DisplayName => _sparkProgressService.GetProgress(_sparkId).DisplayName;
         public string Id => _sparkId;
@@ -63,9 +66,10 @@ namespace ProjectSparks.Companions
             _handsService.HeldItem is IFruitItem
                 ? "Покормить Искру"
                 : "Взять Искру";
-        public bool CanInteract => State == SparkBehaviourState.Standing
+        public bool CanInteract => State != SparkBehaviourState.Held
             && (!_handsService.HasItem
-                || _handsService.HeldItem is IFruitItem);
+                || (State == SparkBehaviourState.Standing
+                    && _handsService.HeldItem is IFruitItem));
 
         [Inject]
         private void Construct(IPlayerHandsService handsService, ISparkProgressService sparkProgressService, IShelterInteractionRequestService requestService)
@@ -132,6 +136,22 @@ namespace ProjectSparks.Companions
             }
         }
 
+        public void CompleteEatingFromAnimation()
+        {
+            if (State != SparkBehaviourState.Eating)
+            {
+                return;
+            }
+
+            EatingAnimationCompleted?.Invoke();
+            CompleteEating();
+        }
+
+        private void OnDisable()
+        {
+            CompleteEating();
+        }
+
         private void OnDestroy()
         {
             CompleteEating();
@@ -166,16 +186,20 @@ namespace ProjectSparks.Companions
 
         private void ApplyState()
         {
-            SetCollidersEnabled(State == SparkBehaviourState.Standing);
+            SetCollidersEnabled(State != SparkBehaviourState.Held);
         }
 
         private static bool CanTransition(SparkBehaviourState currentState, SparkBehaviourState nextState)
         {
+            if (nextState == SparkBehaviourState.Held)
+            {
+                return currentState != SparkBehaviourState.Held;
+            }
+
             return currentState switch
             {
                 SparkBehaviourState.Standing =>
-                    nextState == SparkBehaviourState.Held
-                    || nextState == SparkBehaviourState.Eating,
+                    nextState == SparkBehaviourState.Eating,
                 SparkBehaviourState.Held =>
                     nextState == SparkBehaviourState.Standing,
                 SparkBehaviourState.Eating =>

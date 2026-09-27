@@ -11,6 +11,5 @@ namespace ProjectSparks.Collectibles
         bool TryReturnHeldFruitToCrate();
         bool TryConsumeHeldFruit();
         bool TryPresentHeldFruit(Transform anchor, ISparkStateController spark);
-        void CancelPresentedFruit(ISparkStateController spark);
     }
 }

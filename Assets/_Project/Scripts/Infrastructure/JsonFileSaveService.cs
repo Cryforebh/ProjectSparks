@@ -34,7 +34,7 @@ namespace ProjectSparks.Infrastructure
 
             if (string.IsNullOrWhiteSpace(json))
             {
-                return CreateDefaultProgress();
+                return null;
             }
 
             return JsonUtility.FromJson<GameProgressData>(json) ?? CreateDefaultProgress();
