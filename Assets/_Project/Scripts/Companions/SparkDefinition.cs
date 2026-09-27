@@ -18,7 +18,14 @@ namespace ProjectSparks.Companions
         [Header("Внешность")]
 
         [Tooltip("Основной индивидуальный цвет Искры.")]
-        [SerializeField] private Color _bodyColor = Color.white;
+        [ColorUsage(true, true)]
+        [SerializeField] private Color _bodyColor = SparkColorDefaults.Body;
+
+        [ColorUsage(true, true)]
+        [SerializeField] private Color _secondaryColor = SparkColorDefaults.Secondary;
+
+        [ColorUsage(true, true)]
+        [SerializeField] private Color _accentColor = SparkColorDefaults.Accent;
 
         [Tooltip("Постоянное базовое выражение мордочки Искры.")]
         [SerializeField] private SparkEmotion _emotion = SparkEmotion.Neutral;
@@ -43,6 +50,8 @@ namespace ProjectSparks.Companions
         public string Id => _id;
         public string DefaultName => _defaultName;
         public Color BodyColor => _bodyColor;
+        public Color SecondaryColor => _secondaryColor;
+        public Color AccentColor => _accentColor;
         public SparkEmotion Emotion => _emotion;
 
         public SparkStatValues InitialStats =>

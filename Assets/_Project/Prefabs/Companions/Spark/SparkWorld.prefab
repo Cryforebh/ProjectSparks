@@ -162,6 +162,7 @@ MonoBehaviour:
   _sparkId: spark_starter_01
   _colliders:
   - {fileID: 7130660168345484372}
+  _worldVisual: {fileID: 5503945198594682327}
   _eatingDuration: 5.42
   _completeEatingAutomatically: 0
 --- !u!114 &8688887455361689226

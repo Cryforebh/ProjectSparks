@@ -284,16 +284,24 @@ namespace ProjectSparks.UI
             string sparkId = _currentSpark.Id;
             FruitType fruitType = _currentFruit.FruitType;
             if (!_feedingService.CanFeed(sparkId, fruitType)
-                || _currentSpark is not ISparkStateController stateController
+                || _currentSpark is not SparkInteractable stateController
+                || stateController.FruitHoldAnchor == null
                 || !stateController.TryStartEating())
             {
                 return;
             }
 
-            if (!_fruitWorldService.TryConsumeHeldFruit()
-                || !_feedingService.TryFeed(sparkId, fruitType))
+            if (!_fruitWorldService.TryPresentHeldFruit(stateController.FruitHoldAnchor, stateController))
             {
                 stateController.CompleteEating();
+                return;
+            }
+
+            if (!_feedingService.TryFeed(sparkId, fruitType))
+            {
+                _fruitWorldService.CancelPresentedFruit(stateController);
+                stateController.CompleteEating();
+                ClosePanel();
                 return;
             }
 
@@ -378,7 +386,8 @@ namespace ProjectSparks.UI
                 (long)current.GetStat(stat) + increase.GetValue(stat));
             var future = new SparkProgressData(current.Id, current.DisplayName,
                 Add(SparkStatType.Swim), Add(SparkStatType.Fly), Add(SparkStatType.Run),
-                Add(SparkStatType.Power), Add(SparkStatType.Stamina), current.BodyColor);
+                Add(SparkStatType.Power), Add(SparkStatType.Stamina), current.BodyColor,
+                current.Growth, current.Emotion, current.SecondaryColor, current.AccentColor);
             _abilityText.text += "\n\nПосле кормления:\n"
                 + DescribeAbility("Сбор", _balance.PickupRadius, future) + "\n"
                 + DescribeAbility("Экономия", _balance.BoostSaving, future);

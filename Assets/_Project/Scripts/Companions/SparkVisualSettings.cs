@@ -7,6 +7,10 @@ namespace ProjectSparks.Companions
         [Tooltip("Общая визуальная модель для убежища и поездки. Без коллайдеров и логики взаимодействия.")]
         [SerializeField] private GameObject _basePrefab;
         public GameObject BasePrefab => _basePrefab;
+
+        [Tooltip("Материал чешуи и кончиков усиков, окрашиваемый первым цветом Искры.")]
+        [SerializeField] private Material _scalesMaterial;
+        public Material ScalesMaterial => _scalesMaterial;
     }
 
     public sealed class SparkVisualFactory
@@ -15,6 +19,9 @@ namespace ProjectSparks.Companions
         private readonly SparkBalanceSettings _balance;
         private readonly MaterialPropertyBlock _properties = new MaterialPropertyBlock();
         private static readonly int _bodyColor = Shader.PropertyToID("_BodyColor");
+        private static readonly int _secondaryColor = Shader.PropertyToID("_SecondaryColor");
+        private static readonly int _accentColor = Shader.PropertyToID("_AccentColor");
+        private static readonly int _baseColor = Shader.PropertyToID("_BaseColor");
 
         public SparkVisualFactory(SparkVisualSettings settings, SparkBalanceSettings balance)
         {
@@ -43,16 +50,38 @@ namespace ProjectSparks.Companions
                 {
                     Material material = materials[i];
 
-                    if (material == null || !material.HasProperty(_bodyColor))
+                    if (material == null)
+                    {
+                        continue;
+                    }
+
+                    if (material == _settings.ScalesMaterial)
+                    {
+                        renderer.GetPropertyBlock(_properties, i);
+                        _properties.SetColor(_baseColor, spark.BodyColor);
+                        renderer.SetPropertyBlock(_properties, i);
+                        _properties.Clear();
+                        continue;
+                    }
+
+                    if (!material.HasProperty(_bodyColor))
                     {
                         continue;
                     }
 
                     renderer.GetPropertyBlock(_properties, i);
 
-                    _properties.SetColor(
-                        _bodyColor,
-                        spark.BodyColor);
+                    _properties.SetColor(_bodyColor, spark.BodyColor);
+
+                    if (material.HasProperty(_secondaryColor))
+                    {
+                        _properties.SetColor(_secondaryColor, spark.SecondaryColor);
+                    }
+
+                    if (material.HasProperty(_accentColor))
+                    {
+                        _properties.SetColor(_accentColor, spark.AccentColor);
+                    }
 
                     renderer.SetPropertyBlock(
                         _properties,

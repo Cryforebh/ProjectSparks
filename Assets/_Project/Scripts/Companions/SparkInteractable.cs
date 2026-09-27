@@ -36,6 +36,8 @@ namespace ProjectSparks.Companions
         [SerializeField] private string _sparkId = SparkIds.First;
         [Tooltip("Коллайдеры Искры, активные только в состоянии Стоит.")]
         [SerializeField] private Collider[] _colliders;
+        [Tooltip("Визуал этой Искры, предоставляющий точку крепления фрукта.")]
+        [SerializeField] private SparkWorldVisual _worldVisual;
 
         [Header("Состояния")]
         [Tooltip("Длительность состояния Кушает без подключенной анимации.")]
@@ -53,6 +55,9 @@ namespace ProjectSparks.Companions
         public string Id => _sparkId;
         public HeldItemType ItemType => HeldItemType.Spark;
         public Transform ItemTransform => transform;
+        public Transform FruitHoldAnchor => _worldVisual != null
+            ? _worldVisual.FruitHoldAnchor
+            : null;
         public SparkBehaviourState State { get; private set; } = SparkBehaviourState.Standing;
         public string InteractionPrompt =>
             _handsService.HeldItem is IFruitItem
@@ -125,6 +130,11 @@ namespace ProjectSparks.Companions
             {
                 TransitionTo(SparkBehaviourState.Standing);
             }
+        }
+
+        private void OnDestroy()
+        {
+            CompleteEating();
         }
 
         private async UniTask CompleteEatingAfterDelayAsync()

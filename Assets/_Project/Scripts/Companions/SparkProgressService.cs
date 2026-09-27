@@ -133,7 +133,9 @@ namespace ProjectSparks.Companions
                 progress.GetStat(SparkStatType.Stamina),
                 progress.BodyColor,
                 progress.Growth,
-                progress.Emotion);
+                progress.Emotion,
+                progress.SecondaryColor,
+                progress.AccentColor);
 
             SparkChanged?.Invoke(progress.Id);
         }
@@ -171,7 +173,9 @@ namespace ProjectSparks.Companions
                 GetValue(SparkStatType.Stamina),
                 current.BodyColor,
                 growth ?? current.Growth,
-                current.Emotion);
+                current.Emotion,
+                current.SecondaryColor,
+                current.AccentColor);
         }
 
         private void ResetValues()
@@ -216,7 +220,9 @@ namespace ProjectSparks.Companions
                 stats.Stamina,
                 definition.BodyColor,
                 growth: 0f,
-                emotion: definition.Emotion);
+                emotion: definition.Emotion,
+                secondaryColor: definition.SecondaryColor,
+                accentColor: definition.AccentColor);
         }
 
         private string GetDefaultName(string sparkId)

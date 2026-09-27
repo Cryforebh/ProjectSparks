@@ -45,7 +45,9 @@ namespace ProjectSparks.Player
             item.SetHeld(true);
             itemTransform.SetParent(_holdAnchor, false);
             itemTransform.localPosition = Vector3.zero;
-            itemTransform.localRotation = Quaternion.identity;
+            itemTransform.localRotation = item.ItemType == HeldItemType.Spark
+                ? Quaternion.Euler(0f, 180f, 0f)
+                : Quaternion.identity;
             HeldItemChanged?.Invoke(HeldItem);
             return true;
         }

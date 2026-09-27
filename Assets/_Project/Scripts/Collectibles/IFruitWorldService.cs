@@ -1,3 +1,6 @@
+using ProjectSparks.Companions;
+using UnityEngine;
+
 namespace ProjectSparks.Collectibles
 {
     public interface IFruitWorldService
@@ -7,5 +10,7 @@ namespace ProjectSparks.Collectibles
         bool TryDropHeldFruit();
         bool TryReturnHeldFruitToCrate();
         bool TryConsumeHeldFruit();
+        bool TryPresentHeldFruit(Transform anchor, ISparkStateController spark);
+        void CancelPresentedFruit(ISparkStateController spark);
     }
 }

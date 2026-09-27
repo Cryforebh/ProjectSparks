@@ -23,12 +23,20 @@ namespace ProjectSparks.Companions
 
         [Tooltip("Индивидуальный цвет тела Искры, одинаковый в убежище и поездке.")]
         [SerializeField] private Color _bodyColor;
+        [Tooltip("Второй индивидуальный цвет Искры.")]
+        [SerializeField] private Color _secondaryColor;
+        [Tooltip("Акцентный индивидуальный цвет Искры.")]
+        [SerializeField] private Color _accentColor;
         [Tooltip("Постоянное базовое выражение мордочки Искры.")]
         [SerializeField] private SparkEmotion _emotion = SparkEmotion.Neutral;
         [Tooltip("Степень взросления Искры: 0 — малыш, 1 — взрослая.")]
         [SerializeField, Range(0f, 1f)] private float _growth;
 
         public Color BodyColor => _bodyColor;
+        public Color SecondaryColor => _secondaryColor.a > 0f
+            ? _secondaryColor : SparkColorDefaults.Secondary;
+        public Color AccentColor => _accentColor.a > 0f
+            ? _accentColor : SparkColorDefaults.Accent;
         public SparkEmotion Emotion => _emotion;
         public float Growth => _growth;
 
@@ -42,10 +50,14 @@ namespace ProjectSparks.Companions
             int stamina,
             Color? bodyColor = null,
             float growth = 0f,
-            SparkEmotion emotion = SparkEmotion.Neutral)
+            SparkEmotion emotion = SparkEmotion.Neutral,
+            Color? secondaryColor = null,
+            Color? accentColor = null)
         {
             _id = id;
-            _bodyColor = bodyColor ?? Color.white;
+            _bodyColor = bodyColor ?? SparkColorDefaults.Body;
+            _secondaryColor = secondaryColor ?? SparkColorDefaults.Secondary;
+            _accentColor = accentColor ?? SparkColorDefaults.Accent;
             _growth = Mathf.Clamp01(growth);
             _displayName = displayName ?? string.Empty;
             _swim = Math.Max(0, swim);

@@ -2089,14 +2089,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: FruitStamina
       objectReference: {fileID: 0}
-    - target: {fileID: 4474516340198824295, guid: d45510552c4081c4d95f5abb6fe74e78, type: 3}
-      propertyPath: m_text
-      value: Fruit Stamina
-      objectReference: {fileID: 0}
-    - target: {fileID: 4474516340198824295, guid: d45510552c4081c4d95f5abb6fe74e78, type: 3}
-      propertyPath: m_fontSize
-      value: 18
-      objectReference: {fileID: 0}
     - target: {fileID: 7140377299775460394, guid: d45510552c4081c4d95f5abb6fe74e78, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2845,6 +2837,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FruitRun
       objectReference: {fileID: 0}
+    - target: {fileID: 4204304309038033986, guid: d45510552c4081c4d95f5abb6fe74e78, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 491f4f7e29a26fb4396b2b503d07488d, type: 3}
     - target: {fileID: 4474516340198824295, guid: d45510552c4081c4d95f5abb6fe74e78, type: 3}
       propertyPath: m_text
       value: Fruit Run
@@ -3348,7 +3344,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7058701574894820898, guid: e7fd9af384b2b784a951d551d8450e02, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: -0.00000040233135
       objectReference: {fileID: 0}
     - target: {fileID: 7058701574894820898, guid: e7fd9af384b2b784a951d551d8450e02, type: 3}
       propertyPath: m_LocalRotation.x
@@ -3356,7 +3352,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7058701574894820898, guid: e7fd9af384b2b784a951d551d8450e02, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 7058701574894820898, guid: e7fd9af384b2b784a951d551d8450e02, type: 3}
       propertyPath: m_LocalRotation.z
@@ -3368,7 +3364,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7058701574894820898, guid: e7fd9af384b2b784a951d551d8450e02, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -180
       objectReference: {fileID: 0}
     - target: {fileID: 7058701574894820898, guid: e7fd9af384b2b784a951d551d8450e02, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -6950,6 +6946,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FruitPower
       objectReference: {fileID: 0}
+    - target: {fileID: 4204304309038033986, guid: d45510552c4081c4d95f5abb6fe74e78, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4474516340198824295, guid: d45510552c4081c4d95f5abb6fe74e78, type: 3}
       propertyPath: m_text
       value: Fruit Power
@@ -8298,6 +8298,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FruitFly
       objectReference: {fileID: 0}
+    - target: {fileID: 4204304309038033986, guid: d45510552c4081c4d95f5abb6fe74e78, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: b3352d10f3973bf4493ba40471deb242, type: 3}
     - target: {fileID: 4474516340198824295, guid: d45510552c4081c4d95f5abb6fe74e78, type: 3}
       propertyPath: m_text
       value: Fruit Fly
@@ -9014,7 +9018,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7058701574894820898, guid: e7fd9af384b2b784a951d551d8450e02, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: -0.00000040233135
       objectReference: {fileID: 0}
     - target: {fileID: 7058701574894820898, guid: e7fd9af384b2b784a951d551d8450e02, type: 3}
       propertyPath: m_LocalRotation.x
@@ -9022,7 +9026,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7058701574894820898, guid: e7fd9af384b2b784a951d551d8450e02, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 7058701574894820898, guid: e7fd9af384b2b784a951d551d8450e02, type: 3}
       propertyPath: m_LocalRotation.z
@@ -9034,7 +9038,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7058701574894820898, guid: e7fd9af384b2b784a951d551d8450e02, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -180
       objectReference: {fileID: 0}
     - target: {fileID: 7058701574894820898, guid: e7fd9af384b2b784a951d551d8450e02, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -10451,10 +10455,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _fruitPrefabs:
   - {fileID: 11400000, guid: 1bbdb37dc1d640d5b1ca63c12d6e0fd1, type: 3}
-  - {fileID: 11400000, guid: 2ccdb37dc1d640d5b1ca63c12d6e0fd2, type: 3}
-  - {fileID: 11400000, guid: 3dddb37dc1d640d5b1ca63c12d6e0fd3, type: 3}
+  - {fileID: 4228695364428879835, guid: 2cde03383e9d1b749b074f908ce4d271, type: 3}
+  - {fileID: 4228695364428879835, guid: 3697dd458e4e3cf4db97f73874bebed0, type: 3}
   - {fileID: 11400000, guid: 4eedb37dc1d640d5b1ca63c12d6e0fd4, type: 3}
-  - {fileID: 11400000, guid: 5ffdb37dc1d640d5b1ca63c12d6e0fd5, type: 3}
+  - {fileID: 4228695364428879835, guid: 9e3c021a4bd3f7a4aac8aa6242157147, type: 3}
   _dropOrigin: {fileID: 191892422}
   _worldRoot: {fileID: 507169693}
   _dropDistance: 0.8
@@ -10472,6 +10476,10 @@ PrefabInstance:
     - target: {fileID: 3732753710217623583, guid: d45510552c4081c4d95f5abb6fe74e78, type: 3}
       propertyPath: m_Name
       value: FruitSwim
+      objectReference: {fileID: 0}
+    - target: {fileID: 4204304309038033986, guid: d45510552c4081c4d95f5abb6fe74e78, type: 3}
+      propertyPath: m_Sprite
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7140377299775460394, guid: d45510552c4081c4d95f5abb6fe74e78, type: 3}
       propertyPath: m_Pivot.x

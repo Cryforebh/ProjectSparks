@@ -10,6 +10,10 @@ namespace ProjectSparks.Companions
         private ISparkProgressService _progress;
         private SparkInteractable _spark;
         private GameObject _instance;
+        private SparkFruitAttachment _fruitAttachment;
+        public Transform FruitHoldAnchor => _fruitAttachment != null
+            ? _fruitAttachment.Anchor
+            : null;
         [Inject]
         private void Construct(SparkVisualFactory factory, ISparkProgressService progress)
         { _factory = factory; _progress = progress; }
@@ -23,7 +27,11 @@ namespace ProjectSparks.Companions
         {
             if (id != _spark.Id) return;
             SparkProgressData data = _progress.GetProgress(id);
-            if (_instance == null) _instance = _factory.Create(data, transform);
+            if (_instance == null)
+            {
+                _instance = _factory.Create(data, transform);
+                _fruitAttachment = _instance.GetComponent<SparkFruitAttachment>();
+            }
             else _factory.Apply(_instance, data);
         }
         private void OnDestroy()

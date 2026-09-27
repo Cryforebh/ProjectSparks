@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ProjectSparks.Companions;
 using ProjectSparks.Player;
 using UnityEngine;
 using Zenject;
@@ -32,6 +33,8 @@ namespace ProjectSparks.Collectibles
         private readonly LinkedList<PhysicalFruitItem> _droppedFruits = new();
         private readonly Dictionary<PhysicalFruitItem, LinkedListNode<PhysicalFruitItem>>
             _droppedNodes = new();
+        private readonly Dictionary<ISparkStateController, PhysicalFruitItem> _presentedFruits = new();
+        private readonly Dictionary<ISparkStateController, Action<SparkBehaviourState>> _presentationHandlers = new();
 
         private IPlayerHandsService _handsService;
         private IResourceInventoryService _inventoryService;
@@ -55,7 +58,7 @@ namespace ProjectSparks.Collectibles
             _isReady = BuildPrefabMap();
             if (!_isReady)
             {
-                Debug.LogError(
+                Debug.LogError( 
                     "В FruitWorldController должны быть назначены физические prefab всех пяти типов фруктов.",
                     this);
                 enabled = false;
@@ -155,6 +158,58 @@ namespace ProjectSparks.Collectibles
             return true;
         }
 
+        public bool TryPresentHeldFruit(Transform anchor, ISparkStateController spark)
+        {
+            if (!_isReady || anchor == null || spark == null
+                || spark.State != SparkBehaviourState.Eating
+                || _presentedFruits.ContainsKey(spark)
+                || _handsService.HeldItem is not PhysicalFruitItem fruit
+                || !_handsService.TryRelease())
+            {
+                return false;
+            }
+
+            fruit.transform.SetParent(anchor, false);
+            fruit.transform.localPosition = Vector3.zero;
+            fruit.transform.localRotation = Quaternion.identity;
+            _presentedFruits.Add(spark, fruit);
+
+            Action<SparkBehaviourState> handler = state =>
+            {
+                if (state != SparkBehaviourState.Eating)
+                {
+                    FinishPresentedFruit(spark);
+                }
+            };
+            _presentationHandlers.Add(spark, handler);
+            spark.StateChanged += handler;
+            return true;
+        }
+
+        public void CancelPresentedFruit(ISparkStateController spark)
+        {
+            if (!_presentedFruits.TryGetValue(spark, out PhysicalFruitItem fruit))
+            {
+                return;
+            }
+
+            _inventoryService.AddFruit(fruit.FruitType, 1);
+            FinishPresentedFruit(spark);
+        }
+
+        private void FinishPresentedFruit(ISparkStateController spark)
+        {
+            if (!_presentedFruits.TryGetValue(spark, out PhysicalFruitItem fruit))
+            {
+                return;
+            }
+
+            spark.StateChanged -= _presentationHandlers[spark];
+            _presentationHandlers.Remove(spark);
+            _presentedFruits.Remove(spark);
+            ReturnToPool(fruit);
+        }
+
         private bool BuildPrefabMap()
         {
             _prefabs.Clear();
@@ -238,6 +293,14 @@ namespace ProjectSparks.Collectibles
 
         private void OnDestroy()
         {
+            foreach (var handler in _presentationHandlers)
+            {
+                handler.Key.StateChanged -= handler.Value;
+            }
+
+            _presentationHandlers.Clear();
+            _presentedFruits.Clear();
+
             if (_isShuttingDown || _inventoryService == null)
             {
                 return;

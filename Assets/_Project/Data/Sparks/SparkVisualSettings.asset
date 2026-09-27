@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e01cc16e46ad458794d26530882559b2, type: 3}
   m_Name: SparkVisualSettings
   m_EditorClassIdentifier: 
-  _basePrefab: {fileID: 877839981, guid: 33d944c97be3410da1269a79e30b2d52, type: 3}
+  _basePrefab: {fileID: 877839981, guid: 73c167f39ab3468b816e8c9b887abea3, type: 3}
+  _scalesMaterial: {fileID: 2100000, guid: e903dca9dd5ec314bbb3f670f27d775c, type: 2}
