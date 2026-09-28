@@ -5,7 +5,7 @@ namespace ProjectSparks.Collectibles
 {
     public interface IFruitWorldService
     {
-        bool TryTakeFromCrate(FruitType fruitType);
+        bool TryTakeFromCrate(string fruitId);
         bool TryPickUp(PhysicalFruitItem fruit);
         bool TryDropHeldFruit();
         bool TryReturnHeldFruitToCrate();

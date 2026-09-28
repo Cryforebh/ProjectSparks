@@ -8,8 +8,8 @@ namespace ProjectSparks.Collectibles
     public sealed class PhysicalFruitItem : MonoBehaviour, IFruitItem, IInteractable
     {
         [Header("Фрукт")]
-        [Tooltip("Тип этого физического фрукта.")]
-        [SerializeField] private FruitType _fruitType;
+        [Tooltip("Постоянный уникальный ID фрукта. Не менять после появления сохранений с этим фруктом.")]
+        [SerializeField] private string _fruitId;
         [Tooltip("Название фрукта в подсказке взаимодействия.")]
         [SerializeField] private string _displayName = "Фрукт";
 
@@ -27,11 +27,11 @@ namespace ProjectSparks.Collectibles
         private bool _isHeld;
         private bool _isAvailableInWorld;
 
-        public FruitType FruitType => _fruitType;
+        public string FruitId => _fruitId;
         public Transform LeftHandTarget => _leftHandTarget;
         public Transform RightHandTarget => _rightHandTarget;
         public string DisplayName => string.IsNullOrWhiteSpace(_displayName)
-            ? GetDefaultDisplayName(_fruitType)
+            ? "Фрукт"
             : _displayName;
         public HeldItemType ItemType => HeldItemType.Fruit;
         public Transform ItemTransform => transform;
@@ -153,17 +153,5 @@ namespace ProjectSparks.Collectibles
             }
         }
 
-        private static string GetDefaultDisplayName(FruitType fruitType)
-        {
-            return fruitType switch
-            {
-                FruitType.Swim => "Фрукт плавания",
-                FruitType.Fly => "Фрукт полета",
-                FruitType.Run => "Фрукт бега",
-                FruitType.Power => "Фрукт силы",
-                FruitType.Stamina => "Фрукт выносливости",
-                _ => "Фрукт"
-            };
-        }
     }
 }

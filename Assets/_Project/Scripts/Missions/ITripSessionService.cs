@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ProjectSparks.Collectibles;
 
 namespace ProjectSparks.Missions
@@ -16,13 +17,14 @@ namespace ProjectSparks.Missions
         int Coins { get; }
         int FruitCount { get; }
         int CapsuleCount { get; }
+        IReadOnlyDictionary<string, int> FruitAmounts { get; }
 
-        int GetFruitAmount(FruitType fruitType);
+        int GetFruitAmount(string fruitId);
         bool TryBegin(string locationId, int requiredDeliveryCount);
         bool TryBeginDelivery(string deliveryId);
         bool TryCompleteDelivery(string deliveryId, int coinReward);
         bool TryAddCoins(int amount);
-        bool TryAddFruit(FruitType fruitType, int amount);
+        bool TryAddFruit(string fruitId, int amount);
         bool TryAddCapsules(int amount);
 
         // Фиксирует состояние модели; перенос наград и сохранение выполняются отдельно.

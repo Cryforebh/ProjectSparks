@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using Cysharp.Threading.Tasks;
 using ProjectSparks.Collectibles;
 using ProjectSparks.Core;
@@ -35,6 +36,7 @@ namespace ProjectSparks.UI
         [SerializeField] private TripExitView _tripExitView;
 
         private ITripSessionService _tripSession;
+        private FruitCatalog _fruitCatalog;
         private IPauseService _pauseService;
         private TripCompletionService _completionService;
         private bool _isBusy;
@@ -43,11 +45,12 @@ namespace ProjectSparks.UI
 
         [Zenject.Inject]
         private void Construct(ITripSessionService tripSession, IPauseService pauseService,
-            TripCompletionService completionService)
+            TripCompletionService completionService, FruitCatalog fruitCatalog)
         {
             _tripSession = tripSession;
             _pauseService = pauseService;
             _completionService = completionService;
+            _fruitCatalog = fruitCatalog;
         }
 
         private void Start()
@@ -214,15 +217,17 @@ namespace ProjectSparks.UI
             _continueButton.interactable = !_isBusy && _tripSession.State != TripSessionState.Confirmed;
             _confirmButton.interactable = !_isBusy;
 
-            _summaryText.text =
-                $"Доставки: {_tripSession.CompletedDeliveryCount} / {_tripSession.RequiredDeliveryCount}\n" +
-                $"Монеты: {_tripSession.Coins}\n" +
-                $"Капсулы: {_tripSession.CapsuleCount}\n\n" +
-                $"Фрукты плавания: {_tripSession.GetFruitAmount(FruitType.Swim)}\n" +
-                $"Фрукты полета: {_tripSession.GetFruitAmount(FruitType.Fly)}\n" +
-                $"Фрукты бега: {_tripSession.GetFruitAmount(FruitType.Run)}\n" +
-                $"Фрукты силы: {_tripSession.GetFruitAmount(FruitType.Power)}\n" +
-                $"Фрукты выносливости: {_tripSession.GetFruitAmount(FruitType.Stamina)}";
+            StringBuilder summary = new StringBuilder();
+            summary.AppendLine($"Доставки: {_tripSession.CompletedDeliveryCount} / {_tripSession.RequiredDeliveryCount}");
+            summary.AppendLine($"Монеты: {_tripSession.Coins}");
+            summary.AppendLine($"Капсулы: {_tripSession.CapsuleCount}");
+            summary.AppendLine();
+            for (int i = 0; i < _fruitCatalog.Count; i++)
+            {
+                FruitCatalog.Entry entry = _fruitCatalog.GetEntry(i);
+                summary.AppendLine($"{entry.Prefab.DisplayName}: {_tripSession.GetFruitAmount(entry.FruitId)}");
+            }
+            _summaryText.text = summary.ToString().TrimEnd();
         }
 
         private void LateUpdate()

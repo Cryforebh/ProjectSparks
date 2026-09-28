@@ -4,7 +4,7 @@ namespace ProjectSparks.Collectibles
 {
     public interface IFruitItem : IHoldableItem
     {
-        FruitType FruitType { get; }
+        string FruitId { get; }
         string DisplayName { get; }
     }
 }

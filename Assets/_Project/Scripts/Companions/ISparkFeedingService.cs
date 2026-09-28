@@ -4,8 +4,8 @@ namespace ProjectSparks.Companions
 {
     public interface ISparkFeedingService
     {
-        SparkStatValues GetIncrease(FruitType fruitType);
-        bool CanFeed(string sparkId, FruitType fruitType);
-        bool TryFeed(string sparkId, FruitType fruitType);
+        SparkStatValues GetIncrease(string fruitId);
+        bool CanFeed(string sparkId, string fruitId);
+        bool TryFeed(string sparkId, string fruitId);
     }
 }

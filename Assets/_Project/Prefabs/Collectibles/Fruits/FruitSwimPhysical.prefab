@@ -213,7 +213,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a922cfe14914186a7b573551037ebf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fruitType: 0
+  _fruitId: swim
   _displayName: "\u0424\u0440\u0443\u043A\u0442 \u043F\u043B\u0430\u0432\u0430\u043D\u0438\u044F"
   _leftHandTarget: {fileID: 4100001}
   _rightHandTarget: {fileID: 4100003}

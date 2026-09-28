@@ -11,8 +11,8 @@ namespace ProjectSparks.Collectibles
         [SerializeField] private ResourceType _resourceType;
         [Tooltip("Количество ресурса за один объект.")]
         [SerializeField, Min(1)] private int _amount = 1;
-        [Tooltip("Тип фрукта. Используется только для ресурса Fruit.")]
-        [SerializeField] private FruitType _fruitType = FruitType.Fly;
+        [Tooltip("Физический префаб награждаемого фрукта. Используется только для ресурса Fruit.")]
+        [SerializeField] private PhysicalFruitItem _fruitPrefab;
 
         private ITripSessionService _tripSession;
         private bool _isCollected;
@@ -38,7 +38,8 @@ namespace ProjectSparks.Collectibles
             _isCollected = true;
             bool added = _resourceType switch
             {
-                ResourceType.Fruit => _tripSession.TryAddFruit(_fruitType, _amount),
+                ResourceType.Fruit => _fruitPrefab != null &&
+                    _tripSession.TryAddFruit(_fruitPrefab.FruitId, _amount),
                 ResourceType.Capsule => _tripSession.TryAddCapsules(_amount),
                 _ => false
             };

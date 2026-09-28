@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using ProjectSparks.Collectibles;
 
 namespace ProjectSparks.Missions
 {
     public sealed class TripResult
     {
-        private readonly int[] _fruitAmounts = new int[5];
+        private readonly Dictionary<string, int> _fruitAmounts = new Dictionary<string, int>(StringComparer.Ordinal);
 
         public TripResult(ITripSessionService session)
         {
@@ -18,10 +19,10 @@ namespace ProjectSparks.Missions
             SessionId = session.SessionId;
             Coins = session.Coins;
             CapsuleCount = session.CapsuleCount;
-            for (int index = 0; index < _fruitAmounts.Length; index++)
+            foreach (KeyValuePair<string, int> pair in session.FruitAmounts)
             {
-                _fruitAmounts[index] = session.GetFruitAmount((FruitType)index);
-                FruitCount = checked(FruitCount + _fruitAmounts[index]);
+                _fruitAmounts.Add(pair.Key, pair.Value);
+                FruitCount = checked(FruitCount + pair.Value);
             }
         }
 
@@ -29,10 +30,11 @@ namespace ProjectSparks.Missions
         public int Coins { get; }
         public int FruitCount { get; }
         public int CapsuleCount { get; }
+        public IReadOnlyDictionary<string, int> FruitAmounts => _fruitAmounts;
 
-        public int GetFruitAmount(FruitType type)
+        public int GetFruitAmount(string fruitId)
         {
-            return _fruitAmounts[(int)type];
+            return _fruitAmounts.TryGetValue(fruitId, out int amount) ? amount : 0;
         }
     }
 }

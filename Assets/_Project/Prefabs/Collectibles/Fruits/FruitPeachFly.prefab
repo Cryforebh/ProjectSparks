@@ -128,7 +128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a922cfe14914186a7b573551037ebf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fruitType: 1
+  _fruitId: peach
   _displayName: "\u041F\u0435\u0440\u0441\u0438\u043A"
   _leftHandTarget: {fileID: 1030242373848162014}
   _rightHandTarget: {fileID: 3249607767381472991}

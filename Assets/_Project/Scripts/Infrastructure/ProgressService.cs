@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using ProjectSparks.Collectibles;
@@ -16,6 +17,7 @@ namespace ProjectSparks.Infrastructure
         private readonly ICompanionService _companionService;
         private readonly ISparkProgressService _sparkProgressService;
         private readonly IResourceInventoryService _resourceInventoryService;
+        private readonly FruitCatalog _catalog;
         private readonly CancellationTokenSource _lifetimeCancellation = new CancellationTokenSource();
         private readonly SemaphoreSlim _loadOperationLock = new SemaphoreSlim(1, 1);
         private readonly SemaphoreSlim _saveOperationLock = new SemaphoreSlim(1, 1);
@@ -33,13 +35,15 @@ namespace ProjectSparks.Infrastructure
             IEconomyService economyService,
             ICompanionService companionService,
             ISparkProgressService sparkProgressService,
-            IResourceInventoryService resourceInventoryService)
+            IResourceInventoryService resourceInventoryService,
+            FruitCatalog catalog)
         {
             _saveService = saveService;
             _economyService = economyService;
             _companionService = companionService;
             _sparkProgressService = sparkProgressService;
             _resourceInventoryService = resourceInventoryService;
+            _catalog = catalog;
         }
 
         public bool IsLoaded { get; private set; }
@@ -69,7 +73,9 @@ namespace ProjectSparks.Infrastructure
                 try
                 {
                     progress = await _saveService.LoadAsync(linkedCancellation.Token);
-                    _starterFruitsPending = progress == null;
+                    _starterFruitsPending = progress == null ||
+                        progress.Version != GameProgressData.CurrentVersion;
+                    if (_starterFruitsPending) progress = null;
                     progress ??= new GameProgressData(0, string.Empty, 0);
                 }
                 catch (OperationCanceledException)
@@ -92,12 +98,7 @@ namespace ProjectSparks.Infrastructure
                 }
                 _companionService.Restore(progress.SelectedCompanion);
                 _resourceInventoryService.RestoreCapsules(progress.CapsuleCount);
-                _resourceInventoryService.RestoreFruits(
-                    progress.SwimFruitCount,
-                    progress.FlyFruitCount,
-                    progress.RunFruitCount,
-                    progress.PowerFruitCount,
-                    progress.StaminaFruitCount);
+                _resourceInventoryService.RestoreFruits(progress.GetFruitAmounts(_catalog));
                 IsLoaded = true;
                 Subscribe();
             }
@@ -107,8 +108,7 @@ namespace ProjectSparks.Infrastructure
             }
         }
 
-        public bool TryInitializeStarterFruits(
-            int swim, int fly, int run, int power, int stamina)
+        public bool TryInitializeStarterFruits()
         {
             if (!IsLoaded || !_starterFruitsPending)
             {
@@ -119,7 +119,13 @@ namespace ProjectSparks.Infrastructure
             _ignoreProgressChanges = true;
             try
             {
-                _resourceInventoryService.RestoreFruits(swim, fly, run, power, stamina);
+                Dictionary<string, int> amounts = new Dictionary<string, int>(StringComparer.Ordinal);
+                for (int i = 0; i < _catalog.Count; i++)
+                {
+                    FruitCatalog.Entry entry = _catalog.GetEntry(i);
+                    amounts.Add(entry.FruitId, entry.StartingAmount);
+                }
+                _resourceInventoryService.RestoreFruits(amounts);
             }
             finally
             {
@@ -191,11 +197,7 @@ namespace ProjectSparks.Infrastructure
                         checked(_economyService.Balance + result.Coins),
                         _companionService.SelectedCompanion,
                         checked(_resourceInventoryService.CapsuleCount + result.CapsuleCount),
-                        checked(_resourceInventoryService.GetFruitAmount(FruitType.Swim) + result.GetFruitAmount(FruitType.Swim)),
-                        checked(_resourceInventoryService.GetFruitAmount(FruitType.Fly) + result.GetFruitAmount(FruitType.Fly)),
-                        checked(_resourceInventoryService.GetFruitAmount(FruitType.Run) + result.GetFruitAmount(FruitType.Run)),
-                        checked(_resourceInventoryService.GetFruitAmount(FruitType.Power) + result.GetFruitAmount(FruitType.Power)),
-                        checked(_resourceInventoryService.GetFruitAmount(FruitType.Stamina) + result.GetFruitAmount(FruitType.Stamina)),
+                        MergeFruitAmounts(result),
                         result.SessionId, _sparkProgressService.GetAll());
                     await _saveService.SaveAsync(progress, linkedCancellation.Token);
                     _pendingTripCommit = progress;
@@ -209,10 +211,7 @@ namespace ProjectSparks.Infrastructure
                 _ignoreProgressChanges = true;
                 _economyService.Restore(_pendingTripCommit.Balance);
                 _resourceInventoryService.RestoreCapsules(_pendingTripCommit.CapsuleCount);
-                _resourceInventoryService.RestoreFruits(
-                    _pendingTripCommit.SwimFruitCount, _pendingTripCommit.FlyFruitCount,
-                    _pendingTripCommit.RunFruitCount, _pendingTripCommit.PowerFruitCount,
-                    _pendingTripCommit.StaminaFruitCount);
+                _resourceInventoryService.RestoreFruits(_pendingTripCommit.GetFruitAmounts(_catalog));
                 _lastCommittedTripId = result.SessionId;
                 _pendingTripCommit = null;
             }
@@ -300,11 +299,7 @@ namespace ProjectSparks.Infrastructure
                             _economyService.Balance,
                             _companionService.SelectedCompanion,
                             _resourceInventoryService.CapsuleCount,
-                            _resourceInventoryService.GetFruitAmount(FruitType.Swim),
-                            _resourceInventoryService.GetFruitAmount(FruitType.Fly),
-                            _resourceInventoryService.GetFruitAmount(FruitType.Run),
-                            _resourceInventoryService.GetFruitAmount(FruitType.Power),
-                            _resourceInventoryService.GetFruitAmount(FruitType.Stamina),
+                            _resourceInventoryService.FruitAmounts,
                             _lastCommittedTripId, _sparkProgressService.GetAll());
                         await _saveService.SaveAsync(progress, _lifetimeCancellation.Token);
                     }
@@ -326,6 +321,19 @@ namespace ProjectSparks.Infrastructure
             {
                 _isSaving = false;
             }
+        }
+
+        private IReadOnlyDictionary<string, int> MergeFruitAmounts(TripResult result)
+        {
+            Dictionary<string, int> amounts = new Dictionary<string, int>(StringComparer.Ordinal);
+            foreach (KeyValuePair<string, int> pair in _resourceInventoryService.FruitAmounts)
+                amounts.Add(pair.Key, pair.Value);
+            foreach (KeyValuePair<string, int> pair in result.FruitAmounts)
+            {
+                amounts.TryGetValue(pair.Key, out int current);
+                amounts[pair.Key] = checked(current + pair.Value);
+            }
+            return amounts;
         }
     }
 }

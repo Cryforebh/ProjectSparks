@@ -12,7 +12,9 @@ namespace ProjectSparks.Infrastructure
     {
         [Tooltip("Общий список локаций для главного меню и убежища.")]
         [SerializeField] private LevelCatalog _levelCatalog;
-        [Tooltip("Общие настройки роста способностей и прибавок от фруктов для всех Искр.")]
+        [Tooltip("Общий каталог фруктов, их прибавок, иконок и стартовых количеств.")]
+        [SerializeField] private FruitCatalog _fruitCatalog;
+        [Tooltip("Общие настройки роста и способностей для всех Искр.")]
         [SerializeField] private SparkBalanceSettings _sparkBalance;
 
         [Tooltip("Общая модель Искры для всех сцен.")]
@@ -31,6 +33,11 @@ namespace ProjectSparks.Infrastructure
             if (!_sparkBalance.TryValidate(out string balanceError))
                 throw new ZenjectException(balanceError);
             Container.Bind<SparkBalanceSettings>().FromInstance(_sparkBalance).AsSingle();
+            if (_fruitCatalog == null || _fruitCatalog.Count == 0)
+                throw new ZenjectException("В ProjectInstaller нужен непустой Fruit Catalog.");
+            if (!_fruitCatalog.TryValidate(out string fruitError))
+                throw new ZenjectException(fruitError);
+            Container.Bind<FruitCatalog>().FromInstance(_fruitCatalog).AsSingle();
             Container.Bind<SparkDevelopmentCalculator>().AsSingle();
             Container.Bind<LevelCatalog>().FromInstance(_levelCatalog).AsSingle();
             Container.Bind<LevelSelectionService>().AsSingle();

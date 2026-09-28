@@ -1,157 +1,124 @@
 using System;
+using System.Collections.Generic;
 
 namespace ProjectSparks.Collectibles
 {
     public sealed class ResourceInventoryService : IResourceInventoryService
     {
-        private readonly int[] _fruitAmounts = new int[5];
+        private readonly FruitCatalog _catalog;
+        private readonly Dictionary<string, int> _fruitAmounts = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        public ResourceInventoryService(FruitCatalog catalog)
+        {
+            _catalog = catalog;
+        }
 
         public event Action<ResourceType, int> AmountChanged;
-        public event Action<FruitType, int> FruitAmountChanged;
+        public event Action<string, int> FruitAmountChanged;
 
         public int FruitCount { get; private set; }
         public int CapsuleCount { get; private set; }
+        public IReadOnlyDictionary<string, int> FruitAmounts => _fruitAmounts;
 
-        public int GetAmount(ResourceType resourceType)
+        public int GetAmount(ResourceType resourceType) => resourceType switch
         {
-            return resourceType switch
-            {
-                ResourceType.Fruit => FruitCount,
-                ResourceType.Capsule => CapsuleCount,
-                _ => throw new ArgumentOutOfRangeException(nameof(resourceType))
-            };
-        }
+            ResourceType.Fruit => FruitCount,
+            ResourceType.Capsule => CapsuleCount,
+            _ => throw new ArgumentOutOfRangeException(nameof(resourceType))
+        };
 
-        public int GetFruitAmount(FruitType fruitType)
+        public int GetFruitAmount(string fruitId)
         {
-            return _fruitAmounts[GetFruitIndex(fruitType)];
+            ValidateFruitId(fruitId);
+            return _fruitAmounts.TryGetValue(fruitId, out int amount) ? amount : 0;
         }
 
         public void Add(ResourceType resourceType, int amount)
         {
-            if (amount <= 0)
-            {
-                return;
-            }
-
-            switch (resourceType)
-            {
-                case ResourceType.Fruit:
-                    AddFruit(FruitType.Fly, amount);
-                    break;
-
-                case ResourceType.Capsule:
-                    CapsuleCount += amount;
-                    AmountChanged?.Invoke(resourceType, CapsuleCount);
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(resourceType));
-            }
+            if (amount <= 0) return;
+            if (resourceType == ResourceType.Fruit)
+                throw new InvalidOperationException("Для добавления фрукта нужен его ID.");
+            if (resourceType != ResourceType.Capsule)
+                throw new ArgumentOutOfRangeException(nameof(resourceType));
+            CapsuleCount = checked(CapsuleCount + amount);
+            AmountChanged?.Invoke(resourceType, CapsuleCount);
         }
 
-        public void AddFruit(FruitType fruitType, int amount)
+        public void AddFruit(string fruitId, int amount)
         {
-            if (amount <= 0)
-            {
-                return;
-            }
-
-            int index = GetFruitIndex(fruitType);
-            _fruitAmounts[index] = checked(_fruitAmounts[index] + amount);
-            FruitCount = checked(FruitCount + amount);
-            FruitAmountChanged?.Invoke(fruitType, _fruitAmounts[index]);
+            ValidateFruitId(fruitId);
+            if (amount <= 0) return;
+            int updated = checked(GetFruitAmount(fruitId) + amount);
+            int total = checked(FruitCount + amount);
+            _fruitAmounts[fruitId] = updated;
+            FruitCount = total;
+            FruitAmountChanged?.Invoke(fruitId, updated);
             AmountChanged?.Invoke(ResourceType.Fruit, FruitCount);
         }
 
-        public bool TryRemoveFruit(FruitType fruitType, int amount)
+        public bool TryRemoveFruit(string fruitId, int amount)
         {
-            if (amount <= 0)
-            {
-                return false;
-            }
-
-            int index = GetFruitIndex(fruitType);
-            if (_fruitAmounts[index] < amount || FruitCount < amount)
-            {
-                return false;
-            }
-
-            _fruitAmounts[index] -= amount;
+            ValidateFruitId(fruitId);
+            if (amount <= 0 || GetFruitAmount(fruitId) < amount) return false;
+            int updated = _fruitAmounts[fruitId] - amount;
+            if (updated == 0) _fruitAmounts.Remove(fruitId);
+            else _fruitAmounts[fruitId] = updated;
             FruitCount -= amount;
-            FruitAmountChanged?.Invoke(fruitType, _fruitAmounts[index]);
+            FruitAmountChanged?.Invoke(fruitId, updated);
             AmountChanged?.Invoke(ResourceType.Fruit, FruitCount);
             return true;
         }
 
         public void RestoreCapsules(int capsuleCount)
         {
-            int restoredCapsuleCount = Math.Max(0, capsuleCount);
-
-            if (CapsuleCount != restoredCapsuleCount)
-            {
-                CapsuleCount = restoredCapsuleCount;
-                AmountChanged?.Invoke(ResourceType.Capsule, CapsuleCount);
-            }
+            int restored = Math.Max(0, capsuleCount);
+            if (CapsuleCount == restored) return;
+            CapsuleCount = restored;
+            AmountChanged?.Invoke(ResourceType.Capsule, CapsuleCount);
         }
 
-        public void RestoreFruits(
-            int swimFruitCount,
-            int flyFruitCount,
-            int runFruitCount,
-            int powerFruitCount,
-            int staminaFruitCount)
+        public void RestoreFruits(IReadOnlyDictionary<string, int> amounts)
         {
-            int[] restoredAmounts =
+            Dictionary<string, int> restored = new Dictionary<string, int>(StringComparer.Ordinal);
+            int total = 0;
+            if (amounts != null)
             {
-                Math.Max(0, swimFruitCount),
-                Math.Max(0, flyFruitCount),
-                Math.Max(0, runFruitCount),
-                Math.Max(0, powerFruitCount),
-                Math.Max(0, staminaFruitCount)
-            };
-
-            int restoredTotal = 0;
-            for (int index = 0; index < restoredAmounts.Length; index++)
-            {
-                restoredTotal = checked(restoredTotal + restoredAmounts[index]);
-            }
-
-            for (int index = 0; index < _fruitAmounts.Length; index++)
-            {
-                if (_fruitAmounts[index] == restoredAmounts[index])
+                foreach (KeyValuePair<string, int> pair in amounts)
                 {
-                    continue;
+                    ValidateFruitId(pair.Key);
+                    if (pair.Value < 0) throw new ArgumentOutOfRangeException(nameof(amounts));
+                    if (pair.Value == 0) continue;
+                    restored.Add(pair.Key, pair.Value);
+                    total = checked(total + pair.Value);
                 }
-
-                _fruitAmounts[index] = restoredAmounts[index];
-                FruitAmountChanged?.Invoke(
-                    (FruitType)index,
-                    _fruitAmounts[index]);
             }
 
-            if (FruitCount != restoredTotal)
+            HashSet<string> changed = new HashSet<string>(_fruitAmounts.Keys, StringComparer.Ordinal);
+            changed.UnionWith(restored.Keys);
+            Dictionary<string, int> previous = new Dictionary<string, int>(_fruitAmounts, StringComparer.Ordinal);
+            _fruitAmounts.Clear();
+            foreach (KeyValuePair<string, int> pair in restored) _fruitAmounts.Add(pair.Key, pair.Value);
+            int previousTotal = FruitCount;
+            FruitCount = total;
+            foreach (string id in changed)
             {
-                FruitCount = restoredTotal;
-                AmountChanged?.Invoke(ResourceType.Fruit, FruitCount);
+                previous.TryGetValue(id, out int before);
+                restored.TryGetValue(id, out int after);
+                if (before != after) FruitAmountChanged?.Invoke(id, after);
             }
+            if (previousTotal != total) AmountChanged?.Invoke(ResourceType.Fruit, total);
         }
 
         public void Reset()
         {
-            RestoreFruits(0, 0, 0, 0, 0);
+            RestoreFruits(null);
             RestoreCapsules(0);
         }
 
-        private static int GetFruitIndex(FruitType fruitType)
+        private void ValidateFruitId(string fruitId)
         {
-            int index = (int)fruitType;
-            if (index < 0 || index >= 5)
-            {
-                throw new ArgumentOutOfRangeException(nameof(fruitType));
-            }
-
-            return index;
+            if (!_catalog.Contains(fruitId))
+                throw new ArgumentException("Фрукт отсутствует в каталоге.", nameof(fruitId));
         }
     }
 }

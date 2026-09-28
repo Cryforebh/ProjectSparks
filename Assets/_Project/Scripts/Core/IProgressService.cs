@@ -14,7 +14,6 @@ namespace ProjectSparks.Core
         UniTask LoadAsync(CancellationToken cancellationToken);
         UniTask ResetAsync(CancellationToken cancellationToken);
         UniTask CommitTripAsync(TripResult result, CancellationToken cancellationToken);
-        bool TryInitializeStarterFruits(
-            int swim, int fly, int run, int power, int stamina);
+        bool TryInitializeStarterFruits();
     }
 }

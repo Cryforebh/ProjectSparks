@@ -10,10 +10,6 @@ namespace ProjectSparks.Collectibles
     [DisallowMultipleComponent]
     public sealed class FruitWorldController : MonoBehaviour, IFruitWorldService
     {
-        [Header("Prefab фруктов")]
-        [Tooltip("Физические prefab пяти типов фруктов. Каждый prefab должен иметь PhysicalFruitItem.")]
-        [SerializeField] private PhysicalFruitItem[] _fruitPrefabs;
-
         [Header("Размещение")]
         [Tooltip("Точка, перед которой появляется выброшенный фрукт.")]
         [SerializeField] private Transform _dropOrigin;
@@ -28,8 +24,8 @@ namespace ProjectSparks.Collectibles
         [Tooltip("Максимальное количество фруктов, одновременно лежащих в комнате.")]
         [SerializeField, Min(1)] private int _maxDroppedFruits = 6;
 
-        private readonly Dictionary<FruitType, PhysicalFruitItem> _prefabs = new();
-        private readonly Dictionary<FruitType, Stack<PhysicalFruitItem>> _pool = new();
+        private readonly Dictionary<string, PhysicalFruitItem> _prefabs = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, Stack<PhysicalFruitItem>> _pool = new(StringComparer.Ordinal);
         private readonly LinkedList<PhysicalFruitItem> _droppedFruits = new();
         private readonly Dictionary<PhysicalFruitItem, LinkedListNode<PhysicalFruitItem>>
             _droppedNodes = new();
@@ -41,6 +37,7 @@ namespace ProjectSparks.Collectibles
         private IPlayerHandsService _handsService;
         private IResourceInventoryService _inventoryService;
         private ISparkFeedingService _feedingService;
+        private FruitCatalog _catalog;
         private Transform _poolRoot;
         private bool _isReady;
         private bool _isShuttingDown;
@@ -49,37 +46,45 @@ namespace ProjectSparks.Collectibles
         private void Construct(
             IPlayerHandsService handsService,
             IResourceInventoryService inventoryService,
-            ISparkFeedingService feedingService)
+            ISparkFeedingService feedingService,
+            FruitCatalog catalog)
         {
             _handsService = handsService;
             _inventoryService = inventoryService;
             _feedingService = feedingService;
+            _catalog = catalog;
         }
 
         private void Awake()
         {
             _worldRoot ??= transform;
             CreatePoolRoot();
+        }
+
+        private void Start()
+        {
             _isReady = BuildPrefabMap();
             if (!_isReady)
             {
                 Debug.LogError( 
-                    "В FruitWorldController должны быть назначены физические prefab всех пяти типов фруктов.",
+                    "FruitWorldController: каталог фруктов пуст или содержит недопустимые записи.",
                     this);
                 enabled = false;
             }
         }
 
-        public bool TryTakeFromCrate(FruitType fruitType)
+        public bool TryTakeFromCrate(string fruitId)
         {
             if (!_isReady
+                || string.IsNullOrWhiteSpace(fruitId)
+                || !_prefabs.ContainsKey(fruitId)
                 || _handsService.HasItem
-                || !_inventoryService.TryRemoveFruit(fruitType, 1))
+                || !_inventoryService.TryRemoveFruit(fruitId, 1))
             {
                 return false;
             }
 
-            PhysicalFruitItem fruit = Rent(fruitType);
+            PhysicalFruitItem fruit = Rent(fruitId);
             fruit.PrepareForHand(_poolRoot);
             if (_handsService.TryHold(fruit))
             {
@@ -87,7 +92,7 @@ namespace ProjectSparks.Collectibles
             }
 
             ReturnToPool(fruit);
-            _inventoryService.AddFruit(fruitType, 1);
+            _inventoryService.AddFruit(fruitId, 1);
             return false;
         }
 
@@ -145,7 +150,7 @@ namespace ProjectSparks.Collectibles
                 return false;
             }
 
-            _inventoryService.AddFruit(fruit.FruitType, 1);
+            _inventoryService.AddFruit(fruit.FruitId, 1);
             ReturnToPool(fruit);
             return true;
         }
@@ -210,7 +215,7 @@ namespace ProjectSparks.Collectibles
                 return;
             }
 
-            if (_feedingService.TryFeed(spark.Id, fruit.FruitType))
+            if (_feedingService.TryFeed(spark.Id, fruit.FruitId))
             {
                 ReturnToPool(fruit);
             }
@@ -276,31 +281,27 @@ namespace ProjectSparks.Collectibles
             _prefabs.Clear();
             _pool.Clear();
 
-            if (_fruitPrefabs == null)
+            if (_catalog == null || _catalog.Count == 0 || !_catalog.TryValidate(out _))
             {
                 return false;
             }
 
-            foreach (PhysicalFruitItem prefab in _fruitPrefabs)
+            for (int i = 0; i < _catalog.Count; i++)
             {
-                if (prefab == null || _prefabs.ContainsKey(prefab.FruitType))
-                {
-                    continue;
-                }
-
-                _prefabs.Add(prefab.FruitType, prefab);
-                _pool.Add(prefab.FruitType, new Stack<PhysicalFruitItem>());
+                PhysicalFruitItem prefab = _catalog.GetEntry(i).Prefab;
+                _prefabs.Add(prefab.FruitId, prefab);
+                _pool.Add(prefab.FruitId, new Stack<PhysicalFruitItem>());
             }
 
-            return _prefabs.Count == Enum.GetValues(typeof(FruitType)).Length;
+            return _prefabs.Count == _catalog.Count;
         }
 
-        private PhysicalFruitItem Rent(FruitType fruitType)
+        private PhysicalFruitItem Rent(string fruitId)
         {
-            Stack<PhysicalFruitItem> available = _pool[fruitType];
+            Stack<PhysicalFruitItem> available = _pool[fruitId];
             PhysicalFruitItem fruit = available.Count > 0
                 ? available.Pop()
-                : Instantiate(_prefabs[fruitType], _poolRoot);
+                : Instantiate(_prefabs[fruitId], _poolRoot);
             fruit.Initialize(this);
             return fruit;
         }
@@ -314,7 +315,7 @@ namespace ProjectSparks.Collectibles
 
             UnregisterDropped(fruit);
             fruit.ReturnToPool(_poolRoot);
-            _pool[fruit.FruitType].Push(fruit);
+            _pool[fruit.FruitId].Push(fruit);
         }
 
         private void RegisterDropped(PhysicalFruitItem fruit)
@@ -340,7 +341,7 @@ namespace ProjectSparks.Collectibles
             while (_droppedFruits.Count > _maxDroppedFruits)
             {
                 PhysicalFruitItem oldest = _droppedFruits.First.Value;
-                _inventoryService.AddFruit(oldest.FruitType, 1);
+                _inventoryService.AddFruit(oldest.FruitId, 1);
                 ReturnToPool(oldest);
             }
         }
@@ -381,20 +382,20 @@ namespace ProjectSparks.Collectibles
             {
                 if (presentedFruit != null)
                 {
-                    _inventoryService.AddFruit(presentedFruit.FruitType, 1);
+                    _inventoryService.AddFruit(presentedFruit.FruitId, 1);
                 }
             }
             _presentedFruits.Clear();
             if (_handsService?.HeldItem is PhysicalFruitItem heldFruit)
             {
-                _inventoryService.AddFruit(heldFruit.FruitType, 1);
+                _inventoryService.AddFruit(heldFruit.FruitId, 1);
             }
 
             foreach (PhysicalFruitItem droppedFruit in _droppedFruits)
             {
                 if (droppedFruit != null)
                 {
-                    _inventoryService.AddFruit(droppedFruit.FruitType, 1);
+                    _inventoryService.AddFruit(droppedFruit.FruitId, 1);
                 }
             }
         }

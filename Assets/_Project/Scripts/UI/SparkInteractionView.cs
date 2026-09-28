@@ -281,7 +281,7 @@ namespace ProjectSparks.UI
                 return;
             }
 
-            if (!_feedingService.CanFeed(_currentSpark.Id, _currentFruit.FruitType)
+            if (!_feedingService.CanFeed(_currentSpark.Id, _currentFruit.FruitId)
                 || _currentSpark is not SparkInteractable stateController
                 || stateController.FruitHoldAnchor == null
                 || !stateController.TryStartEating())
@@ -370,7 +370,7 @@ namespace ProjectSparks.UI
         private void RefreshFeedingPreview()
         {
             SparkStatValues increase = _feedingService.GetIncrease(
-                _currentFruit.FruitType);
+                _currentFruit.FruitId);
             SparkProgressData current = _sparkProgressService.GetProgress(_currentSpark.Id);
             int Add(SparkStatType stat) => (int)System.Math.Min(int.MaxValue,
                 (long)current.GetStat(stat) + increase.GetValue(stat));
@@ -389,7 +389,7 @@ namespace ProjectSparks.UI
             _feedButton.interactable = _isReady
                 && _feedingService.CanFeed(
                     _currentSpark.Id,
-                    _currentFruit.FruitType);
+                    _currentFruit.FruitId);
         }
 
         private void SetFeedingMode(bool isFeedingMode)

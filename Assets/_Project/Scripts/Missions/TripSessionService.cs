@@ -6,8 +6,11 @@ namespace ProjectSparks.Missions
 {
     public sealed class TripSessionService : ITripSessionService
     {
-        private readonly int[] _fruitAmounts = new int[5];
+        private readonly Dictionary<string, int> _fruitAmounts = new Dictionary<string, int>(StringComparer.Ordinal);
+        private readonly FruitCatalog _catalog;
         private readonly HashSet<string> _completedDeliveryIds = new HashSet<string>(StringComparer.Ordinal);
+
+        public TripSessionService(FruitCatalog catalog) => _catalog = catalog;
 
         public event Action Changed;
 
@@ -20,18 +23,15 @@ namespace ProjectSparks.Missions
         public int Coins { get; private set; }
         public int FruitCount { get; private set; }
         public int CapsuleCount { get; private set; }
+        public IReadOnlyDictionary<string, int> FruitAmounts => _fruitAmounts;
 
         private bool CanCollect => State == TripSessionState.InProgress || State == TripSessionState.Succeeded;
 
-        public int GetFruitAmount(FruitType fruitType)
+        public int GetFruitAmount(string fruitId)
         {
-            int index = (int)fruitType;
-            if (index < 0 || index >= _fruitAmounts.Length)
-            {
-                throw new ArgumentOutOfRangeException(nameof(fruitType));
-            }
-
-            return _fruitAmounts[index];
+            if (!_catalog.Contains(fruitId))
+                throw new ArgumentException("Фрукт отсутствует в каталоге.", nameof(fruitId));
+            return _fruitAmounts.TryGetValue(fruitId, out int amount) ? amount : 0;
         }
 
         public bool TryBegin(string locationId, int requiredDeliveryCount)
@@ -96,16 +96,17 @@ namespace ProjectSparks.Missions
             return true;
         }
 
-        public bool TryAddFruit(FruitType fruitType, int amount)
+        public bool TryAddFruit(string fruitId, int amount)
         {
-            int index = (int)fruitType;
-            if (!CanCollect || index < 0 || index >= _fruitAmounts.Length ||
+            if (!CanCollect || !_catalog.Contains(fruitId) ||
                 amount <= 0 || amount > int.MaxValue - FruitCount)
             {
                 return false;
             }
 
-            _fruitAmounts[index] += amount;
+            int current = GetFruitAmount(fruitId);
+            if (amount > int.MaxValue - current) return false;
+            _fruitAmounts[fruitId] = current + amount;
             FruitCount += amount;
             Changed?.Invoke();
             return true;
@@ -150,7 +151,7 @@ namespace ProjectSparks.Missions
 
         private void ClearResult()
         {
-            Array.Clear(_fruitAmounts, 0, _fruitAmounts.Length);
+            _fruitAmounts.Clear();
             _completedDeliveryIds.Clear();
             ActiveDeliveryId = null;
             Coins = 0;

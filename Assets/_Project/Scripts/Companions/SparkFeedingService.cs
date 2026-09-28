@@ -5,35 +5,40 @@ namespace ProjectSparks.Companions
     public sealed class SparkFeedingService : ISparkFeedingService
     {
         private readonly SparkBalanceSettings _settings;
+        private readonly FruitCatalog _catalog;
 
         private readonly ISparkProgressService _sparkProgressService;
 
-        public SparkFeedingService(ISparkProgressService sparkProgressService, SparkBalanceSettings settings)
+        public SparkFeedingService(ISparkProgressService sparkProgressService,
+            SparkBalanceSettings settings, FruitCatalog catalog)
         {
             _sparkProgressService = sparkProgressService;
             _settings = settings;
+            _catalog = catalog;
         }
 
-        public SparkStatValues GetIncrease(FruitType fruitType)
+        public SparkStatValues GetIncrease(string fruitId)
         {
-            return _settings.GetFruitIncrease(fruitType);
+            if (!_catalog.TryGetEntry(fruitId, out FruitCatalog.Entry entry))
+                throw new System.ArgumentException("Фрукт отсутствует в каталоге.", nameof(fruitId));
+            return entry.StatIncrease;
         }
 
-        public bool CanFeed(string sparkId, FruitType fruitType)
+        public bool CanFeed(string sparkId, string fruitId)
         {
-            return _sparkProgressService.Contains(sparkId) && System.Enum.IsDefined(typeof(FruitType), fruitType);
+            return _sparkProgressService.Contains(sparkId) && _catalog.Contains(fruitId);
         }
 
-        public bool TryFeed(string sparkId, FruitType fruitType)
+        public bool TryFeed(string sparkId, string fruitId)
         {
-            if (!CanFeed(sparkId, fruitType))
+            if (!CanFeed(sparkId, fruitId))
             {
                 return false;
             }
 
             return _sparkProgressService.AddStats(
                 sparkId,
-                GetIncrease(fruitType),
+                GetIncrease(fruitId),
                 _settings.GrowthPerFeeding);
         }
     }

@@ -24,7 +24,5 @@ MonoBehaviour:
     _maximumAt: 50
     _initialBonus: 0.25
     _maximumBonus: 0.5
-  _primaryFruitIncrease: 5
-  _secondaryFruitIncrease: 2
   _feedingsToFullGrowth: 10
   _earDevelopmentMaximumAt: 100

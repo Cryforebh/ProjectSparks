@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7944b7e2f9844f23a60615b56f15ea01, type: 3}
+  m_Name: FruitCatalog
+  m_EditorClassIdentifier: 
+  _entries:
+  - _prefab: {fileID: 11400000, guid: 1bbdb37dc1d640d5b1ca63c12d6e0fd1, type: 3}
+    _icon: {fileID: 0}
+    _startingAmount: 20
+    _swimIncrease: 5
+    _flyIncrease: 0
+    _runIncrease: 0
+    _powerIncrease: 0
+    _staminaIncrease: 2
+  - _prefab: {fileID: 4228695364428879835, guid: 2cde03383e9d1b749b074f908ce4d271, type: 3}
+    _icon: {fileID: 21300000, guid: b3352d10f3973bf4493ba40471deb242, type: 3}
+    _startingAmount: 20
+    _swimIncrease: 0
+    _flyIncrease: 5
+    _runIncrease: 0
+    _powerIncrease: 0
+    _staminaIncrease: 2
+  - _prefab: {fileID: 4228695364428879835, guid: 3697dd458e4e3cf4db97f73874bebed0, type: 3}
+    _icon: {fileID: 21300000, guid: 491f4f7e29a26fb4396b2b503d07488d, type: 3}
+    _startingAmount: 20
+    _swimIncrease: 0
+    _flyIncrease: 0
+    _runIncrease: 5
+    _powerIncrease: 0
+    _staminaIncrease: 2
+  - _prefab: {fileID: 11400000, guid: 4eedb37dc1d640d5b1ca63c12d6e0fd4, type: 3}
+    _icon: {fileID: 0}
+    _startingAmount: 20
+    _swimIncrease: 0
+    _flyIncrease: 0
+    _runIncrease: 0
+    _powerIncrease: 5
+    _staminaIncrease: 2
+  - _prefab: {fileID: 4228695364428879835, guid: 9e3c021a4bd3f7a4aac8aa6242157147, type: 3}
+    _icon: {fileID: 21300000, guid: 416e607650a3af943904559e7322b23b, type: 3}
+    _startingAmount: 20
+    _swimIncrease: 0
+    _flyIncrease: 0
+    _runIncrease: 1
+    _powerIncrease: 1
+    _staminaIncrease: 5

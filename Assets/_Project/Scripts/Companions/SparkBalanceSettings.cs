@@ -1,5 +1,4 @@
 using System;
-using ProjectSparks.Collectibles;
 using UnityEngine;
 
 namespace ProjectSparks.Companions
@@ -51,10 +50,6 @@ namespace ProjectSparks.Companions
         [SerializeField] private SparkAbilityGrowth _pickupRadius = new SparkAbilityGrowth(SparkStatType.Power, 0.5f, 1f);
         [Tooltip("Снижение расхода ускорения. Одинаковые правила для всех Искр."), Space]
         [SerializeField] private SparkAbilityGrowth _boostSaving = new SparkAbilityGrowth(SparkStatType.Stamina, 0.25f, 0.5f);
-        [MinTooltip(0, "Прибавка к основной характеристике съеденного фрукта."), Space]
-        [SerializeField] private int _primaryFruitIncrease = 5;
-        [MinTooltip(0, "Прибавка к каждой из остальных характеристик от съеденного фрукта."), Space]
-        [SerializeField] private int _secondaryFruitIncrease = 2;
         [MinTooltip(1, "Количество успешных кормлений от маленькой Искры до полностью взрослой."), Space]
         [SerializeField] private int _feedingsToFullGrowth = 10;
         [MinTooltip(1, "Значение характеристики полета, при котором уши Искры достигают максимального развития."), Space]
@@ -81,11 +76,6 @@ namespace ProjectSparks.Companions
                 error = "Проверьте характеристики, пороги и эффекты: максимум характеристики должен быть выше порога, эффекты от 0 до 1 и не убывают.";
                 return false;
             }
-            if (_primaryFruitIncrease < 0 || _secondaryFruitIncrease < 0)
-            {
-                error = "Прибавки характеристик от фруктов не могут быть отрицательными.";
-                return false;
-            }
             if (_feedingsToFullGrowth < 1)
             {
                 error = "Количество кормлений до полного взросления должно быть не меньше 1.";
@@ -99,18 +89,6 @@ namespace ProjectSparks.Companions
 
             error = string.Empty;
             return true;
-        }
-
-        public SparkStatValues GetFruitIncrease(FruitType fruit)
-        {
-            if (!Enum.IsDefined(typeof(FruitType), fruit))
-                throw new ArgumentOutOfRangeException(nameof(fruit));
-            return new SparkStatValues(
-                fruit == FruitType.Swim ? _primaryFruitIncrease : _secondaryFruitIncrease,
-                fruit == FruitType.Fly ? _primaryFruitIncrease : _secondaryFruitIncrease,
-                fruit == FruitType.Run ? _primaryFruitIncrease : _secondaryFruitIncrease,
-                fruit == FruitType.Power ? _primaryFruitIncrease : _secondaryFruitIncrease,
-                fruit == FruitType.Stamina ? _primaryFruitIncrease : _secondaryFruitIncrease);
         }
 
         private void OnValidate()

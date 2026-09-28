@@ -149,6 +149,7 @@ GameObject:
   - component: {fileID: 8883727783480988207}
   - component: {fileID: 95846276137949162}
   - component: {fileID: 2016907210389201233}
+  - component: {fileID: 8700011907225077123}
   m_Layer: 5
   m_Name: FruitSwim
   m_TagString: Untagged
@@ -260,6 +261,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8700011907225077123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3732753710217623583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60953568007847a996759b3982ca6156, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  _button: {fileID: 2016907210389201233}
+  _icon: {fileID: 4204304309038033986}
+  _nameText: {fileID: 4474516340198824295}
+  _amountText: {fileID: 5793942609264753865}
 --- !u!1 &6431285992016205836
 GameObject:
   m_ObjectHideFlags: 0
