@@ -1,4 +1,5 @@
 using System;
+using ProjectSparks.Companions;
 using UnityEngine;
 
 namespace ProjectSparks.Player
@@ -73,6 +74,44 @@ namespace ProjectSparks.Player
 
             releasedItem.SetHeld(false);
             _originalParent = null;
+            HeldItemChanged?.Invoke(null);
+            return true;
+        }
+
+        public bool TryPutDownSpark(Vector3 position, Quaternion rotation)
+        {
+            return PlaceSpark(position, rotation, false);
+        }
+
+        public bool TrySeatSpark(Transform seat)
+        {
+            return seat != null && PlaceSpark(seat.position, seat.rotation, true);
+        }
+
+        private bool PlaceSpark(Vector3 position, Quaternion rotation, bool editing)
+        {
+            if (HeldItem is not SparkInteractable spark)
+            {
+                return false;
+            }
+
+            if (editing && !spark.BeginEditing())
+            {
+                return false;
+            }
+
+            Transform itemTransform = spark.ItemTransform;
+            itemTransform.SetParent(_originalParent, true);
+            itemTransform.localScale = _originalLocalScale;
+            itemTransform.SetPositionAndRotation(position, rotation);
+            HeldItem = null;
+            _originalParent = null;
+
+            if (!editing)
+            {
+                spark.SetHeld(false);
+            }
+
             HeldItemChanged?.Invoke(null);
             return true;
         }

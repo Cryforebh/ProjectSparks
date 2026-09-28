@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using ProjectSparks.Companions;
 using ProjectSparks.Core;
 using ProjectSparks.Levels;
 using ProjectSparks.Player;
@@ -35,7 +36,13 @@ namespace ProjectSparks.UI
         private ISceneTransitionService _transition;
         private IPauseService _pause;
         private IPlayerControlService _control;
+        private SparkBalanceSettings _balance;
         private readonly List<LevelCardView> _cards = new List<LevelCardView>();
+        private readonly List<LevelCardView> _sparkCards = new List<LevelCardView>();
+        private LevelDefinition _selectedLevel;
+        private TMP_Text _closeButtonText;
+        private string _closeButtonLabel;
+        private bool _choosingSpark;
         private bool _isOpen;
         private bool _isBusy;
         private bool _isReady;
@@ -45,16 +52,20 @@ namespace ProjectSparks.UI
 
         [Inject]
         private void Construct(LevelSelectionService selection, ISceneTransitionService transition,
+            SparkBalanceSettings balance,
             [InjectOptional] IPauseService pause = null, [InjectOptional] IPlayerControlService control = null)
         {
             _selection = selection;
             _transition = transition;
+            _balance = balance;
             _pause = pause;
             _control = control;
         }
 
         private void Start()
         {
+            _closeButtonText = _closeButton.GetComponentInChildren<TMP_Text>(true);
+            _closeButtonLabel = _closeButtonText != null ? _closeButtonText.text : string.Empty;
             _panel.SetActive(false);
             _cardTemplate.gameObject.SetActive(false);
             for (int i = 0; i < _selection.Catalog.Count; i++)
@@ -91,6 +102,7 @@ namespace ProjectSparks.UI
             _previousCursorLock = Cursor.lockState;
             _previousCursorVisible = Cursor.visible;
             _wasControlEnabled = _control?.IsControlEnabled ?? false;
+            ShowLevels();
             _isOpen = true;
             _panel.SetActive(true);
             _control?.SetControlEnabled(false);
@@ -110,9 +122,9 @@ namespace ProjectSparks.UI
             {
                 await _selection.PrepareAsync(this.GetCancellationTokenOnDestroy());
                 _isReady = true;
-                _statusText.text = _selection.HasCompanion
-                    ? "Выберите локацию для следующей поездки."
-                    : "Сначала выберите Искру в убежище, затем отправляйтесь на доставку.";
+                _statusText.text = _selection.HasAvailableSparks
+                    ? "Выберите уровень доставки. Затем выберите Искру."
+                    : "Нет доступных Искр для поездки.";
             }
             catch (OperationCanceledException) { }
             catch (Exception exception)
@@ -135,7 +147,9 @@ namespace ProjectSparks.UI
         private void Refresh()
         {
             foreach (LevelCardView card in _cards)
-                card.SetCanLaunch(_isReady && !_isBusy && _selection.HasCompanion);
+                card.SetCanLaunch(_isReady && !_isBusy && _selection.HasAvailableSparks);
+            foreach (LevelCardView card in _sparkCards)
+                card.SetCanLaunch(_isReady && !_isBusy);
             _closeButton.interactable = !_isBusy;
             _shelterButton.gameObject.SetActive(SceneManager.GetActiveScene().name != _shelterSceneName);
             _shelterButton.interactable = !_isBusy;
@@ -144,7 +158,83 @@ namespace ProjectSparks.UI
         private void Close()
         {
             if (!_isBusy)
-                ClosePanel();
+            {
+                if (_choosingSpark)
+                    ShowLevels();
+                else
+                    ClosePanel();
+            }
+        }
+
+        private void ShowLevels()
+        {
+            _choosingSpark = false;
+            _selectedLevel = null;
+            ClearSparkCards();
+            foreach (LevelCardView card in _cards)
+                card.gameObject.SetActive(true);
+            _content.sizeDelta = new Vector2(0f, _cards.Count * 190f);
+            if (_closeButtonText != null)
+                _closeButtonText.text = _closeButtonLabel;
+            if (_isReady && _statusText != null)
+                _statusText.text = _selection.HasAvailableSparks
+                    ? "Выберите уровень доставки. Затем выберите Искру."
+                    : "Нет доступных Искр для поездки.";
+            Refresh();
+        }
+
+        private void ShowSparks(LevelDefinition level)
+        {
+            _selectedLevel = level;
+            _choosingSpark = true;
+            foreach (LevelCardView card in _cards)
+                card.gameObject.SetActive(false);
+            ClearSparkCards();
+            SparkProgressData[] sparks = _selection.AvailableSparks;
+            foreach (SparkProgressData spark in sparks)
+            {
+                LevelCardView card = Instantiate(_cardTemplate, _content);
+                card.InitializeSpark(spark.Id, DescribeSpark(spark), SelectSpark);
+                card.gameObject.SetActive(true);
+                ((RectTransform)card.transform).anchoredPosition =
+                    new Vector2(0f, -_sparkCards.Count * 190f);
+                _sparkCards.Add(card);
+            }
+            _content.sizeDelta = new Vector2(0f, _sparkCards.Count * 190f);
+            _statusText.text = $"{level.Title}: выберите Искру для доставки.";
+            if (_closeButtonText != null)
+                _closeButtonText.text = "Назад";
+            Refresh();
+        }
+
+        private void ClearSparkCards()
+        {
+            foreach (LevelCardView card in _sparkCards)
+                if (card != null)
+                {
+                    card.gameObject.SetActive(false);
+                    Destroy(card.gameObject);
+                }
+            _sparkCards.Clear();
+        }
+
+        private string DescribeSpark(SparkProgressData spark)
+        {
+            string name = spark.DisplayName.Replace("<", "‹").Replace(">", "›");
+            return $"<b>{name}</b>\n"
+                + $"Плавание {spark.GetStat(SparkStatType.Swim)}   Полёт {spark.GetStat(SparkStatType.Fly)}   Бег {spark.GetStat(SparkStatType.Run)}\n"
+                + $"Сила {spark.GetStat(SparkStatType.Power)}   Выносливость {spark.GetStat(SparkStatType.Stamina)}\n"
+                + DescribeAbility("Радиус сбора", _balance.PickupRadius, spark) + "\n"
+                + DescribeAbility("Экономия ускорения", _balance.BoostSaving, spark);
+        }
+
+        private static string DescribeAbility(string title, SparkAbilityGrowth ability,
+            SparkProgressData spark)
+        {
+            int value = spark.GetStat(ability.Stat);
+            return value < ability.UnlockAt
+                ? $"{title}: закрыто ({value}/{ability.UnlockAt})"
+                : $"{title}: +{ability.Evaluate(spark.Stats) * 100f:0.#}%";
         }
 
         private void ClosePanel()
@@ -152,6 +242,9 @@ namespace ProjectSparks.UI
             if (!_isOpen)
                 return;
             _isOpen = false;
+            _choosingSpark = false;
+            _selectedLevel = null;
+            ClearSparkCards();
             if (_panel != null)
                 _panel.SetActive(false);
             _control?.SetControlEnabled(_wasControlEnabled);
@@ -174,16 +267,23 @@ namespace ProjectSparks.UI
         private void Launch(LevelDefinition level)
         {
             if (_isOpen && !_isBusy && _isReady)
-                NavigateAsync(level).Forget();
+                ShowSparks(level);
+        }
+
+        private void SelectSpark(string sparkId)
+        {
+            if (_isOpen && _choosingSpark && !_isBusy && _isReady
+                && _selectedLevel != null)
+                NavigateAsync(_selectedLevel, sparkId).Forget();
         }
 
         private void GoToShelter()
         {
             if (_isOpen && !_isBusy)
-                NavigateAsync(null).Forget();
+                NavigateAsync(null, null).Forget();
         }
 
-        private async UniTask NavigateAsync(LevelDefinition level)
+        private async UniTask NavigateAsync(LevelDefinition level, string sparkId)
         {
             _isBusy = true;
             _statusText.text = "Переход...";
@@ -191,7 +291,7 @@ namespace ProjectSparks.UI
             try
             {
                 if (level != null)
-                    await _selection.LaunchAsync(level, this.GetCancellationTokenOnDestroy());
+                    await _selection.LaunchAsync(level, sparkId, this.GetCancellationTokenOnDestroy());
                 else
                     await _transition.TransitionAsync(_shelterSceneName, string.Empty, this.GetCancellationTokenOnDestroy());
             }

@@ -12,6 +12,7 @@ namespace ProjectSparks.Companions
         private static readonly int Standing = Animator.StringToHash("Standing");
         private static readonly int Held = Animator.StringToHash("Held");
         private static readonly int Eating = Animator.StringToHash("Eating");
+        private static readonly int EditingSit = Animator.StringToHash("Base Layer.SparkRig|Ilde_Sit");
 
         private void Start()
         {
@@ -69,6 +70,9 @@ namespace ProjectSparks.Companions
 
                 case SparkBehaviourState.Eating:
                     _animator.SetTrigger(Eating);
+                    break;
+                case SparkBehaviourState.Editing:
+                    _animator.CrossFade(EditingSit, 0.1f);
                     break;
             }
         }

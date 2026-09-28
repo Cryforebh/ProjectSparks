@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace ProjectSparks.Player
 {
@@ -11,5 +12,7 @@ namespace ProjectSparks.Player
 
         bool TryHold(IHoldableItem item);
         bool TryRelease();
+        bool TryPutDownSpark(Vector3 position, Quaternion rotation);
+        bool TrySeatSpark(Transform seat);
     }
 }

@@ -11,7 +11,8 @@ namespace ProjectSparks.Companions
     {
         Standing = 0,
         Held = 1,
-        Eating = 2
+        Eating = 2,
+        Editing = 3
     }
 
     public interface ISparkStateController
@@ -67,6 +68,7 @@ namespace ProjectSparks.Companions
                 ? "Покормить Искру"
                 : "Взять Искру";
         public bool CanInteract => State != SparkBehaviourState.Held
+            && State != SparkBehaviourState.Editing
             && (!_handsService.HasItem
                 || (State == SparkBehaviourState.Standing
                     && _handsService.HeldItem is IFruitItem));
@@ -136,6 +138,11 @@ namespace ProjectSparks.Companions
             }
         }
 
+        public bool BeginEditing()
+        {
+            return TransitionTo(SparkBehaviourState.Editing);
+        }
+
         public void CompleteEatingFromAnimation()
         {
             if (State != SparkBehaviourState.Eating)
@@ -186,7 +193,8 @@ namespace ProjectSparks.Companions
 
         private void ApplyState()
         {
-            SetCollidersEnabled(State != SparkBehaviourState.Held);
+            SetCollidersEnabled(State != SparkBehaviourState.Held
+                && State != SparkBehaviourState.Editing);
         }
 
         private static bool CanTransition(SparkBehaviourState currentState, SparkBehaviourState nextState)
@@ -201,7 +209,9 @@ namespace ProjectSparks.Companions
                 SparkBehaviourState.Standing =>
                     nextState == SparkBehaviourState.Eating,
                 SparkBehaviourState.Held =>
-                    nextState == SparkBehaviourState.Standing,
+                    nextState == SparkBehaviourState.Standing
+                    || nextState == SparkBehaviourState.Editing,
+                SparkBehaviourState.Editing => false,
                 SparkBehaviourState.Eating =>
                     nextState == SparkBehaviourState.Standing,
                 _ => false

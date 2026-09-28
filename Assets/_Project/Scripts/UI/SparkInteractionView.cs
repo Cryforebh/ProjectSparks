@@ -65,7 +65,6 @@ namespace ProjectSparks.UI
 
         private IPlayerHandsService _handsService;
         private IPlayerControlService _controlService;
-        private ICompanionService _companionService;
         private ISparkProgressService _sparkProgressService;
         private ISparkFeedingService _feedingService;
         private IFruitWorldService _fruitWorldService;
@@ -74,15 +73,16 @@ namespace ProjectSparks.UI
         private IProgressService _progressService;
         private ISparkProfile _currentSpark;
         private IFruitItem _currentFruit;
+        private SparkInteractable _editingSpark;
         private TMP_Text _putDownButtonText;
         private bool _isReady;
         private bool _isFeedingMode;
+        private bool _isEditingMode;
 
         [Inject]
         private void Construct(
             IPlayerHandsService handsService,
             IPlayerControlService controlService,
-            ICompanionService companionService,
             ISparkProgressService sparkProgressService,
             ISparkFeedingService feedingService,
             IFruitWorldService fruitWorldService,
@@ -91,7 +91,6 @@ namespace ProjectSparks.UI
         {
             _handsService = handsService;
             _controlService = controlService;
-            _companionService = companionService;
             _sparkProgressService = sparkProgressService;
             _feedingService = feedingService;
             _fruitWorldService = fruitWorldService;
@@ -116,14 +115,13 @@ namespace ProjectSparks.UI
                 return;
             }
 
-            _selectButton.onClick.AddListener(HandleSelectClicked);
             _putDownButton.onClick.AddListener(HandlePutDownClicked);
             _feedButton.onClick.AddListener(HandleFeedClicked);
             _renameButton.onClick.AddListener(HandleRenameClicked);
             _handsService.HeldItemChanged += HandleHeldItemChanged;
-            _companionService.SelectedCompanionChanged += HandleSelectedCompanionChanged;
             _sparkProgressService.SparkChanged += HandleSparkChanged;
             _requestService.SparkFeedingRequested += HandleSparkFeedingRequested;
+            _requestService.SparkEditingRequested += HandleSparkEditingRequested;
 
             _putDownButtonText = _putDownButton.GetComponentInChildren<TMP_Text>(true);
             ClosePanel();
@@ -132,13 +130,11 @@ namespace ProjectSparks.UI
 
         private void OnDisable()
         {
+            ReturnEditingSparkToHands();
+            ClosePanel();
             if (_handsService?.HeldItem is PhysicalFruitItem)
             {
                 _fruitWorldService?.TryReturnHeldFruitToCrate();
-            }
-            else if (_handsService != null && _handsService.HasItem)
-            {
-                _handsService.TryRelease();
             }
 
             _controlService?.SetControlEnabled(true);
@@ -146,11 +142,6 @@ namespace ProjectSparks.UI
 
         private void OnDestroy()
         {
-            if (_selectButton != null)
-            {
-                _selectButton.onClick.RemoveListener(HandleSelectClicked);
-            }
-
             if (_putDownButton != null)
             {
                 _putDownButton.onClick.RemoveListener(HandlePutDownClicked);
@@ -171,11 +162,6 @@ namespace ProjectSparks.UI
                 _handsService.HeldItemChanged -= HandleHeldItemChanged;
             }
 
-            if (_companionService != null)
-            {
-                _companionService.SelectedCompanionChanged -= HandleSelectedCompanionChanged;
-            }
-
             if (_sparkProgressService != null)
             {
                 _sparkProgressService.SparkChanged -= HandleSparkChanged;
@@ -184,6 +170,7 @@ namespace ProjectSparks.UI
             if (_requestService != null)
             {
                 _requestService.SparkFeedingRequested -= HandleSparkFeedingRequested;
+                _requestService.SparkEditingRequested -= HandleSparkEditingRequested;
             }
         }
 
@@ -215,6 +202,25 @@ namespace ProjectSparks.UI
 
             _currentFruit = null;
             _isFeedingMode = false;
+            _isEditingMode = false;
+            OpenPanels();
+            RefreshView();
+        }
+
+        private void HandleSparkEditingRequested(SparkInteractable spark, Transform seat)
+        {
+            if (!_isReady || spark == null || seat == null
+                || !ReferenceEquals(_handsService.HeldItem, spark)
+                || !_handsService.TrySeatSpark(seat))
+            {
+                return;
+            }
+
+            _editingSpark = spark;
+            _currentSpark = spark;
+            _currentFruit = null;
+            _isFeedingMode = false;
+            _isEditingMode = true;
             OpenPanels();
             RefreshView();
         }
@@ -238,11 +244,6 @@ namespace ProjectSparks.UI
             RefreshView();
         }
 
-        private void HandleSelectedCompanionChanged(string sparkId)
-        {
-            RefreshSelection();
-        }
-
         private void HandleSparkChanged(string sparkId)
         {
             if (_currentSpark != null
@@ -252,16 +253,14 @@ namespace ProjectSparks.UI
             }
         }
 
-        private void HandleSelectClicked()
-        {
-            if (_isReady && _currentSpark != null)
-            {
-                _companionService.Select(_currentSpark.Id);
-            }
-        }
-
         private void HandlePutDownClicked()
         {
+            if (_isEditingMode)
+            {
+                ReturnEditingSparkToHands();
+                return;
+            }
+
             if (_isFeedingMode)
             {
                 ClosePanel();
@@ -300,7 +299,7 @@ namespace ProjectSparks.UI
 
         private void HandleRenameClicked()
         {
-            if (_isReady && _currentSpark != null)
+            if (_isReady && _isEditingMode && _currentSpark != null)
             {
                 _sparkProgressService.Rename(
                     _currentSpark.Id,
@@ -340,17 +339,19 @@ namespace ProjectSparks.UI
             _abilityText.enableAutoSizing = true;
             _abilityText.fontSizeMin = 16f;
             _abilityText.fontSizeMax = 30f;
-            _abilityText.text = DescribeAbility("Радиус сбора", _balance.PickupRadius, progress)
-                + "\n\n" + DescribeAbility("Экономия ускорения", _balance.BoostSaving, progress);
-            SetFeedingMode(_isFeedingMode);
+            if (_isFeedingMode)
+            {
+                _abilityText.text = DescribeAbility("Радиус сбора", _balance.PickupRadius, progress)
+                    + "\n\n" + DescribeAbility("Экономия ускорения", _balance.BoostSaving, progress);
+            }
+            SetMode();
             if (_isFeedingMode && _currentFruit != null)
             {
                 RefreshFeedingPreview();
             }
             else
             {
-                _renameButton.interactable = _isReady;
-                RefreshSelection();
+                _renameButton.interactable = _isReady && _isEditingMode;
             }
         }
 
@@ -392,22 +393,23 @@ namespace ProjectSparks.UI
                     _currentFruit.FruitId);
         }
 
-        private void SetFeedingMode(bool isFeedingMode)
+        private void SetMode()
         {
-            _selectionStateText.gameObject.SetActive(!isFeedingMode);
-            _nameInputField.gameObject.SetActive(!isFeedingMode);
-            _renameButton.gameObject.SetActive(!isFeedingMode);
-            _selectButton.gameObject.SetActive(!isFeedingMode);
-            _feedButton.gameObject.SetActive(isFeedingMode);
-            _putDownButton.gameObject.SetActive(true);
+            _abilityText.gameObject.SetActive(_isFeedingMode);
+            _selectionStateText.gameObject.SetActive(false);
+            _nameInputField.gameObject.SetActive(_isEditingMode);
+            _renameButton.gameObject.SetActive(_isEditingMode);
+            _selectButton.gameObject.SetActive(false);
+            _feedButton.gameObject.SetActive(_isFeedingMode);
+            _putDownButton.gameObject.SetActive(_isEditingMode || _isFeedingMode);
             if (_putDownButtonText != null)
             {
-                _putDownButtonText.text = isFeedingMode
+                _putDownButtonText.text = _isFeedingMode
                     ? "ОТМЕНА"
-                    : "ОПУСТИТЬ";
+                    : "ВЗЯТЬ В РУКИ";
             }
 
-            SetIncreaseTextsActive(isFeedingMode);
+            SetIncreaseTextsActive(_isFeedingMode);
         }
 
         private void SetIncreaseTextsActive(bool isActive)
@@ -422,24 +424,21 @@ namespace ProjectSparks.UI
         private void OpenPanels()
         {
             _panel.SetActive(true);
-            _panelInteract.SetActive(true);
-            _controlService.SetControlEnabled(false);
+            _panelInteract.SetActive(_isEditingMode || _isFeedingMode);
+            _controlService.SetControlEnabled(_isEditingMode == false && _isFeedingMode == false);
         }
 
-        private void RefreshSelection()
+        private void ReturnEditingSparkToHands()
         {
-            if (_currentSpark == null)
+            SparkInteractable spark = _editingSpark;
+            if (spark == null)
             {
-                _selectButton.interactable = false;
                 return;
             }
 
-            bool isSelected =
-                _companionService.SelectedCompanion == _currentSpark.Id;
-            _selectionStateText.text = isSelected
-                ? "Выбрана активным компаньоном"
-                : "Можно выбрать активным компаньоном";
-            _selectButton.interactable = _isReady && !isSelected;
+            _editingSpark = null;
+            _isEditingMode = false;
+            _handsService.TryHold(spark);
         }
 
         private void ClosePanel()
@@ -447,6 +446,7 @@ namespace ProjectSparks.UI
             _currentSpark = null;
             _currentFruit = null;
             _isFeedingMode = false;
+            _isEditingMode = false;
             if (_panel != null)
             {
                 _panel.SetActive(false);

@@ -1,5 +1,6 @@
 using System;
 using ProjectSparks.Collectibles;
+using ProjectSparks.Companions;
 using ProjectSparks.Core;
 using UnityEngine;
 using Zenject;
@@ -77,7 +78,14 @@ namespace ProjectSparks.Player
                 }
                 else
                 {
-                    TryDiscardHeldFruit();
+                    if (_handsService.HeldItem is SparkInteractable)
+                    {
+                        TryPutDownHeldSpark();
+                    }
+                    else
+                    {
+                        TryDiscardHeldFruit();
+                    }
                 }
             }
         }
@@ -143,10 +151,51 @@ namespace ProjectSparks.Player
 
         private string GetHeldItemPrompt()
         {
-            return _handsService != null
-                && _handsService.HeldItem is IFruitItem
-                    ? "Выбросить фрукт"
-                    : string.Empty;
+            if (_handsService?.HeldItem is IFruitItem)
+                return "Выбросить фрукт";
+            if (_handsService?.HeldItem is SparkInteractable)
+                return "Поставить Искру";
+            return string.Empty;
+        }
+
+        private void TryPutDownHeldSpark()
+        {
+            Vector3 candidate = transform.position + transform.forward * 1.25f;
+            Vector3 origin = candidate + Vector3.up * 1.5f;
+            RaycastHit[] hits = Physics.RaycastAll(origin, Vector3.down, 3f,
+                _interactionMask, QueryTriggerInteraction.Ignore);
+            Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            foreach (RaycastHit hit in hits)
+            {
+                if (hit.normal.y < 0.75f
+                    || Mathf.Abs(hit.point.y - transform.position.y) > 0.5f
+                    || hit.collider.transform.IsChildOf(transform)
+                    || (_handsService.HeldItem?.ItemTransform != null
+                        && hit.collider.transform.IsChildOf(_handsService.HeldItem.ItemTransform)))
+                    continue;
+
+                Vector3 position = hit.point;
+                Collider[] nearby = Physics.OverlapSphere(position + Vector3.up * 0.3f,
+                    0.25f, _interactionMask, QueryTriggerInteraction.Ignore);
+                bool blocked = false;
+                foreach (Collider collider in nearby)
+                {
+                    if (collider == hit.collider
+                        || collider.transform.IsChildOf(transform)
+                        || collider.transform.IsChildOf(_handsService.HeldItem.ItemTransform))
+                        continue;
+                    blocked = true;
+                    break;
+                }
+
+                if (!blocked)
+                {
+                    _handsService.TryPutDownSpark(position,
+                        Quaternion.Euler(0f, transform.eulerAngles.y + 180f, 0f));
+                    return;
+                }
+            }
         }
 
         private void TryDiscardHeldFruit()
