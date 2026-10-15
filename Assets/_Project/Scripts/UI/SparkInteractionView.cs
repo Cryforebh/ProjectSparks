@@ -290,7 +290,7 @@ namespace ProjectSparks.UI
 
             if (!_fruitWorldService.TryPresentHeldFruit(stateController.FruitHoldAnchor, stateController))
             {
-                stateController.CompleteEating();
+                stateController.CancelEating();
                 return;
             }
 

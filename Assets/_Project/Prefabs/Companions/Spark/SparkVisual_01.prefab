@@ -50,6 +50,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animator: {fileID: 1562375919320735512}
+  _headRenderer: {fileID: 4522632432902107475}
+  _lookDistance: 4
+  _maxLookAngle: 60
+  _maxLookPitch: 20
+  _lookHeightOffset: 0.08
+  _lookTurnSpeed: 120
+  _lookReturnDuration: 0.45
 --- !u!114 &1862405612461022065
 MonoBehaviour:
   m_ObjectHideFlags: 0

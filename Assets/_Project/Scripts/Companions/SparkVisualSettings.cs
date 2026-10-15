@@ -106,6 +106,12 @@ namespace ProjectSparks.Companions
             {
                 growthView.SetDevelopment(spark.Growth, _balance.GetEarDevelopment(spark.Stats));
             }
+
+            SparkAnimatorView animatorView = instance.GetComponent<SparkAnimatorView>();
+            if (animatorView != null)
+            {
+                animatorView.SetGrowth(spark.Growth);
+            }
         }
     }
 }

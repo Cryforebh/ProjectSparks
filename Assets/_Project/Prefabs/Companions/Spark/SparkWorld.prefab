@@ -110,6 +110,8 @@ GameObject:
   - component: {fileID: 5503945198594682327}
   - component: {fileID: 8365068681108048011}
   - component: {fileID: 8688887455361689226}
+  - component: {fileID: 8688887455361689227}
+  - component: {fileID: 8688887455361689228}
   m_Layer: 0
   m_Name: SparkWorld
   m_TagString: Untagged
@@ -158,7 +160,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb7f3552aef5a8b4698bded6fe28c9c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _displayName: "\u0418\u0441\u043A\u0440\u0430"
   _sparkId: spark_starter_01
   _colliders:
   - {fileID: 7130660168345484372}
@@ -179,3 +180,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _highlightVisuals:
   - {fileID: 4426084990396345110}
+--- !u!195 &8688887455361689227
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5652345116941732823}
+  m_Enabled: 0
+  m_AgentTypeID: 0
+  m_Radius: 0.18
+  m_Speed: 0.55
+  m_Acceleration: 2
+  avoidancePriority: 50
+  m_AngularSpeed: 800
+  m_StoppingDistance: 0.1
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 0.65
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &8688887455361689228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5652345116941732823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05e2bb8e0cdd47efa75c83735f11b32d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sittingProfile: {fileID: 11400000, guid: 99ddc10f858342918a37a2db88364d1d, type: 2}
+  _minTravelDistance: 0.6
+  _maxTravelDistance: 10
+  _decisionDelay: 4.5
+  _arrivalDistance: 0.12

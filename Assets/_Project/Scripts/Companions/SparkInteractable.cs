@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using ProjectSparks.Collectibles;
 using ProjectSparks.Player;
@@ -12,7 +13,9 @@ namespace ProjectSparks.Companions
         Standing = 0,
         Held = 1,
         Eating = 2,
-        Editing = 3
+        Editing = 3,
+        Moving = 4,
+        Resting = 5
     }
 
     public interface ISparkStateController
@@ -34,10 +37,14 @@ namespace ProjectSparks.Companions
         ISparkProfile,
         ISparkStateController
     {
+        private static readonly List<SparkInteractable> ActiveInstances = new();
+
+        public static IReadOnlyList<SparkInteractable> ActiveSparks => ActiveInstances;
+
         [Header("Искра")]
         [Tooltip("Постоянный уникальный ID Искры, совпадающий с ее записью прогресса.")]
         [SerializeField] private string _sparkId = SparkIds.First;
-        [Tooltip("Коллайдеры Искры, активные только в состоянии Стоит.")]
+        [Tooltip("Коллайдеры Искры, активные в игровом мире и отключённые, пока Искра находится в руках.")]
         [SerializeField] private Collider[] _colliders;
         [Tooltip("Визуал этой Искры, предоставляющий точку крепления фрукта.")]
         [SerializeField] private SparkWorldVisual _worldVisual;
@@ -67,11 +74,11 @@ namespace ProjectSparks.Companions
             _handsService.HeldItem is IFruitItem
                 ? "Покормить Искру"
                 : "Взять Искру";
-        public bool CanInteract => State != SparkBehaviourState.Held
-            && State != SparkBehaviourState.Editing
-            && (!_handsService.HasItem
-                || (State == SparkBehaviourState.Standing
-                    && _handsService.HeldItem is IFruitItem));
+        public bool CanInteract => _handsService.HeldItem is IFruitItem
+            ? State != SparkBehaviourState.Eating
+            : State != SparkBehaviourState.Held
+              && State != SparkBehaviourState.Editing
+              && !_handsService.HasItem;
 
         [Inject]
         private void Construct(IPlayerHandsService handsService, ISparkProgressService sparkProgressService, IShelterInteractionRequestService requestService)
@@ -89,6 +96,14 @@ namespace ProjectSparks.Companions
             }
 
             ApplyState();
+        }
+
+        private void OnEnable()
+        {
+            if (!ActiveInstances.Contains(this))
+            {
+                ActiveInstances.Add(this);
+            }
         }
 
         public void Interact()
@@ -115,6 +130,28 @@ namespace ProjectSparks.Companions
                 : SparkBehaviourState.Standing);
         }
 
+        public bool TryStartMoving()
+        {
+            return TransitionTo(SparkBehaviourState.Moving);
+        }
+
+        public void CompleteMoving()
+        {
+            if (State == SparkBehaviourState.Moving)
+            {
+                TransitionTo(SparkBehaviourState.Standing);
+            }
+        }
+
+        public bool TryStartResting() => TransitionTo(SparkBehaviourState.Resting);
+        public void CompleteResting()
+        {
+            if (State == SparkBehaviourState.Resting)
+            {
+                TransitionTo(SparkBehaviourState.Standing);
+            }
+        }
+
         public bool TryStartEating()
         {
             if (!TransitionTo(SparkBehaviourState.Eating))
@@ -131,6 +168,14 @@ namespace ProjectSparks.Companions
         }
 
         public void CompleteEating()
+        {
+            if (State == SparkBehaviourState.Eating)
+            {
+                TransitionTo(SparkBehaviourState.Resting);
+            }
+        }
+
+        public void CancelEating()
         {
             if (State == SparkBehaviourState.Eating)
             {
@@ -156,11 +201,13 @@ namespace ProjectSparks.Companions
 
         private void OnDisable()
         {
+            ActiveInstances.Remove(this);
             CompleteEating();
         }
 
         private void OnDestroy()
         {
+            ActiveInstances.Remove(this);
             CompleteEating();
         }
 
@@ -193,8 +240,7 @@ namespace ProjectSparks.Companions
 
         private void ApplyState()
         {
-            SetCollidersEnabled(State != SparkBehaviourState.Held
-                && State != SparkBehaviourState.Editing);
+            SetCollidersEnabled(State != SparkBehaviourState.Held);
         }
 
         private static bool CanTransition(SparkBehaviourState currentState, SparkBehaviourState nextState)
@@ -204,16 +250,28 @@ namespace ProjectSparks.Companions
                 return currentState != SparkBehaviourState.Held;
             }
 
+            if (nextState == SparkBehaviourState.Eating)
+            {
+                return currentState != SparkBehaviourState.Eating;
+            }
+
             return currentState switch
             {
                 SparkBehaviourState.Standing =>
-                    nextState == SparkBehaviourState.Eating,
+                    nextState == SparkBehaviourState.Eating
+                    || nextState == SparkBehaviourState.Moving
+                    || nextState == SparkBehaviourState.Resting,
                 SparkBehaviourState.Held =>
                     nextState == SparkBehaviourState.Standing
                     || nextState == SparkBehaviourState.Editing,
                 SparkBehaviourState.Editing => false,
-                SparkBehaviourState.Eating =>
+                SparkBehaviourState.Moving =>
                     nextState == SparkBehaviourState.Standing,
+                SparkBehaviourState.Resting =>
+                    nextState == SparkBehaviourState.Standing,
+                SparkBehaviourState.Eating =>
+                    nextState == SparkBehaviourState.Standing
+                    || nextState == SparkBehaviourState.Resting,
                 _ => false
             };
         }
