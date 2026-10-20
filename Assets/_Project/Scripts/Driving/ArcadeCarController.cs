@@ -63,6 +63,8 @@ namespace ProjectSparks.Driving
         [SerializeField, Min(0.1f)] private float _boostDuration = 1.8f;
         [Tooltip("Время полного восстановления заряда Boost, в секундах.")]
         [SerializeField, Min(0.01f)] private float _boostRechargeTime = 3.5f;
+        [MinTooltip(0f, "Пауза перед восстановлением заряда после последнего фактического использования Boost, в секундах.")]
+        [SerializeField] private float _boostRechargeDelay = 1f;
 
         private readonly RaycastHit[] _groundHits = new RaycastHit[8];
         private Rigidbody _body;
@@ -72,6 +74,8 @@ namespace ProjectSparks.Driving
         private Quaternion _lastSafeRotation;
         private float _nextSafePoseTime;
         private float _boostCharge = 1f;
+        private float _boostRechargeReadyTime;
+        private bool _boostLocked;
         private bool _grounded;
         private Vector3 _groundNormal = Vector3.up;
         private float _smoothedSteer;
@@ -84,6 +88,8 @@ namespace ProjectSparks.Driving
         public float SmoothedSteer => _smoothedSteer;
         public float Speed01 => Mathf.Clamp01(Mathf.Abs(ForwardSpeed) / Mathf.Max(_maxForwardSpeed, 0.01f));
         public float Boost01 => _boostCharge;
+        // Истина только в тот физический тик, когда реально применена сила Boost.
+        public bool IsBoostActive { get; private set; }
         public bool IsGrounded => _grounded;
 
         [Inject]
@@ -120,6 +126,8 @@ namespace ProjectSparks.Driving
 
         private void FixedUpdate()
         {
+            IsBoostActive = false;
+
             _smoothedSteer = Mathf.MoveTowards(
                 _smoothedSteer,
                 _input.Steer,
@@ -147,7 +155,13 @@ namespace ProjectSparks.Driving
             _body.linearVelocity = Vector3.zero;
             _body.angularVelocity = Vector3.zero;
             _smoothedSteer = 0f;
+            IsBoostActive = false;
             _body.WakeUp();
+        }
+
+        private void OnDisable()
+        {
+            IsBoostActive = false;
         }
 
         private void ProbeGround()
@@ -213,12 +227,18 @@ namespace ProjectSparks.Driving
                 _body.AddForce(-transform.forward * resistance, ForceMode.Acceleration);
             }
 
-            if (_input.BoostHeld && drive > 0.1f && _boostCharge > 0f)
+            if (_input.BoostHeld && drive > 0.1f && !_boostLocked && _boostCharge > 0f)
             {
                 _body.AddForce(transform.forward * _boostAcceleration, ForceMode.Acceleration);
+                IsBoostActive = true;
                 float baseConsumption = Time.fixedDeltaTime / _boostDuration;
                 float consumption = _companionService.ModifyBoostConsumption(baseConsumption);
                 _boostCharge = Mathf.Max(0f, _boostCharge - consumption);
+                _boostRechargeReadyTime = Time.fixedTime + _boostRechargeDelay;
+                if (_boostCharge <= 0f)
+                {
+                    _boostLocked = true;
+                }
             }
             else
             {
@@ -244,7 +264,16 @@ namespace ProjectSparks.Driving
 
         private void RechargeBoost()
         {
+            if (Time.fixedTime < _boostRechargeReadyTime)
+            {
+                return;
+            }
+
             _boostCharge = Mathf.Min(1f, _boostCharge + Time.fixedDeltaTime / _boostRechargeTime);
+            if (_boostCharge >= 1f)
+            {
+                _boostLocked = false;
+            }
         }
 
         private void ApplyLateralGrip()

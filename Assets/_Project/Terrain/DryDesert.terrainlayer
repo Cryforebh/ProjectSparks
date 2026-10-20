@@ -7,17 +7,17 @@ TerrainLayer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: DryDesert
-  m_DiffuseTexture: {fileID: 2800000, guid: c5386e12a05116444aaac44fa4f64f47, type: 3}
+  m_DiffuseTexture: {fileID: 2800000, guid: 0dd2e11510b2bc5489f9ad10c40036cf, type: 3}
   m_NormalMapTexture: {fileID: 0}
   m_MaskMapTexture: {fileID: 0}
-  m_TileSize: {x: 3, y: 3}
+  m_TileSize: {x: 15, y: 15}
   m_TileOffset: {x: 0, y: 0}
   m_Specular: {r: 1, g: 1, b: 1, a: 0}
   m_Metallic: 0
   m_Smoothness: 0
   m_NormalScale: 1
   m_DiffuseRemapMin: {x: 0, y: 0, z: 0, w: 0}
-  m_DiffuseRemapMax: {x: 0.8962264, y: 0.8962264, z: 0.8962264, w: 1}
+  m_DiffuseRemapMax: {x: 0.7830189, y: 0.74464124, z: 0.6537469, w: 1}
   m_MaskMapRemapMin: {x: 0, y: 0, z: 0, w: 0}
   m_MaskMapRemapMax: {x: 1, y: 1, z: 1, w: 1}
   m_SmoothnessSource: 1

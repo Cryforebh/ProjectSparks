@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5e129267f33431cbab231f500a43f6b, type: 3}
   m_Name: RandomMissionSettings
   m_EditorClassIdentifier: 
-  _deliveryCount: 3
-  _missionTitle: "\u0414\u043e\u0441\u0442\u0430\u0432\u043a\u0430"
+  _deliveryCount: 4
+  _missionTitle: "\u0414\u043E\u0441\u0442\u0430\u0432\u043A\u0430"
   _reward: 10

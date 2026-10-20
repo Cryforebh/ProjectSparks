@@ -1637,7 +1637,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 271051605f24b404c8dacaf947cbc5f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cargoPrefab: {fileID: 5466930874943782839, guid: 11b230080ff686a479abeeca467f184b, type: 3}
+  _cargoPrefabs:
+  - {fileID: 5466930874943782839, guid: 11b230080ff686a479abeeca467f184b, type: 3}
 --- !u!114 &1606609203
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7561393764431225218}
   - component: {fileID: 8386990949120303252}
+  - component: {fileID: 3871707449898537312}
   m_Layer: 0
   m_Name: Palm 01
   m_TagString: Untagged
@@ -31,6 +32,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 796179311912655515}
+  - {fileID: 1551964927598276460}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &8386990949120303252
@@ -50,10 +52,37 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1.5641727, y: 10.227352, z: 2.2854881}
   m_Center: {x: 0, y: 4.613675, z: -0.467597}
+--- !u!205 &3871707449898537312
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3011009425275063963}
+  serializedVersion: 2
+  m_LocalReferencePoint: {x: -0.0047125816, y: 5.6737504, z: -1.0410991}
+  m_Size: 11.326179
+  m_FadeMode: 0
+  m_AnimateCrossFading: 0
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.6
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 61697751927040312}
+    - renderer: {fileID: 7264497908925844413}
+    - renderer: {fileID: 1127861269757292601}
+    - renderer: {fileID: 6355698454753320884}
+    - renderer: {fileID: 734261048192976577}
+  - screenRelativeHeight: 0.0037
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 3112961522629288019}
+  m_Enabled: 1
 --- !u!1001 &902445750014508400
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -102,17 +131,147 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -3119345606083026236, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 30fe6495dd7742c68cee75dae8691646, type: 2}
     - target: {fileID: 919132149155446097, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
       propertyPath: m_Name
-      value: Palm_01 (3)
+      value: Palm_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 95540713147388275, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5821920615075364050}
+  m_SourcePrefab: {fileID: 100100000, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
+--- !u!23 &61697751927040312 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -8332485698353245112, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
+  m_PrefabInstance: {fileID: 902445750014508400}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &734261048192976577 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -8739587845605409871, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
+  m_PrefabInstance: {fileID: 902445750014508400}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &796179311912655515 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
+  m_PrefabInstance: {fileID: 902445750014508400}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &996786890987285507 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 95540713147388275, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
+  m_PrefabInstance: {fileID: 902445750014508400}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &5821920615075364050
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 996786890987285507}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -869943748746931621, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
+--- !u!23 &1127861269757292601 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -8997956237263827639, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
+  m_PrefabInstance: {fileID: 902445750014508400}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &6355698454753320884 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -3119345606083026236, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
+  m_PrefabInstance: {fileID: 902445750014508400}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &7264497908925844413 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1705017100114118963, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
+  m_PrefabInstance: {fileID: 902445750014508400}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1297905978961905799
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7561393764431225218}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+      propertyPath: m_Name
+      value: Palm_01_LOD1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
---- !u!4 &796179311912655515 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+--- !u!4 &1551964927598276460 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 020d8a91359e4fd69fd2b421d379c2e5, type: 3}
-  m_PrefabInstance: {fileID: 902445750014508400}
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+  m_PrefabInstance: {fileID: 1297905978961905799}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &3112961522629288019 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -5102472143939671852, guid: ff12724bb8fb47a58f7591e0cde8e0e1, type: 3}
+  m_PrefabInstance: {fileID: 1297905978961905799}
   m_PrefabAsset: {fileID: 0}

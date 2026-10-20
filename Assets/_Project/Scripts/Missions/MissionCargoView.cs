@@ -8,12 +8,13 @@ namespace ProjectSparks.Missions
     [DisallowMultipleComponent]
     public sealed class MissionCargoView : MonoBehaviour
     {
-        [Tooltip("Префаб посылки, создаваемый в каждой точке груза текущей машины.")]
-        [SerializeField] private GameObject _cargoPrefab;
+        [Tooltip("Варианты посылок. Для каждой точки машины при получении нового груза случайно выбирается один префаб. Повторения допускаются.")]
+        [SerializeField] private GameObject[] _cargoPrefabs = Array.Empty<GameObject>();
 
         private IMissionService _missionService;
         private VehicleCargoPoints _cargoPoints;
         private GameObject[] _instances = Array.Empty<GameObject>();
+        private MissionAssignment _cargoMission;
         private bool _isSubscribed;
 
         [Inject]
@@ -75,16 +76,25 @@ namespace ProjectSparks.Missions
                 return;
             }
 
-            if (_instances.Length > 0)
+            if (_instances.Length > 0 && ReferenceEquals(_cargoMission, _missionService.ActiveMission))
             {
                 SetCargoVisible(true);
                 return;
             }
 
-            if (_cargoPrefab == null || _cargoPoints == null || _cargoPoints.Count == 0)
+            if (_cargoPrefabs == null || _cargoPrefabs.Length == 0 || _cargoPoints == null || _cargoPoints.Count == 0)
             {
-                Debug.LogError("Для груза не назначен префаб или точки на машине.", this);
+                Debug.LogError("Для груза не назначены префабы посылок или точки на машине.", this);
                 return;
+            }
+
+            for (int index = 0; index < _cargoPrefabs.Length; index++)
+            {
+                if (_cargoPrefabs[index] == null)
+                {
+                    Debug.LogError($"Не назначен префаб посылки {index + 1}.", this);
+                    return;
+                }
             }
 
             for (int index = 0; index < _cargoPoints.Count; index++)
@@ -96,10 +106,13 @@ namespace ProjectSparks.Missions
                 }
             }
 
+            ClearCargo();
+            _cargoMission = _missionService.ActiveMission;
             _instances = new GameObject[_cargoPoints.Count];
             for (int index = 0; index < _instances.Length; index++)
             {
-                GameObject instance = Instantiate(_cargoPrefab, _cargoPoints.GetPoint(index), false);
+                GameObject prefab = _cargoPrefabs[UnityEngine.Random.Range(0, _cargoPrefabs.Length)];
+                GameObject instance = Instantiate(prefab, _cargoPoints.GetPoint(index), false);
                 _instances[index] = instance;
                 instance.transform.localPosition = Vector3.zero;
                 instance.transform.localRotation = Quaternion.identity;
@@ -130,6 +143,7 @@ namespace ProjectSparks.Missions
             }
 
             _instances = Array.Empty<GameObject>();
+            _cargoMission = null;
         }
     }
 }
