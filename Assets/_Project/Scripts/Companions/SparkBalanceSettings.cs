@@ -8,9 +8,9 @@ namespace ProjectSparks.Companions
     {
         [Tooltip("Характеристика, открывающая и усиливающая способность у любой Искры.")]
         [SerializeField] private SparkStatType _stat;
-        [MinTooltip(0, "Минимальное значение характеристики для открытия способности.")]
+        [Min(0), Tooltip("Минимальное значение характеристики для открытия способности.")]
         [SerializeField] private int _unlockAt = 10;
-        [MinTooltip(1, "Значение характеристики, при котором эффект достигает максимума. Должно быть больше порога открытия.")]
+        [Min(1), Tooltip("Значение характеристики, при котором эффект достигает максимума. Должно быть больше порога открытия.")]
         [SerializeField] private int _maximumAt = 50;
         [Tooltip("Доля эффекта при открытии: 0.5 означает 50 процентов.")]
         [SerializeField, Range(0f, 1f)] private float _initialBonus;
@@ -50,9 +50,9 @@ namespace ProjectSparks.Companions
         [SerializeField] private SparkAbilityGrowth _pickupRadius = new SparkAbilityGrowth(SparkStatType.Power, 0.5f, 1f);
         [Tooltip("Снижение расхода ускорения. Одинаковые правила для всех Искр."), Space]
         [SerializeField] private SparkAbilityGrowth _boostSaving = new SparkAbilityGrowth(SparkStatType.Stamina, 0.25f, 0.5f);
-        [MinTooltip(1, "Количество успешных кормлений от маленькой Искры до полностью взрослой."), Space]
+        [Min(1), Tooltip("Количество успешных кормлений от маленькой Искры до полностью взрослой."), Space]
         [SerializeField] private int _feedingsToFullGrowth = 10;
-        [MinTooltip(1, "Значение характеристики полета, при котором уши Искры достигают максимального развития."), Space]
+        [Min(1), Tooltip("Значение характеристики полета, при котором уши Искры достигают максимального развития."), Space]
         [SerializeField] private int _earDevelopmentMaximumAt = 100;
 
         public int FeedingsToFullGrowth => _feedingsToFullGrowth;

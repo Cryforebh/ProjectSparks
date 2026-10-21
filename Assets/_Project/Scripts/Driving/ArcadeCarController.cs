@@ -15,8 +15,19 @@ namespace ProjectSparks.Driving
         [SerializeField, Min(1f)] private float _maxForwardSpeed = 14f;
         [Tooltip("Максимальная скорость заднего хода в метрах в секунду.")]
         [SerializeField, Min(1f)] private float _maxReverseSpeed = 5.5f;
-        [Tooltip("Ускорение машины при нажатии газа.")]
-        [SerializeField, Min(0f)] private float _forwardAcceleration = 18f;
+        [Tooltip("Начальное ускорение вперед в м/с². При росте скорости умножается на кривую разгона ниже.")]
+        [SerializeField, Min(0f)] private float _forwardAcceleration = 8f;
+
+        [Header("Плавное снижение ускорения")]
+        [Tooltip("Множитель ускорения в зависимости от доли обычной максимальной скорости: 0 = стоим, 1 = достигли предела. По оси Y рекомендуются значения от 0 до 1.")]
+        [SerializeField] private AnimationCurve _forwardAccelerationBySpeed = new AnimationCurve(
+            new Keyframe(0f, 1f, -0.8f, -0.8f),
+            new Keyframe(0.25f, 0.78f, -0.85f, -0.85f),
+            new Keyframe(0.5f, 0.58f, -0.72f, -0.72f),
+            new Keyframe(0.75f, 0.42f, -0.55f, -0.55f),
+            new Keyframe(1f, 0.3f, -0.4f, -0.4f));
+
+        [Header("Скорость: остальные параметры")]
         [Tooltip("Ускорение при движении задним ходом.")]
         [SerializeField, Min(0f)] private float _reverseAcceleration = 10f;
         [Tooltip("Сила отдельного тормоза.")]
@@ -63,7 +74,7 @@ namespace ProjectSparks.Driving
         [SerializeField, Min(0.1f)] private float _boostDuration = 1.8f;
         [Tooltip("Время полного восстановления заряда Boost, в секундах.")]
         [SerializeField, Min(0.01f)] private float _boostRechargeTime = 3.5f;
-        [MinTooltip(0f, "Пауза перед восстановлением заряда после последнего фактического использования Boost, в секундах.")]
+        [Min(0f), Tooltip("Пауза перед восстановлением заряда после последнего фактического использования Boost, в секундах.")]
         [SerializeField] private float _boostRechargeDelay = 1f;
 
         private readonly RaycastHit[] _groundHits = new RaycastHit[8];
@@ -210,7 +221,16 @@ namespace ProjectSparks.Driving
             {
                 if (forwardSpeed < _maxForwardSpeed)
                 {
-                    _body.AddForce(transform.forward * _forwardAcceleration * drive, ForceMode.Acceleration);
+                    // Плавно уменьшаем тягу по мере приближения к обычной максимальной скорости.
+                    // Если машина движется назад, полный разгон вперед остается доступен.
+                    float speedRatio = Mathf.Clamp01(
+                        Mathf.Max(0f, forwardSpeed) / Mathf.Max(0.01f, _maxForwardSpeed));
+                    float accelerationMultiplier = _forwardAccelerationBySpeed != null &&
+                                                   _forwardAccelerationBySpeed.length > 0
+                        ? Mathf.Clamp01(_forwardAccelerationBySpeed.Evaluate(speedRatio))
+                        : 1f;
+                    float effectiveAcceleration = _forwardAcceleration * accelerationMultiplier;
+                    _body.AddForce(transform.forward * effectiveAcceleration * drive, ForceMode.Acceleration);
                 }
             }
             else if (drive < -0.01f)

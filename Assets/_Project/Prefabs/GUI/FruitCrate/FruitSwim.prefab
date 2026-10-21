@@ -200,7 +200,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.77832043, b: 0.43867922, a: 1}
+  m_Color: {r: 1, g: 0.9078704, b: 0.7688679, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -271,8 +271,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 60953568007847a996759b3982ca6156, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _button: {fileID: 2016907210389201233}
   _icon: {fileID: 4204304309038033986}
   _nameText: {fileID: 4474516340198824295}
@@ -386,7 +386,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -20.805504}
+  m_AnchoredPosition: {x: 0, y: -39.8}
   m_SizeDelta: {x: -60, y: -136.691}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &376968746960378298

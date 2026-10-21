@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: spark_starter_01
   _defaultName: "\u0418\u0441\u043A\u0440\u0430"
-  _bodyColor: {r: 0.21653427, g: 1.2406828, b: 0.99210304, a: 1}
-  _secondaryColor: {r: 1.0908118, g: 1.0098633, b: 0.77999264, a: 1}
-  _accentColor: {r: 0.62083447, g: 1.1580511, b: 1.4610145, a: 1}
+  _bodyColor: {r: 0.42706135, g: 1.1254342, b: 1.3371922, a: 1}
+  _secondaryColor: {r: 1.0853702, g: 1.0415686, b: 0.9164211, a: 1}
+  _accentColor: {r: 0.81600654, g: 1.2255511, b: 1.4537259, a: 1}
   _emotion: 0
   _swim: 0
   _fly: 0

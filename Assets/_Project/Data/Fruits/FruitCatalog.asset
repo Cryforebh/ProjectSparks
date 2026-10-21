@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _entries:
   - _prefab: {fileID: 11400000, guid: 1bbdb37dc1d640d5b1ca63c12d6e0fd1, type: 3}
-    _icon: {fileID: 0}
+    _icon: {fileID: 21300000, guid: 6b83238219c74eceaaa5960778557a99, type: 3}
     _startingAmount: 20
     _swimIncrease: 5
     _flyIncrease: 0
@@ -38,7 +38,7 @@ MonoBehaviour:
     _powerIncrease: 0
     _staminaIncrease: 2
   - _prefab: {fileID: 11400000, guid: 4eedb37dc1d640d5b1ca63c12d6e0fd4, type: 3}
-    _icon: {fileID: 0}
+    _icon: {fileID: 21300000, guid: e985a0ce0b6e42baa617fad8a1025d71, type: 3}
     _startingAmount: 20
     _swimIncrease: 0
     _flyIncrease: 0

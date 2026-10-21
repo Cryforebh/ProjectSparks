@@ -11,13 +11,13 @@ namespace ProjectSparks.Companions
         {
             [Tooltip("Полное имя состояния в базовом слое Animator, например Base Layer.SparkRig|Ilde_Sit.")]
             [SerializeField] private string _animatorState;
-            [MinTooltip(0.1f, "Минимальное время этого варианта сидения, в секундах. Не используется при завершении по анимации.")]
+            [Min(0.1f), Tooltip("Минимальное время этого варианта сидения, в секундах. Не используется при завершении по анимации.")]
             [SerializeField] private float _minDuration = 3f;
-            [MinTooltip(0.1f, "Максимальное время этого варианта сидения, в секундах. Не используется при завершении по анимации.")]
+            [Min(0.1f), Tooltip("Максимальное время этого варианта сидения, в секундах. Не используется при завершении по анимации.")]
             [SerializeField] private float _maxDuration = 6f;
             [Tooltip("Завершить сидение после первого проигрывания состояния Animator. Если включено, интервал времени не используется.")]
             [SerializeField] private bool _finishOnClipEnd;
-            [MinTooltip(0f, "Относительная частота выбора. Ноль исключает вариант из случайного выбора.")]
+            [Min(0f), Tooltip("Относительная частота выбора. Ноль исключает вариант из случайного выбора.")]
             [SerializeField] private float _selectionWeight = 1f;
             [Tooltip("Разрешить Искре поворачивать голову к игроку или другой Искре во время этого варианта сидения.")]
             [SerializeField] private bool _lookAtTargets;

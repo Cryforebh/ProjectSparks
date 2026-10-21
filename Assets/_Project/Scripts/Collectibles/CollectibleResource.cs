@@ -9,13 +9,15 @@ namespace ProjectSparks.Collectibles
     {
         [Tooltip("Тип ресурса, который получит игрок.")]
         [SerializeField] private ResourceType _resourceType;
-        [Tooltip("Количество ресурса за один объект.")]
-        [SerializeField, Min(1)] private int _amount = 1;
-        [Tooltip("Физический префаб награждаемого фрукта. Используется только для ресурса Fruit.")]
+        [Min(1), Tooltip("Количество выбранного ресурса за подбор этого объекта.")]
+        [SerializeField] private int _amount = 1;
+        [Tooltip("Выбранный фрукт из каталога. При подборе начисляется его ID, внешний вид этого объекта не меняется. Используется только для ресурса Fruit.")]
         [SerializeField] private PhysicalFruitItem _fruitPrefab;
 
         private ITripSessionService _tripSession;
         private bool _isCollected;
+
+        public ResourceType ResourceType => _resourceType;
 
         [Inject]
         private void Construct(ITripSessionService tripSession)

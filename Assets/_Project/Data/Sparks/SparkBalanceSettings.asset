@@ -15,14 +15,14 @@ MonoBehaviour:
   _pickupRadius:
     _stat: 3
     _unlockAt: 10
-    _maximumAt: 50
+    _maximumAt: 100
     _initialBonus: 0.5
     _maximumBonus: 1
   _boostSaving:
     _stat: 4
     _unlockAt: 10
-    _maximumAt: 50
+    _maximumAt: 100
     _initialBonus: 0.25
     _maximumBonus: 0.5
-  _feedingsToFullGrowth: 10
+  _feedingsToFullGrowth: 100
   _earDevelopmentMaximumAt: 100

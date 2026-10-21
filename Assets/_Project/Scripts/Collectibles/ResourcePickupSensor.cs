@@ -1,3 +1,4 @@
+using System;
 using ProjectSparks.Companions;
 using UnityEngine;
 using Zenject;
@@ -15,6 +16,8 @@ namespace ProjectSparks.Collectibles
 
         private ICompanionService _companionService;
         private SphereCollider _sensorCollider;
+
+        public event Action<ResourceType> Collected;
 
         [Inject]
         private void Construct(ICompanionService companionService)
@@ -50,9 +53,9 @@ namespace ProjectSparks.Collectibles
             }
 
             CollectibleResource collectible = other.GetComponentInParent<CollectibleResource>();
-            if (collectible != null)
+            if (collectible != null && collectible.TryCollect())
             {
-                collectible.TryCollect();
+                Collected?.Invoke(collectible.ResourceType);
             }
         }
 

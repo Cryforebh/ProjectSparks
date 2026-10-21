@@ -8,17 +8,17 @@ namespace ProjectSparks.Companions
     {
         [SerializeField] private Animator _animator;
         [SerializeField] private SkinnedMeshRenderer _headRenderer;
-        [MinTooltip(0.1f, "Максимальное расстояние до игрока или другой Искры, за которыми сидящая Искра может следить взглядом, в метрах.")]
+        [Min(0.1f), Tooltip("Максимальное расстояние до игрока или другой Искры, за которыми сидящая Искра может следить взглядом, в метрах.")]
         [SerializeField] private float _lookDistance = 4f;
-        [MinTooltip(0f, "Предельный угол поворота головы от направления тела в статическом сидении, в градусах.")]
+        [Min(0f), Tooltip("Предельный угол поворота головы от направления тела в статическом сидении, в градусах.")]
         [SerializeField] private float _maxLookAngle = 30f;
-        [MinTooltip(0f, "Предельный наклон головы вверх и вниз в статическом сидении, в градусах.")]
+        [Min(0f), Tooltip("Предельный наклон головы вверх и вниз в статическом сидении, в градусах.")]
         [SerializeField] private float _maxLookPitch = 20f;
         [Tooltip("На сколько метров выше выбранной точки Искра направляет взгляд.")]
         [SerializeField] private float _lookHeightOffset = 0.08f;
-        [MinTooltip(0.1f, "Скорость плавного поворота головы к цели и обратно, в градусах в секунду.")]
+        [Min(0.1f), Tooltip("Скорость плавного поворота головы к цели и обратно, в градусах в секунду.")]
         [SerializeField] private float _lookTurnSpeed = 90f;
-        [MinTooltip(0.05f, "За сколько секунд до окончания статического сидения голова плавно вернётся к позе анимации.")]
+        [Min(0.05f), Tooltip("За сколько секунд до окончания статического сидения голова плавно вернётся к позе анимации.")]
         [SerializeField] private float _lookReturnDuration = 0.45f;
 
         private SparkInteractable _spark;
@@ -36,6 +36,11 @@ namespace ProjectSparks.Companions
         private bool _sittingLookAllowed;
         private bool _isBaby;
         private bool _started;
+        private bool _isPassenger;
+
+        public bool IsInitialized => _started;
+
+        public void SetPassengerMode() => _isPassenger = true;
 
         private static readonly int DecisionMain = Animator.StringToHash("Base Layer.Decision_Main");
         private static readonly int DecisionBaby = Animator.StringToHash("Base Layer.Decision_Baby");
@@ -62,7 +67,7 @@ namespace ProjectSparks.Companions
             }
 
             _isBaby = isBaby;
-            if (!_started)
+            if (!_started || _isPassenger)
             {
                 return;
             }
@@ -106,8 +111,8 @@ namespace ProjectSparks.Companions
 
             if (_spark == null)
             {
-                // В поездке визуал также получает возраст, но не имеет состояния взаимодействия.
-                PlayDecision();
+                if (!_isPassenger)
+                    PlayDecision();
                 return;
             }
 
@@ -161,7 +166,7 @@ namespace ProjectSparks.Companions
 
         public void PlaySitStart() => PlayRest(_isBaby ? SitStartBaby : SitStartMain);
         public void PlaySitToDefault() => PlayRest(_isBaby ? SitToDefaultBaby : SitToDefaultMain);
-        public bool PlaySitting(SparkSittingProfile.Variant variant, float endTime)
+        public bool PlaySitting(SparkSittingProfile.Variant variant, float endTime, bool immediately = false)
         {
             if (variant == null || string.IsNullOrWhiteSpace(variant.AnimatorState))
             {
@@ -175,7 +180,15 @@ namespace ProjectSparks.Companions
                 return false;
             }
 
-            PlayRest(state);
+            if (immediately)
+            {
+                _activeRestState = state;
+                _animator.Play(state, 0, 0f);
+            }
+            else
+            {
+                PlayRest(state);
+            }
             _sittingEndTime = endTime;
             _sittingFinishesOnClipEnd = variant.FinishOnClipEnd;
             _sittingLookAllowed = variant.LookAtTargets;

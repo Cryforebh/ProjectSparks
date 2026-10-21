@@ -9,13 +9,13 @@ namespace ProjectSparks.Companions
     {
         [Tooltip("Варианты сидения, их длительность и разрешение поворачивать голову.")]
         [SerializeField] private SparkSittingProfile _sittingProfile;
-        [MinTooltip(0.1f, "Минимальная длина маршрута до случайной цели по NavMesh, в метрах.")]
+        [Min(0.1f), Tooltip("Минимальная длина маршрута до случайной цели по NavMesh, в метрах.")]
         [SerializeField] private float _minTravelDistance = 0.6f;
-        [MinTooltip(0.1f, "Максимальная длина маршрута до случайной цели по NavMesh, в метрах. Учитывает обход препятствий.")]
+        [Min(0.1f), Tooltip("Максимальная длина маршрута до случайной цели по NavMesh, в метрах. Учитывает обход препятствий.")]
         [SerializeField] private float _maxTravelDistance = 10f;
-        [MinTooltip(0.1f, "Пауза в секундах перед поиском следующей цели после перехода в раздумье. При неудаче поиск повторяется через тот же интервал.")]
+        [Min(0.1f), Tooltip("Пауза в секундах перед поиском следующей цели после перехода в раздумье. При неудаче поиск повторяется через тот же интервал.")]
         [SerializeField] private float _decisionDelay = 4.5f;
-        [MinTooltip(0.01f, "Дополнительный допуск к Stopping Distance агента, при котором цель считается достигнутой, в метрах.")]
+        [Min(0.01f), Tooltip("Дополнительный допуск к Stopping Distance агента, при котором цель считается достигнутой, в метрах.")]
         [SerializeField] private float _arrivalDistance = 0.12f;
 
         private const int DestinationAttempts = 8;

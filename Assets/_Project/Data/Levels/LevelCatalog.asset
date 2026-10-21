@@ -16,6 +16,6 @@ MonoBehaviour:
   - _level: {fileID: 11400000, guid: 950929e77dac4d5cacce74b4a3dd9a47, type: 2}
     _isAvailable: 1
   - _level: {fileID: 11400000, guid: 11bae48326946f24c82e8554567b00e8, type: 2}
-    _isAvailable: 1
+    _isAvailable: 0
   - _level: {fileID: 11400000, guid: 31d7c55cbdb24b6db8a9694346c5f277, type: 2}
     _isAvailable: 0

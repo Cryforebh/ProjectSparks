@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc8cdbfd081b953448cf7e068efd86f8, type: 3}
+  m_Name: SparkStarter03
+  m_EditorClassIdentifier: 
+  _id: spark_starter_03
+  _defaultName: "\u0418\u0441\u043A\u0440\u0430"
+  _bodyColor: {r: 1.337192, g: 0.4226031, b: 0.4539245, a: 1}
+  _secondaryColor: {r: 1.0853702, g: 1.0415686, b: 0.9164211, a: 1}
+  _accentColor: {r: 1.4537259, g: 0.77486336, b: 0.80000633, a: 1}
+  _emotion: 2
+  _swim: 90
+  _fly: 90
+  _run: 90
+  _power: 90
+  _stamina: 90

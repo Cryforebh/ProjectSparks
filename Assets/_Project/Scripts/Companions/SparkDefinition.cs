@@ -32,19 +32,19 @@ namespace ProjectSparks.Companions
 
         [Header("Стартовые характеристики")]
 
-        [MinTooltip(0, "Стартовое значение плавания.")]
+        [Min(0), Tooltip("Стартовое значение плавания.")]
         [SerializeField] private int _swim;
 
-        [MinTooltip(0, "Стартовое значение полета.")]
+        [Min(0), Tooltip("Стартовое значение полета.")]
         [SerializeField] private int _fly;
 
-        [MinTooltip(0, "Стартовое значение бега.")]
+        [Min(0), Tooltip("Стартовое значение бега.")]
         [SerializeField] private int _run;
 
-        [MinTooltip(0, "Стартовое значение силы.")]
+        [Min(0), Tooltip("Стартовое значение силы.")]
         [SerializeField] private int _power;
 
-        [MinTooltip(0, "Стартовое значение выносливости.")]
+        [Min(0), Tooltip("Стартовое значение выносливости.")]
         [SerializeField] private int _stamina;
 
         public string Id => _id;
