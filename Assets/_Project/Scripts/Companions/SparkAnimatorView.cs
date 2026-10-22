@@ -1,4 +1,3 @@
-using ProjectSparks.Player;
 using UnityEngine;
 
 namespace ProjectSparks.Companions
@@ -22,6 +21,7 @@ namespace ProjectSparks.Companions
         [SerializeField] private float _lookReturnDuration = 0.45f;
 
         private SparkInteractable _spark;
+        private ISparkLookTargets _lookTargets;
         private Transform _headBone;
         private Transform _lookTarget;
         private SparkAnimatorView _lookTargetSpark;
@@ -41,6 +41,8 @@ namespace ProjectSparks.Companions
         public bool IsInitialized => _started;
 
         public void SetPassengerMode() => _isPassenger = true;
+
+        public void SetLookTargets(ISparkLookTargets lookTargets) => _lookTargets = lookTargets;
 
         private static readonly int DecisionMain = Animator.StringToHash("Base Layer.Decision_Main");
         private static readonly int DecisionBaby = Animator.StringToHash("Base Layer.Decision_Baby");
@@ -295,16 +297,21 @@ namespace ProjectSparks.Companions
         {
             _lookTarget = null;
             _lookTargetSpark = null;
+            if (_lookTargets == null)
+            {
+                return;
+            }
+
             float nearestDistanceSquared = _lookDistance * _lookDistance;
             Vector3 origin = _headBone.position;
 
-            Transform playerTarget = PlayerLookTarget.Current;
+            Transform playerTarget = _lookTargets.PlayerTarget;
             if (playerTarget != null)
             {
                 ConsiderLookTarget(playerTarget, null, origin, ref nearestDistanceSquared);
             }
 
-            foreach (SparkInteractable otherSpark in SparkInteractable.ActiveSparks)
+            foreach (SparkInteractable otherSpark in _lookTargets.Sparks)
             {
                 if (otherSpark == null || otherSpark == _spark)
                 {

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using ProjectSparks.Collectibles;
 using ProjectSparks.Player;
@@ -37,10 +36,6 @@ namespace ProjectSparks.Companions
         ISparkProfile,
         ISparkStateController
     {
-        private static readonly List<SparkInteractable> ActiveInstances = new();
-
-        public static IReadOnlyList<SparkInteractable> ActiveSparks => ActiveInstances;
-
         [Header("Искра")]
         [Tooltip("Постоянный уникальный ID Искры, совпадающий с ее записью прогресса.")]
         [SerializeField] private string _sparkId = SparkIds.First;
@@ -58,6 +53,7 @@ namespace ProjectSparks.Companions
         private IPlayerHandsService _handsService;
         private ISparkProgressService _sparkProgressService;
         private IShelterInteractionRequestService _requestService;
+        private ISparkLookTargets _lookTargets;
 
         public event Action<SparkBehaviourState> StateChanged;
         public event Action EatingAnimationCompleted;
@@ -81,11 +77,17 @@ namespace ProjectSparks.Companions
               && !_handsService.HasItem;
 
         [Inject]
-        private void Construct(IPlayerHandsService handsService, ISparkProgressService sparkProgressService, IShelterInteractionRequestService requestService)
+        private void Construct(IPlayerHandsService handsService, ISparkProgressService sparkProgressService,
+            IShelterInteractionRequestService requestService, ISparkLookTargets lookTargets)
         {
             _handsService = handsService;
             _sparkProgressService = sparkProgressService;
             _requestService = requestService;
+            _lookTargets = lookTargets;
+            if (isActiveAndEnabled)
+            {
+                _lookTargets.RegisterSpark(this);
+            }
         }
 
         private void Awake()
@@ -100,10 +102,7 @@ namespace ProjectSparks.Companions
 
         private void OnEnable()
         {
-            if (!ActiveInstances.Contains(this))
-            {
-                ActiveInstances.Add(this);
-            }
+            _lookTargets?.RegisterSpark(this);
         }
 
         public void Interact()
@@ -201,13 +200,13 @@ namespace ProjectSparks.Companions
 
         private void OnDisable()
         {
-            ActiveInstances.Remove(this);
+            _lookTargets?.UnregisterSpark(this);
             CompleteEating();
         }
 
         private void OnDestroy()
         {
-            ActiveInstances.Remove(this);
+            _lookTargets?.UnregisterSpark(this);
             CompleteEating();
         }
 

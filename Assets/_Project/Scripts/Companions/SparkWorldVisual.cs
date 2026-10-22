@@ -12,6 +12,7 @@ namespace ProjectSparks.Companions
         private SparkVisualFactory _factory;
         private ISparkProgressService _progress;
         private IProgressService _progressService;
+        private ISparkLookTargets _lookTargets;
         private SparkInteractable _spark;
         private GameObject _instance;
         private SparkFruitAttachment _fruitAttachment;
@@ -23,11 +24,13 @@ namespace ProjectSparks.Companions
         private void Construct(
             SparkVisualFactory factory,
             ISparkProgressService progress,
-            IProgressService progressService)
+            IProgressService progressService,
+            ISparkLookTargets lookTargets)
         {
             _factory = factory;
             _progress = progress;
             _progressService = progressService;
+            _lookTargets = lookTargets;
         }
 
         private void Start()
@@ -62,6 +65,7 @@ namespace ProjectSparks.Companions
             if (_instance == null)
             {
                 _instance = _factory.Create(data, transform);
+                _instance.GetComponent<SparkAnimatorView>()?.SetLookTargets(_lookTargets);
                 _fruitAttachment = _instance.GetComponent<SparkFruitAttachment>();
             }
             else _factory.Apply(_instance, data);

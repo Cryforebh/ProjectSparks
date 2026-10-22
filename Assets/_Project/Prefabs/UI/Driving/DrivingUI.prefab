@@ -4480,7 +4480,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5026497895353955434}
   m_Layer: 0
-  m_Name: '[GUI]'
+  m_Name: DrivingUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

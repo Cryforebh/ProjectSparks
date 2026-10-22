@@ -1,4 +1,6 @@
+using ProjectSparks.Companions;
 using UnityEngine;
+using Zenject;
 
 namespace ProjectSparks.Player
 {
@@ -8,21 +10,28 @@ namespace ProjectSparks.Player
         [Tooltip("Точка, на которую смотрят Искры. Для другого вида камеры можно назначить, например, голову персонажа.")]
         [SerializeField] private Transform _target;
 
-        private static PlayerLookTarget _active;
+        private ISparkLookTargets _lookTargets;
 
-        public static Transform Current => _active != null ? _active._target : null;
+        public Transform Target => _target;
+
+        [Inject]
+        private void Construct(ISparkLookTargets lookTargets)
+        {
+            _lookTargets = lookTargets;
+            if (isActiveAndEnabled)
+            {
+                _lookTargets.RegisterPlayer(this);
+            }
+        }
 
         private void OnEnable()
         {
-            _active = this;
+            _lookTargets?.RegisterPlayer(this);
         }
 
         private void OnDisable()
         {
-            if (_active == this)
-            {
-                _active = null;
-            }
+            _lookTargets?.UnregisterPlayer(this);
         }
     }
 }

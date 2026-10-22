@@ -1,4 +1,5 @@
 using ProjectSparks.Collectibles;
+using ProjectSparks.Companions;
 using ProjectSparks.Core;
 using UnityEngine;
 using Zenject;
@@ -19,6 +20,8 @@ namespace ProjectSparks.Player
 
         public override void InstallBindings()
         {
+            Container.Bind<ISparkLookTargets>().To<SparkLookTargets>().AsSingle();
+
             if (_playerInput == null
                 || _playerInteractor == null
                 || _playerHands == null
