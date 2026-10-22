@@ -29,6 +29,9 @@ namespace ProjectSparks.Player
         private float _verticalVelocity;
         private float _pitch;
 
+        public bool IsWalking { get; private set; }
+        public float WalkedDistance { get; private set; }
+
         [Inject]
         private void Construct(
             IPlayerInputSource input,
@@ -60,6 +63,7 @@ namespace ProjectSparks.Player
 
         public void UpdateFrame()
         {
+            IsWalking = false;
             if (_pauseService.IsPaused || !_controlService.IsControlEnabled)
             {
                 return;
@@ -120,7 +124,18 @@ namespace ProjectSparks.Player
             Vector3 velocity =
                 planarMovement * _moveSpeed
                 + Vector3.up * _verticalVelocity;
+            Vector3 previousPosition = transform.position;
             _characterController.Move(velocity * Time.deltaTime);
+
+            Vector3 displacement = transform.position - previousPosition;
+            displacement.y = 0f;
+            float distance = displacement.magnitude;
+            IsWalking = moveInput.sqrMagnitude > 0.0001f
+                && _characterController.isGrounded && distance > 0.001f;
+            if (IsWalking)
+            {
+                WalkedDistance += distance;
+            }
         }
 
         private void HandlePauseChanged(bool isPaused)

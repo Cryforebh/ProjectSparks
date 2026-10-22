@@ -29,6 +29,7 @@ namespace ProjectSparks.Player
         private IInteractable _currentTarget;
         private IFocusable _currentFocus;
         private float _lastFocusTime;
+        private RaycastHit[] _interactionHits = new RaycastHit[16];
 
         public event Action<string> PromptChanged;
 
@@ -47,6 +48,7 @@ namespace ProjectSparks.Player
             _controlService = controlService;
             _handsService = handsService;
             _fruitWorldService = fruitWorldService;
+            _handsService.HeldItemChanged += HandleHeldItemChanged;
         }
 
         private void Awake()
@@ -96,6 +98,32 @@ namespace ProjectSparks.Player
             SetFocus(null);
         }
 
+        private void OnDestroy()
+        {
+            if (_handsService != null)
+            {
+                _handsService.HeldItemChanged -= HandleHeldItemChanged;
+            }
+        }
+
+        private void HandleHeldItemChanged(IHoldableItem item)
+        {
+            if (item == null)
+            {
+                return;
+            }
+
+            if (_currentTarget is Component target && target.transform.IsChildOf(item.ItemTransform))
+            {
+                SetTarget(null);
+            }
+
+            if (_currentFocus is Component focus && focus.transform.IsChildOf(item.ItemTransform))
+            {
+                SetFocus(null);
+            }
+        }
+
         private void RefreshTarget()
         {
             Ray ray = new Ray(
@@ -104,13 +132,8 @@ namespace ProjectSparks.Player
 
             IInteractable target = null;
             IFocusable focus = null;
-            if (Physics.SphereCast(
-                    ray,
-                    _interactionRadius,
-                    out RaycastHit hit,
-                    _interactionDistance,
-                    _interactionMask,
-                    QueryTriggerInteraction.Collide))
+            bool hasHit = TryGetTargetHit(ray, out RaycastHit hit);
+            if (hasHit)
             {
                 target = hit.collider.GetComponentInParent<IInteractable>();
                 focus = hit.collider.GetComponentInParent<IFocusable>();
@@ -124,7 +147,7 @@ namespace ProjectSparks.Player
             {
                 _lastFocusTime = Time.unscaledTime;
             }
-            else if ((_currentTarget != null || _currentFocus != null)
+            else if (!hasHit && (_currentTarget != null || _currentFocus != null)
                 && Time.unscaledTime - _lastFocusTime < _focusLostDelay)
             {
                 return;
@@ -132,6 +155,44 @@ namespace ProjectSparks.Player
 
             SetTarget(target);
             SetFocus(focus);
+        }
+
+        private bool TryGetTargetHit(Ray ray, out RaycastHit closestHit)
+        {
+            int hitCount = Physics.SphereCastNonAlloc(ray, _interactionRadius, _interactionHits,
+                _interactionDistance, _interactionMask, QueryTriggerInteraction.Collide);
+
+            while (hitCount == _interactionHits.Length)
+            {
+                Array.Resize(ref _interactionHits, _interactionHits.Length * 2);
+                hitCount = Physics.SphereCastNonAlloc(ray, _interactionRadius, _interactionHits,
+                    _interactionDistance, _interactionMask, QueryTriggerInteraction.Collide);
+            }
+
+            Transform heldTransform = _handsService.HeldItem?.ItemTransform;
+            float closestDistance = float.PositiveInfinity;
+            closestHit = default;
+            bool found = false;
+
+            for (int i = 0; i < hitCount; i++)
+            {
+                RaycastHit candidate = _interactionHits[i];
+                Transform hitTransform = candidate.collider.transform;
+                if (hitTransform.IsChildOf(transform)
+                    || (heldTransform != null && hitTransform.IsChildOf(heldTransform)))
+                {
+                    continue;
+                }
+
+                if (candidate.distance < closestDistance)
+                {
+                    closestDistance = candidate.distance;
+                    closestHit = candidate;
+                    found = true;
+                }
+            }
+
+            return found;
         }
 
         private void SetTarget(IInteractable target)

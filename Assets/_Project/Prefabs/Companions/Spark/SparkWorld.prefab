@@ -9,9 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8318676528032830184}
-  - component: {fileID: 7130660168345484372}
   - component: {fileID: 752457540101367775}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28,32 +27,11 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1904882, y: 0.1904882, z: 0.1904882}
+  m_LocalScale: {x: 0.24772991, y: 0.24772991, z: 0.24772991}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7058701574894820898}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &7130660168345484372
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2302605441965590678}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!135 &752457540101367775
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -85,7 +63,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1181659751409664183}
   - component: {fileID: 6482243639616017805}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FocusGlow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -134,7 +112,7 @@ GameObject:
   - component: {fileID: 8688887455361689226}
   - component: {fileID: 8688887455361689227}
   - component: {fileID: 8688887455361689228}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: SparkWorld
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -184,7 +162,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sparkId: spark_starter_01
   _colliders:
-  - {fileID: 7130660168345484372}
+  - {fileID: 0}
   _worldVisual: {fileID: 5503945198594682327}
   _eatingDuration: 5.42
   _completeEatingAutomatically: 0

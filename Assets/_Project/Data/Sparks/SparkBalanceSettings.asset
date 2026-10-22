@@ -17,7 +17,7 @@ MonoBehaviour:
     _unlockAt: 10
     _maximumAt: 100
     _initialBonus: 0.5
-    _maximumBonus: 1
+    _maximumBonus: 3
   _boostSaving:
     _stat: 4
     _unlockAt: 10

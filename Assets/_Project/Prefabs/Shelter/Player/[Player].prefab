@@ -249,6 +249,9 @@ GameObject:
   - component: {fileID: 5411680674585701270}
   - component: {fileID: 7021797215586538159}
   - component: {fileID: 6191289111298468820}
+  - component: {fileID: 2230000001}
+  - component: {fileID: 2230000002}
+  - component: {fileID: 2230000003}
   m_Layer: 0
   m_Name: '[Player]'
   m_TagString: Untagged
@@ -387,4 +390,146 @@ MonoBehaviour:
   _components:
   - {fileID: 4890716286987723259}
   - {fileID: 925057672226014502}
+  - {fileID: 2230000002}
+  - {fileID: 2230000003}
   - {fileID: 336187959307618685}
+--- !u!82 &2230000001
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6462569558637638073}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 0
+  MinDistance: 4
+  MaxDistance: 35
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.8
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &2230000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6462569558637638073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad5ec86ac47c4e1fa6da7f89a3b44500, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _controller: {fileID: 925057672226014502}
+  _audioSource: {fileID: 2230000001}
+  _clips:
+  - {fileID: 8300000, guid: 61ab683eff121a34a8ca12686ad9c543, type: 3}
+  - {fileID: 8300000, guid: 0be7ae985a844264aa64502827ba9b09, type: 3}
+  - {fileID: 8300000, guid: 286addc5a2f791543b92fd868241dffd, type: 3}
+  - {fileID: 8300000, guid: d3bb84c720830c84987e4a8cf2719f1b, type: 3}
+  - {fileID: 8300000, guid: 54d0aa390eb87d040b1c4fb9a8d83f36, type: 3}
+  - {fileID: 8300000, guid: ffd21030452dc134fa428299355ad290, type: 3}
+  _stepDistance: 1.6
+  _volume: 0.25
+  _volumeVariation: 0.1
+  _pitchVariation: 0.035
+--- !u!114 &2230000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6462569558637638073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30338d82d3554007835a8d28dfa80466, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _controller: {fileID: 925057672226014502}
+  _camera: {fileID: 579765653981748147}
+  _strideLength: 3.2
+  _verticalAmplitude: 0.01
+  _horizontalAmplitude: 0.004
+  _response: 10

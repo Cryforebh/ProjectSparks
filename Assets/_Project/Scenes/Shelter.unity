@@ -7702,7 +7702,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: ce5efb6c40ac1dc4c8c9af632b5ed00c, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.5
+  m_Volume: 0.4
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -14216,6 +14216,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2230000003, guid: 2ff5e77dcb32fae469d73a5c51649e7f, type: 3}
+      propertyPath: _verticalAmplitude
+      value: 0.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 2230000003, guid: 2ff5e77dcb32fae469d73a5c51649e7f, type: 3}
+      propertyPath: _horizontalAmplitude
+      value: 0.034
+      objectReference: {fileID: 0}
+    - target: {fileID: 196389193515438427, guid: 2ff5e77dcb32fae469d73a5c51649e7f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.38
+      objectReference: {fileID: 0}
+    - target: {fileID: 196389193515438427, guid: 2ff5e77dcb32fae469d73a5c51649e7f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.891
+      objectReference: {fileID: 0}
     - target: {fileID: 2447238897820804257, guid: 2ff5e77dcb32fae469d73a5c51649e7f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -6.1
