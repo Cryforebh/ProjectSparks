@@ -63780,18 +63780,6 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -1.5
       objectReference: {fileID: 0}
-    - target: {fileID: 3102, guid: c396c5818d5e421c904b21f010258cde, type: 3}
-      propertyPath: m_Color.b
-      value: 0.99343157
-      objectReference: {fileID: 0}
-    - target: {fileID: 3102, guid: c396c5818d5e421c904b21f010258cde, type: 3}
-      propertyPath: m_Color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3102, guid: c396c5818d5e421c904b21f010258cde, type: 3}
-      propertyPath: m_Color.r
-      value: 0.41176474
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -63851,7 +63839,7 @@ MonoBehaviour:
   _vehicleOffset: 3
   _targetOffset: 2.5
   _spacing: 2.5
-  _diameter: 0.5
+  _diameter: 0.3
   _maxDots: 199
   _raycastHeight: 50
   _raycastDepth: 200

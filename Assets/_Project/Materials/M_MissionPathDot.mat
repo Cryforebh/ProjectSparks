@@ -51,7 +51,8 @@ Material:
     - _Surface: 0
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.08376967, g: 2, b: 1.9802213, a: 1}
+    - _BaseColor: {r: 0, g: 1, b: 0.9559734, a: 1}
+    - _OutlineColor: {r: 0, g: 0.1946178, b: 0.1878208, a: 1}
     - _Color: {r: 1, g: 0.8, b: 0.049999982, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

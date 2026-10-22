@@ -2,7 +2,8 @@ Shader "Project Sparks/Mission Path Dot"
 {
     Properties
     {
-        [HDR] _BaseColor("Цвет маркера", Color) = (2, 1.25, 0.08, 1)
+        _BaseColor("Цвет точки", Color) = (0, 1, 0.9559734, 1)
+        _OutlineColor("Цвет обводки", Color) = (0, 0.1946178, 0.1878208, 1)
     }
     SubShader
     {
@@ -11,7 +12,7 @@ Shader "Project Sparks/Mission Path Dot"
         {
             Name "PathDot"
             Tags { "LightMode"="SRPDefaultUnlit" }
-            Blend SrcAlpha One
+            Blend SrcAlpha OneMinusSrcAlpha
             ZWrite Off
             Cull Off
 
@@ -22,6 +23,7 @@ Shader "Project Sparks/Mission Path Dot"
 
             CBUFFER_START(UnityPerMaterial)
                 half4 _BaseColor;
+                half4 _OutlineColor;
             CBUFFER_END
 
             struct Attributes
@@ -49,11 +51,12 @@ Shader "Project Sparks/Mission Path Dot"
 
             half4 Frag(Varyings input) : SV_Target
             {
-                half distanceFromCenter = length(input.uv * 2.0h - 1.0h);
-                half core = 1.0h - smoothstep(0.12h, 0.3h, distanceFromCenter);
-                half glow = saturate(1.0h - distanceFromCenter);
-                half4 color = _BaseColor;
-                color.a *= saturate(core + glow * glow * 0.35h);
+                float distanceFromCenter = length(input.uv * 2.0 - 1.0);
+                float edgeWidth = max(fwidth(distanceFromCenter), 0.002);
+                half fill = 1.0 - smoothstep(0.74 - edgeWidth, 0.74 + edgeWidth, distanceFromCenter);
+                half opacity = 1.0 - smoothstep(0.92 - edgeWidth, 0.92 + edgeWidth, distanceFromCenter);
+                half4 color = lerp(_OutlineColor, _BaseColor, fill);
+                color.a *= opacity;
                 return color;
             }
             ENDHLSL
