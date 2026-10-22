@@ -10,20 +10,33 @@ namespace ProjectSparks.Missions
         [SerializeField] private MissionScenePoints _scenePoints;
         [Tooltip("Единственный маркер, заранее размещенный в этой сцене. Изначально выключен.")]
         [SerializeField] private MissionTargetMarker _marker;
+        [Tooltip("Точка возвращения в убежище. Используется тем же маркером после всех доставок.")]
+        [SerializeField] private Transform _returnPoint;
         [Tooltip("Высота маркера над верхней границей триггера зоны в метрах.")]
         [SerializeField, Min(0f)] private float _surfaceOffset = 0.04f;
 
         private IMissionService _missionService;
+        private ITripSessionService _tripSession;
         private MissionScenePoint _currentPoint;
+        private Vector3 _currentTargetPosition;
+        private bool _hasTarget;
         private bool _isInitialized;
         private bool _isSubscribed;
 
+        // Оставлено для совместимости с другими системами: при возврате это null.
         public MissionScenePoint CurrentPoint => _currentPoint;
 
+        public bool TryGetTargetPosition(out Vector3 position)
+        {
+            position = _currentTargetPosition;
+            return _hasTarget;
+        }
+
         [Inject]
-        private void Construct(IMissionService missionService)
+        private void Construct(IMissionService missionService, ITripSessionService tripSession)
         {
             _missionService = missionService;
+            _tripSession = tripSession;
         }
 
         private void Start()
@@ -50,9 +63,10 @@ namespace ProjectSparks.Missions
 
         private void Subscribe()
         {
-            if (_isSubscribed || _missionService == null)
+            if (_isSubscribed || _missionService == null || _tripSession == null)
                 return;
             _missionService.StateChanged += Refresh;
+            _tripSession.Changed += Refresh;
             _isSubscribed = true;
             Refresh();
         }
@@ -62,6 +76,7 @@ namespace ProjectSparks.Missions
             if (_isSubscribed)
             {
                 _missionService.StateChanged -= Refresh;
+                _tripSession.Changed -= Refresh;
                 _isSubscribed = false;
             }
 
@@ -74,10 +89,26 @@ namespace ProjectSparks.Missions
             if (_marker != null)
                 _marker.gameObject.SetActive(false);
             _currentPoint = null;
+            _hasTarget = false;
+            _currentTargetPosition = Vector3.zero;
         }
 
         private void Refresh()
         {
+            // Статус сессии важнее фазы отдельной доставки.
+            if (_tripSession.State == TripSessionState.Succeeded ||
+                _tripSession.State == TripSessionState.Confirmed)
+            {
+                if (_returnPoint == null)
+                {
+                    HideMarker();
+                    return;
+                }
+
+                ShowTarget(_returnPoint.position, null);
+                return;
+            }
+
             MissionAssignment mission = _missionService.ActiveMission;
             MissionScenePoint point = null;
             if (mission != null)
@@ -94,10 +125,18 @@ namespace ProjectSparks.Missions
                 return;
             }
 
-            if (_currentPoint != point)
+            ShowTarget(point.SurfacePosition, point);
+        }
+
+        private void ShowTarget(Vector3 position, MissionScenePoint point)
+        {
+            if (!_hasTarget || _currentPoint != point)
                 _marker.gameObject.SetActive(false);
-            _marker.transform.SetPositionAndRotation(point.SurfacePosition + Vector3.up * _surfaceOffset, Quaternion.identity);
+
             _currentPoint = point;
+            _currentTargetPosition = position;
+            _hasTarget = true;
+            _marker.transform.SetPositionAndRotation(position + Vector3.up * _surfaceOffset, Quaternion.identity);
             _marker.gameObject.SetActive(true);
         }
     }

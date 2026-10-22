@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 namespace ProjectSparks.Driving
 {
     [DefaultExecutionOrder(-100)]
-    public sealed class ArcadeCarInput : MonoBehaviour, IVehicleInputSource, IPauseInputSource
+    public sealed class ArcadeCarInput : MonoBehaviour, IVehicleInputSource, IPauseInputSource, IFrameUpdate
     {
         [Tooltip("Набор команд управления машиной.")]
         [SerializeField] private InputActionAsset _inputActions;
@@ -50,7 +50,7 @@ namespace ProjectSparks.Driving
             _vehicleActions?.Enable();
         }
 
-        private void Update()
+        public void UpdateFrame()
         {
             Steer = Mathf.Clamp(_steerAction.ReadValue<float>(), -1f, 1f);
             Drive = Mathf.Clamp(

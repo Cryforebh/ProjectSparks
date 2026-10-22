@@ -105,15 +105,14 @@ namespace ProjectSparks.Missions
             }
             if (_mesh == null)
                 CreateMesh();
-            MissionScenePoint point = _targetView.CurrentPoint;
-            if (point == null)
+            if (!_targetView.TryGetTargetPosition(out Vector3 targetPosition))
             {
                 _renderer.enabled = false;
                 return;
             }
             if (Time.timeScale == 0f)
                 return;
-            Rebuild(point.SurfacePosition);
+            Rebuild(targetPosition);
         }
 
         private void Rebuild(Vector3 target)

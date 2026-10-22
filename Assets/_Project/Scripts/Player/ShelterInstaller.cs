@@ -66,6 +66,8 @@ namespace ProjectSparks.Player
                 .BindInterfacesAndSelfTo<PauseService>()
                 .AsSingle()
                 .NonLazy();
+
+            Container.BindInterfacesTo<LevelRestartService>().AsSingle().NonLazy();
         }
     }
 }

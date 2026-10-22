@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering;
+using Zenject;
 
 namespace ProjectSparks.Missions
 {
@@ -25,6 +26,12 @@ namespace ProjectSparks.Missions
         private Sprite _placeholderSprite;
         private float _elapsed;
 
+        [Inject]
+        private void Construct(Camera viewCamera)
+        {
+            _viewCamera = viewCamera;
+        }
+
         private void Awake()
         {
             if (_rings == null || _parcel == null || _parcelIcon == null)
@@ -36,7 +43,6 @@ namespace ProjectSparks.Missions
 
             _ringScale = _rings.localScale;
             _parcelHeight = _parcel.localPosition.y;
-            _viewCamera = Camera.main;
             if (_parcelIcon.sprite == null)
             {
                 Texture2D texture = Texture2D.whiteTexture;
@@ -68,8 +74,6 @@ namespace ProjectSparks.Missions
 
         private void HandleBeginCameraRendering(ScriptableRenderContext context, Camera camera)
         {
-            if (_viewCamera == null)
-                _viewCamera = Camera.main;
             if (camera != _viewCamera || _viewCamera == null)
                 return;
 

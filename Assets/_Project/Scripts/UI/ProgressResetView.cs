@@ -75,6 +75,7 @@ namespace ProjectSparks.UI
         private void HandleOpenClicked()
         {
             SetConfirmationVisible(true);
+            _cancelButton.Select();
         }
 
         private void HandleCancelClicked()
@@ -99,7 +100,9 @@ namespace ProjectSparks.UI
 
             try
             {
-                await _progressService.ResetAsync(this.GetCancellationTokenOnDestroy());
+                var cancellationToken = this.GetCancellationTokenOnDestroy();
+                await _progressService.LoadAsync(cancellationToken);
+                await _progressService.ResetAsync(cancellationToken);
                 SetConfirmationVisible(false);
             }
             catch (OperationCanceledException)
@@ -118,6 +121,11 @@ namespace ProjectSparks.UI
 
         private void SetButtonsInteractable(bool isInteractable)
         {
+            if (_openButton != null)
+            {
+                _openButton.interactable = isInteractable;
+            }
+
             if (_confirmButton != null)
             {
                 _confirmButton.interactable = isInteractable;

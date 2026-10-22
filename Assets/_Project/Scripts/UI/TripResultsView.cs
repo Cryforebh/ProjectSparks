@@ -35,6 +35,9 @@ namespace ProjectSparks.UI
         [Tooltip("Общее окно подтверждения выхода без сохранения наград.")]
         [SerializeField] private TripExitView _tripExitView;
 
+        // Общий сигнал отказа от возвращения через окно итогов либо предупреждение.
+        public event Action ReturnCancelled;
+
         private ITripSessionService _tripSession;
         private FruitCatalog _fruitCatalog;
         private IPauseService _pauseService;
@@ -84,6 +87,8 @@ namespace ProjectSparks.UI
 
             _tripSession.Changed += Refresh;
             _pauseService.PauseChanged += HandlePauseChanged;
+            if (_tripExitView != null)
+                _tripExitView.ExitCancelled += HandleTripExitCancelled;
             _openButton.onClick.AddListener(Open);
             if (_pauseOpenButton != null)
                 _pauseOpenButton.onClick.AddListener(RequestReturn);
@@ -103,6 +108,8 @@ namespace ProjectSparks.UI
 
             _tripSession.Changed -= Refresh;
             _pauseService.PauseChanged -= HandlePauseChanged;
+            if (_tripExitView != null)
+                _tripExitView.ExitCancelled -= HandleTripExitCancelled;
             _openButton.onClick.RemoveListener(Open);
             if (_pauseOpenButton != null)
             {
@@ -147,12 +154,18 @@ namespace ProjectSparks.UI
 
         private void Close()
         {
-            if (_isBusy || _tripSession.State == TripSessionState.Confirmed)
+            if (_isBusy || _tripSession.State == TripSessionState.Confirmed || !_isOpen)
             {
                 return;
             }
 
             ClosePanel();
+            ReturnCancelled?.Invoke();
+        }
+
+        private void HandleTripExitCancelled()
+        {
+            ReturnCancelled?.Invoke();
         }
 
         private void ClosePanel()

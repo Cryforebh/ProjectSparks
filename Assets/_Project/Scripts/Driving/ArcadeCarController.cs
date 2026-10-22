@@ -1,3 +1,4 @@
+using ProjectSparks.Core;
 using ProjectSparks.Companions;
 using UnityEngine;
 using Zenject;
@@ -5,7 +6,7 @@ using Zenject;
 namespace ProjectSparks.Driving
 {
     [RequireComponent(typeof(Rigidbody))]
-    public sealed class ArcadeCarController : MonoBehaviour, IVehicleTelemetry
+    public sealed class ArcadeCarController : MonoBehaviour, IVehicleTelemetry, IFrameUpdate
     {
         private const float _centerOfMassGizmoRadius = 0.14f;
         private const float _centerOfMassAxisLength = 0.32f;
@@ -121,7 +122,7 @@ namespace ProjectSparks.Driving
             _lastSafeRotation = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
         }
 
-        private void Update()
+        public void UpdateFrame()
         {
             bool resetRequested = _input.ConsumeReset();
             if (Time.timeScale <= 0f)

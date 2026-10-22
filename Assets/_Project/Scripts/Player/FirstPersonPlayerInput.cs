@@ -6,7 +6,7 @@ namespace ProjectSparks.Player
 {
     [DefaultExecutionOrder(-100)]
     [DisallowMultipleComponent]
-    public sealed class FirstPersonPlayerInput : MonoBehaviour, IPlayerInputSource, IPauseInputSource
+    public sealed class FirstPersonPlayerInput : MonoBehaviour, IPlayerInputSource, IPauseInputSource, IFrameUpdate
     {
         [Tooltip("Набор команд управления персонажем.")]
         [SerializeField] private InputActionAsset _inputActions;
@@ -43,7 +43,7 @@ namespace ProjectSparks.Player
             _playerActions?.Enable();
         }
 
-        private void Update()
+        public void UpdateFrame()
         {
             Move = Vector2.ClampMagnitude(_moveAction.ReadValue<Vector2>(), 1f);
             Look = _lookAction.ReadValue<Vector2>();

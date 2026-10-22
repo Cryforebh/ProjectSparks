@@ -1,3 +1,4 @@
+using ProjectSparks.Core;
 using UnityEngine;
 using Zenject;
 
@@ -8,7 +9,7 @@ namespace ProjectSparks.Driving
     /// Две петли воспроизводятся одновременно и плавно смешиваются по скорости и газу.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class VehicleEngineAudio : MonoBehaviour
+    public sealed class VehicleEngineAudio : MonoBehaviour, IFrameUpdate
     {
         [Header("Ссылки")]
         [Tooltip("Контроллер автомобиля, откуда берутся фактическая скорость и ее предел.")]
@@ -175,7 +176,7 @@ namespace ProjectSparks.Driving
             _driveSource.Play();
         }
 
-        private void Update()
+        public void UpdateFrame()
         {
             if (!_initialized)
             {

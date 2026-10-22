@@ -8,7 +8,7 @@ using Zenject;
 namespace ProjectSparks.Player
 {
     [DisallowMultipleComponent]
-    public sealed class PlayerInteractor : MonoBehaviour, IInteractionPromptSource
+    public sealed class PlayerInteractor : MonoBehaviour, IInteractionPromptSource, IFrameUpdate
     {
         [Tooltip("Камера, из центра которой проверяется взаимодействие.")]
         [SerializeField] private Camera _viewCamera;
@@ -58,7 +58,7 @@ namespace ProjectSparks.Player
             }
         }
 
-        private void Update()
+        public void UpdateFrame()
         {
             if (_pauseService.IsPaused || !_controlService.IsControlEnabled)
             {

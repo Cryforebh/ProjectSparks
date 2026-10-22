@@ -560,6 +560,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _vehicleInput: {fileID: 1695413830}
   _vehicleController: {fileID: 1695413834}
+  _viewCamera: {fileID: 330585545}
 --- !u!1 &578798957
 GameObject:
   m_ObjectHideFlags: 0

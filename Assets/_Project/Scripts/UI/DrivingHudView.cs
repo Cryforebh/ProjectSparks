@@ -55,7 +55,7 @@ namespace ProjectSparks.UI
             {
                 if (_boostText != null)
                 {
-                    _boostText.text = $"Boost: {boost}%";
+                    _boostText.text = $"Ускорение: {boost}%";
                 }
 
                 if (_boostFill != null)

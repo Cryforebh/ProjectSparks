@@ -23,6 +23,9 @@ namespace ProjectSparks.UI
         [Tooltip("Имя сцены главного меню.")]
         [SerializeField] private string _mainMenuSceneName = "MainMenu";
 
+        // Вызывается только при отказе игрока от выхода, не при смене сцены.
+        public event Action ExitCancelled;
+
         private TripExitService _exitService;
         private ITripSessionService _session;
         private IPauseService _pauseService;
@@ -103,9 +106,10 @@ namespace ProjectSparks.UI
 
         private void Cancel()
         {
-            if (!_isBusy)
+            if (!_isBusy && _isOpen)
             {
                 Close();
+                ExitCancelled?.Invoke();
             }
         }
 

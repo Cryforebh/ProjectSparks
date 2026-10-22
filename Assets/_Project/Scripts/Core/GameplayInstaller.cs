@@ -9,6 +9,8 @@ namespace ProjectSparks.Core
     {
         public override void InstallBindings()
         {
+            Container.BindInterfacesTo<LevelRestartService>().AsSingle().NonLazy();
+
             Container
                 .BindInterfacesAndSelfTo<PauseService>()
                 .AsSingle()

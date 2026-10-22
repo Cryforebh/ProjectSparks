@@ -6,7 +6,7 @@ namespace ProjectSparks.Player
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CharacterController))]
-    public sealed class FirstPersonController : MonoBehaviour
+    public sealed class FirstPersonController : MonoBehaviour, IFrameUpdate
     {
         [Header("Перемещение")]
         [Tooltip("Скорость перемещения персонажа.")]
@@ -58,7 +58,7 @@ namespace ProjectSparks.Player
             RefreshCursorState();
         }
 
-        private void Update()
+        public void UpdateFrame()
         {
             if (_pauseService.IsPaused || !_controlService.IsControlEnabled)
             {

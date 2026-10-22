@@ -1,3 +1,4 @@
+using ProjectSparks.Core;
 using UnityEngine;
 
 namespace ProjectSparks.Driving
@@ -8,7 +9,7 @@ namespace ProjectSparks.Driving
     /// Не влияет на физику, управление и заряд ускорения.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class VehicleBoostAudio : MonoBehaviour
+    public sealed class VehicleBoostAudio : MonoBehaviour, IFrameUpdate
     {
         [Header("Ссылки")]
         [Tooltip("Контроллер автомобиля. Должен иметь свойство IsBoostActive.")]
@@ -138,7 +139,7 @@ namespace ProjectSparks.Driving
             _lastActualBoostTime = float.NegativeInfinity;
         }
 
-        private void Update()
+        public void UpdateFrame()
         {
             if (!_initialized)
             {

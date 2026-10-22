@@ -1045,7 +1045,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "В убежище"
+  m_text: "\u0412 \u0422\u0435\u0440\u0440\u0430\u0440\u0438\u0443\u043c"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
@@ -1323,7 +1323,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -178}
+  m_AnchoredPosition: {x: 0, y: -308}
   m_SizeDelta: {x: 506.5502, y: 129.9892}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1976605750
@@ -1585,16 +1585,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!1660057539 &9223372036854775807
-SceneRoots:
-  m_ObjectHideFlags: 0
-  m_Roots:
-  - {fileID: 2081854507}
-  - {fileID: 106932698}
-  - {fileID: 1178477641}
-  - {fileID: 884672118}
-  - {fileID: 1628723582}
-  - {fileID: 2120000000}
 --- !u!1 &2130000000
 GameObject:
   m_ObjectHideFlags: 0
@@ -1942,3 +1932,32 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f4addaa7359147d499f702cea2f1f266, type: 3}
+--- !u!1001 &2141000000
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 02bbdbd3b34145a3afe4eaab9527bf94, type: 3}
+--- !u!224 &2141000001 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7388023658468053377, guid: 02bbdbd3b34145a3afe4eaab9527bf94, type: 3}
+  m_PrefabInstance: {fileID: 2141000000}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1660057539 &9223372036854775807
+SceneRoots:
+  m_ObjectHideFlags: 0
+  m_Roots:
+  - {fileID: 2081854507}
+  - {fileID: 106932698}
+  - {fileID: 1178477641}
+  - {fileID: 884672118}
+  - {fileID: 1628723582}
+  - {fileID: 2120000000}
+  - {fileID: 2141000001}

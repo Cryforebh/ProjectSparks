@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SparkBalanceSettings
   m_EditorClassIdentifier: 
   _pickupRadius:
-    _stat: 3
+    _stat: 1
     _unlockAt: 10
     _maximumAt: 100
     _initialBonus: 0.5
@@ -23,6 +23,6 @@ MonoBehaviour:
     _unlockAt: 10
     _maximumAt: 100
     _initialBonus: 0.25
-    _maximumBonus: 0.5
-  _feedingsToFullGrowth: 100
+    _maximumBonus: 0.8
+  _feedingsToFullGrowth: 20
   _earDevelopmentMaximumAt: 100
