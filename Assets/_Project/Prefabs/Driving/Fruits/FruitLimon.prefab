@@ -16,7 +16,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &4940289474228623118
 Transform:
@@ -132,9 +132,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 12.093
       objectReference: {fileID: 0}
+    - target: {fileID: -3813111308409870863, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
       propertyPath: m_Name
       value: Limon (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 1084159133573106967, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 3227974592095069894, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -206,9 +222,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -38.301
       objectReference: {fileID: 0}
+    - target: {fileID: -3813111308409870863, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
       propertyPath: m_Name
       value: Limon (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 1084159133573106967, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 3227974592095069894, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -280,9 +312,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -3813111308409870863, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
       propertyPath: m_Name
       value: Limon
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 1084159133573106967, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 3227974592095069894, guid: c6b6e896995c3a6468bc6c6d426b393b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -12,6 +12,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: -9208255819373085225, guid: a20a4b459b89490e8a621a5bd2c2fe49, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -8809389843735770194, guid: a20a4b459b89490e8a621a5bd2c2fe49, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a20a4b459b89490e8a621a5bd2c2fe49, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -52,9 +60,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -4059517890532443538, guid: a20a4b459b89490e8a621a5bd2c2fe49, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -3403368164690566984, guid: a20a4b459b89490e8a621a5bd2c2fe49, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a20a4b459b89490e8a621a5bd2c2fe49, type: 3}
       propertyPath: m_Name
       value: Road_Junction_T
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a20a4b459b89490e8a621a5bd2c2fe49, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 3733095494690001196, guid: a20a4b459b89490e8a621a5bd2c2fe49, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 6176074316976147285, guid: a20a4b459b89490e8a621a5bd2c2fe49, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -48,9 +48,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7072793161563661056, guid: 719bd98d04804c72a6ee652b4fc5a1a4, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 719bd98d04804c72a6ee652b4fc5a1a4, type: 3}
       propertyPath: m_Name
       value: Rock_03_Wedge_LOD1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 719bd98d04804c72a6ee652b4fc5a1a4, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 4934922290763246492, guid: 719bd98d04804c72a6ee652b4fc5a1a4, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -117,6 +129,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: e280b7ae5a1e4c62b1701d516844c102, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e280b7ae5a1e4c62b1701d516844c102, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 8512094639487707548, guid: e280b7ae5a1e4c62b1701d516844c102, type: 3}
       propertyPath: m_IsActive

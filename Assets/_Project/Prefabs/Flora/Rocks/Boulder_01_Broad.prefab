@@ -48,9 +48,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 206402970011921608, guid: de73ae82ee494b189397bb3ac937c733, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: de73ae82ee494b189397bb3ac937c733, type: 3}
       propertyPath: m_Name
       value: Boulder_01_Broad_LOD0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: de73ae82ee494b189397bb3ac937c733, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 953352850396307664, guid: de73ae82ee494b189397bb3ac937c733, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -147,6 +159,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4cb70901bec740feabae9c614ab0b737, type: 3}
       propertyPath: m_Name
       value: Boulder_01_Broad
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4cb70901bec740feabae9c614ab0b737, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:

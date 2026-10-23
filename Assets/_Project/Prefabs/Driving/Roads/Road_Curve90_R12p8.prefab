@@ -48,13 +48,37 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -3664393065716299761, guid: 2c9e6e84a19241cea5a6e1824ae40891, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -1029603007822958838, guid: 2c9e6e84a19241cea5a6e1824ae40891, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 2c9e6e84a19241cea5a6e1824ae40891, type: 3}
       propertyPath: m_Name
       value: Road_Curve90_R12p8
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2c9e6e84a19241cea5a6e1824ae40891, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 4759041464285614779, guid: 2c9e6e84a19241cea5a6e1824ae40891, type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4759041464285614779, guid: 2c9e6e84a19241cea5a6e1824ae40891, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 7664984369173290835, guid: 2c9e6e84a19241cea5a6e1824ae40891, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 8800201432878567561, guid: 2c9e6e84a19241cea5a6e1824ae40891, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

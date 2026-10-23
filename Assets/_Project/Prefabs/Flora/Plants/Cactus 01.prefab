@@ -16,7 +16,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &7236875786238011530
 Transform:
@@ -66,12 +66,12 @@ LODGroup:
   serializedVersion: 2
   m_LocalReferencePoint: {x: -0.06279564, y: 2.0241132, z: -0.04094231}
   m_Size: 11.32618
-  m_FadeMode: 0
+  m_FadeMode: 1
   m_AnimateCrossFading: 0
   m_LastLODIsBillboard: 0
   m_LODs:
-  - screenRelativeHeight: 0.6
-    fadeTransitionWidth: 0
+  - screenRelativeHeight: 0.5
+    fadeTransitionWidth: 0.6
     renderers:
     - renderer: {fileID: 1087750781565131300}
     - renderer: {fileID: 2161583961974355263}
@@ -128,9 +128,33 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -4949866981311651837, guid: b3755735c7454fdab707e20f52b24e3a, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -1894937324790547465, guid: b3755735c7454fdab707e20f52b24e3a, type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -624630145008495380, guid: b3755735c7454fdab707e20f52b24e3a, type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b3755735c7454fdab707e20f52b24e3a, type: 3}
       propertyPath: m_Name
       value: Cactus_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b3755735c7454fdab707e20f52b24e3a, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 7794717646421646331, guid: b3755735c7454fdab707e20f52b24e3a, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 8936978934513367924, guid: b3755735c7454fdab707e20f52b24e3a, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -200,9 +224,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8279480626014536482, guid: 96635b1e9df641a4a7ebd34e125d1628, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 96635b1e9df641a4a7ebd34e125d1628, type: 3}
       propertyPath: m_Name
       value: Cactus_01_LOD1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 96635b1e9df641a4a7ebd34e125d1628, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 1879479819440085959, guid: 96635b1e9df641a4a7ebd34e125d1628, type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6133633765965812810, guid: 96635b1e9df641a4a7ebd34e125d1628, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

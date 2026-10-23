@@ -52,13 +52,25 @@ PrefabInstance:
       propertyPath: m_Name
       value: Boulder_03_Long_LOD0_Mesh
       objectReference: {fileID: 0}
+    - target: {fileID: -1154138297045082469, guid: f65c3ebebd48478cbc72f3206eb6cd43, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: f65c3ebebd48478cbc72f3206eb6cd43, type: 3}
       propertyPath: m_Name
       value: Boulder_03_Long_LOD0
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: f65c3ebebd48478cbc72f3206eb6cd43, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 6118193472956219590, guid: f65c3ebebd48478cbc72f3206eb6cd43, type: 3}
       propertyPath: m_Name
       value: Boulder_03_Long_LOD0.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 6118193472956219590, guid: f65c3ebebd48478cbc72f3206eb6cd43, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -155,6 +167,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 6edcac2ac0434e0889f978e9d16ef1c6, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 6edcac2ac0434e0889f978e9d16ef1c6, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 3656380762446693510, guid: 6edcac2ac0434e0889f978e9d16ef1c6, type: 3}
       propertyPath: m_IsActive

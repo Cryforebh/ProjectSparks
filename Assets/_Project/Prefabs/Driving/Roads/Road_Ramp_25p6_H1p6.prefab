@@ -52,9 +52,33 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: -5266833938777249203, guid: 60df5c5d7d7f495cabb9416f3099d48d, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -5112578175417313065, guid: 60df5c5d7d7f495cabb9416f3099d48d, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 677840865301942986, guid: 60df5c5d7d7f495cabb9416f3099d48d, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 60df5c5d7d7f495cabb9416f3099d48d, type: 3}
       propertyPath: m_Name
       value: Road_Ramp_25p6_H1p6
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 60df5c5d7d7f495cabb9416f3099d48d, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 4865167228884132055, guid: 60df5c5d7d7f495cabb9416f3099d48d, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 6886733249911355278, guid: 60df5c5d7d7f495cabb9416f3099d48d, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -48,17 +48,33 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5015509878551893369, guid: 41faeb2b7ccf4e57b253631e1fa57178, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: -1329444792404761715, guid: 41faeb2b7ccf4e57b253631e1fa57178, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: b514e3e805ce8254cadcc05a641af032, type: 2}
+    - target: {fileID: -45920412305755021, guid: 41faeb2b7ccf4e57b253631e1fa57178, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 41faeb2b7ccf4e57b253631e1fa57178, type: 3}
       propertyPath: m_Name
       value: Garden
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 41faeb2b7ccf4e57b253631e1fa57178, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 7241404786396922114, guid: 41faeb2b7ccf4e57b253631e1fa57178, type: 3}
       propertyPath: m_LocalPosition.y
       value: -0.119
+      objectReference: {fileID: 0}
+    - target: {fileID: 8902234424439296579, guid: 41faeb2b7ccf4e57b253631e1fa57178, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

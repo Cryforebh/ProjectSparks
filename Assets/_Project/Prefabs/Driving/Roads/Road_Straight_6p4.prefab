@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: -9193473351121799683, guid: 549d4bbfbaa2401e95ae7489691f23e0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 549d4bbfbaa2401e95ae7489691f23e0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -52,9 +56,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -4087628355230843530, guid: 549d4bbfbaa2401e95ae7489691f23e0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -1546454392338452993, guid: 549d4bbfbaa2401e95ae7489691f23e0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 549d4bbfbaa2401e95ae7489691f23e0, type: 3}
       propertyPath: m_Name
       value: Road_Straight_6p4
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 549d4bbfbaa2401e95ae7489691f23e0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 3231546393213832456, guid: 549d4bbfbaa2401e95ae7489691f23e0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 5775617794711384533, guid: 549d4bbfbaa2401e95ae7489691f23e0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

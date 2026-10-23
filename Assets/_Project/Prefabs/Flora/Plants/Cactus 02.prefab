@@ -16,7 +16,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2330110952688953324
 Transform:
@@ -66,12 +66,12 @@ LODGroup:
   serializedVersion: 2
   m_LocalReferencePoint: {x: -0.10764992, y: 1.6659071, z: -0.09769058}
   m_Size: 11.32618
-  m_FadeMode: 0
+  m_FadeMode: 1
   m_AnimateCrossFading: 0
   m_LastLODIsBillboard: 0
   m_LODs:
-  - screenRelativeHeight: 0.6
-    fadeTransitionWidth: 0
+  - screenRelativeHeight: 0.5
+    fadeTransitionWidth: 0.6
     renderers:
     - renderer: {fileID: 3241971876216094315}
     - renderer: {fileID: 5631819986219622793}
@@ -129,9 +129,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8337881214555045843, guid: 4c97ce8e41794938b17dd9227ed03b8a, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -3729607204122152700, guid: 4c97ce8e41794938b17dd9227ed03b8a, type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4c97ce8e41794938b17dd9227ed03b8a, type: 3}
       propertyPath: m_Name
       value: Cactus_02_LOD1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4c97ce8e41794938b17dd9227ed03b8a, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214638368963067306, guid: 4c97ce8e41794938b17dd9227ed03b8a, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -196,9 +212,33 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7724955328429017842, guid: 5bb690fa1d134fc6b35a0d5b212640fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -4557812966639353341, guid: 5bb690fa1d134fc6b35a0d5b212640fa, type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -673702673764120068, guid: 5bb690fa1d134fc6b35a0d5b212640fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -490226841120067556, guid: 5bb690fa1d134fc6b35a0d5b212640fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 5bb690fa1d134fc6b35a0d5b212640fa, type: 3}
       propertyPath: m_Name
       value: Cactus_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 5bb690fa1d134fc6b35a0d5b212640fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 7686386118094715222, guid: 5bb690fa1d134fc6b35a0d5b212640fa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

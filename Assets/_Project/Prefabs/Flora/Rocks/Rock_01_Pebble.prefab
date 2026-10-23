@@ -48,9 +48,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -629199626648616145, guid: faae6ff175fa4ea2a14d584d9348872e, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: faae6ff175fa4ea2a14d584d9348872e, type: 3}
       propertyPath: m_Name
       value: Rock_01_Pebble_LOD1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: faae6ff175fa4ea2a14d584d9348872e, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 3855053666572404695, guid: faae6ff175fa4ea2a14d584d9348872e, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -121,6 +133,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 16eb83a75b35478392b1595024b3ae69, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 16eb83a75b35478392b1595024b3ae69, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
