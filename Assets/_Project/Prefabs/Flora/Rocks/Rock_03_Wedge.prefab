@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
+    - target: {fileID: -1942181754257403273, guid: 719bd98d04804c72a6ee652b4fc5a1a4, type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 719bd98d04804c72a6ee652b4fc5a1a4, type: 3}
       propertyPath: m_Name
       value: Rock_03_Wedge_LOD1

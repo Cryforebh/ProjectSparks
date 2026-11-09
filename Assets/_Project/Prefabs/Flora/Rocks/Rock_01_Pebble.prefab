@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
+    - target: {fileID: 534392183542077612, guid: faae6ff175fa4ea2a14d584d9348872e, type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: faae6ff175fa4ea2a14d584d9348872e, type: 3}
       propertyPath: m_Name
       value: Rock_01_Pebble_LOD1

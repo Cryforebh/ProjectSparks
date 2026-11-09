@@ -48,6 +48,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -1690824533176572575, guid: f65c3ebebd48478cbc72f3206eb6cd43, type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: -1154138297045082469, guid: f65c3ebebd48478cbc72f3206eb6cd43, type: 3}
       propertyPath: m_Name
       value: Boulder_03_Long_LOD0_Mesh

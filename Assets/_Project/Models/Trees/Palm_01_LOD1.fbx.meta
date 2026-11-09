@@ -12,13 +12,13 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Tree_03_Palm_Wood_Material
-    second: {fileID: 2100000, guid: 30fe6495dd7742c68cee75dae8691646, type: 2}
+      name: Tree_03_Palm_Up_Material
+    second: {fileID: 2100000, guid: 0ba08d7a637249babefff44b8fe69bbb, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Tree_03_Palm_Up_Material
-    second: {fileID: 2100000, guid: 0ba08d7a637249babefff44b8fe69bbb, type: 2}
+      name: Tree_03_Palm_Wood_Material
+    second: {fileID: 2100000, guid: 30fe6495dd7742c68cee75dae8691646, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -74,11 +74,11 @@ ModelImporter:
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
-    secondaryUVAreaDistortion: 15.000001
+    secondaryUVAreaDistortion: 15
     secondaryUVHardAngle: 88
     secondaryUVMarginMethod: 1
     secondaryUVMinLightmapResolution: 10
-    secondaryUVMinObjectScale: 1
+    secondaryUVMinObjectScale: 0.5
     secondaryUVPackMargin: 4
     useFileScale: 1
     strictVertexDataChecks: 0
