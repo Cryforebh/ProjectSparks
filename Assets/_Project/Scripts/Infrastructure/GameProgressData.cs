@@ -18,10 +18,13 @@ namespace ProjectSparks.Infrastructure
         [SerializeField] private string _lastCommittedTripId;
         [SerializeField] private string _selectedSparkId;
         [SerializeField] private SparkProgressData[] _sparks;
+        [SerializeField] private bool _terrariumGuideSeen;
+        [SerializeField] private bool _starterFruitsPending;
 
         public GameProgressData(int balance, string selectedCompanion, int capsuleCount,
             IReadOnlyDictionary<string, int> fruits = null, string lastCommittedTripId = null,
-            SparkProgressData[] sparks = null)
+            SparkProgressData[] sparks = null, bool terrariumGuideSeen = false,
+            bool starterFruitsPending = false)
         {
             _version = CurrentVersion;
             _balance = Math.Max(0, balance);
@@ -29,6 +32,8 @@ namespace ProjectSparks.Infrastructure
             _capsuleCount = Math.Max(0, capsuleCount);
             _lastCommittedTripId = lastCommittedTripId;
             _sparks = sparks;
+            _terrariumGuideSeen = terrariumGuideSeen;
+            _starterFruitsPending = starterFruitsPending;
 
             List<FruitAmountData> entries = new List<FruitAmountData>();
             if (fruits != null)
@@ -49,6 +54,15 @@ namespace ProjectSparks.Infrastructure
         public SparkProgressData[] Sparks => _sparks;
         public int CapsuleCount => _capsuleCount;
         public string LastCommittedTripId => _lastCommittedTripId;
+        public bool TerrariumGuideSeen => _terrariumGuideSeen;
+        public bool StarterFruitsPending => _starterFruitsPending;
+
+        internal GameProgressData WithTerrariumGuideSeen()
+        {
+            var progress = (GameProgressData)MemberwiseClone();
+            progress._terrariumGuideSeen = true;
+            return progress;
+        }
 
         public IReadOnlyDictionary<string, int> GetFruitAmounts(FruitCatalog catalog)
         {

@@ -10,8 +10,10 @@ namespace ProjectSparks.Core
         event Action ResetCompleted;
 
         bool IsLoaded { get; }
+        bool TerrariumGuideSeen { get; }
 
         UniTask LoadAsync(CancellationToken cancellationToken);
+        UniTask CompleteTerrariumGuideAsync(CancellationToken cancellationToken);
         UniTask ResetAsync(CancellationToken cancellationToken);
         UniTask CommitTripAsync(TripResult result, CancellationToken cancellationToken);
         bool TryInitializeStarterFruits();

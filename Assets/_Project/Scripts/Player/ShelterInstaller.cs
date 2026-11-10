@@ -1,6 +1,7 @@
 using ProjectSparks.Collectibles;
 using ProjectSparks.Companions;
 using ProjectSparks.Core;
+using ProjectSparks.UI;
 using UnityEngine;
 using Zenject;
 
@@ -17,6 +18,8 @@ namespace ProjectSparks.Player
         [SerializeField] private PlayerHandsController _playerHands;
         [Tooltip("Компонент, который управляет физическими фруктами и их пулом.")]
         [SerializeField] private FruitWorldController _fruitWorld;
+        [Tooltip("Префаб инструктажа, который открывается при первом посещении Террариума.")]
+        [SerializeField] private TerrariumGuideView _terrariumGuidePrefab;
 
         public override void InstallBindings()
         {
@@ -71,6 +74,12 @@ namespace ProjectSparks.Player
                 .NonLazy();
 
             Container.BindInterfacesTo<LevelRestartService>().AsSingle().NonLazy();
+
+            if (_terrariumGuidePrefab != null)
+            {
+                Container.Bind<TerrariumGuideView>().FromComponentInNewPrefab(_terrariumGuidePrefab).AsSingle();
+                Container.BindInterfacesTo<TerrariumGuidePresenter>().AsSingle();
+            }
         }
     }
 }

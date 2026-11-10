@@ -47,6 +47,7 @@ namespace ProjectSparks.Infrastructure
         }
 
         public bool IsLoaded { get; private set; }
+        public bool TerrariumGuideSeen { get; private set; }
         public event Action ResetCompleted;
 
         public async UniTask LoadAsync(CancellationToken cancellationToken)
@@ -90,6 +91,8 @@ namespace ProjectSparks.Infrastructure
                 }
 
                 _lastCommittedTripId = progress.LastCommittedTripId;
+                TerrariumGuideSeen = progress.TerrariumGuideSeen;
+                _starterFruitsPending |= progress.StarterFruitsPending;
                 _economyService.Restore(progress.Balance);
                 _sparkProgressService.Reset();
                 if (progress.Sparks != null)
@@ -152,6 +155,7 @@ namespace ProjectSparks.Infrastructure
                 _resourceInventoryService.Reset();
                 _starterFruitsPending = true;
                 _lastCommittedTripId = null;
+                TerrariumGuideSeen = false;
                 _pendingTripCommit = null;
                 _saveRequested = false;
                 await _saveService.DeleteAsync(linkedCancellation.Token);
@@ -198,7 +202,8 @@ namespace ProjectSparks.Infrastructure
                         _companionService.SelectedCompanion,
                         checked(_resourceInventoryService.CapsuleCount + result.CapsuleCount),
                         MergeFruitAmounts(result),
-                        result.SessionId, _sparkProgressService.GetAll());
+                        result.SessionId, _sparkProgressService.GetAll(), TerrariumGuideSeen,
+                        _starterFruitsPending);
                     await _saveService.SaveAsync(progress, linkedCancellation.Token);
                     _pendingTripCommit = progress;
                 }
@@ -295,13 +300,7 @@ namespace ProjectSparks.Infrastructure
                     await _saveOperationLock.WaitAsync(_lifetimeCancellation.Token);
                     try
                     {
-                        GameProgressData progress = _pendingTripCommit ?? new GameProgressData(
-                            _economyService.Balance,
-                            _companionService.SelectedCompanion,
-                            _resourceInventoryService.CapsuleCount,
-                            _resourceInventoryService.FruitAmounts,
-                            _lastCommittedTripId, _sparkProgressService.GetAll());
-                        await _saveService.SaveAsync(progress, _lifetimeCancellation.Token);
+                        await _saveService.SaveAsync(CaptureProgress(), _lifetimeCancellation.Token);
                     }
                     finally
                     {
@@ -321,6 +320,44 @@ namespace ProjectSparks.Infrastructure
             {
                 _isSaving = false;
             }
+        }
+
+        public async UniTask CompleteTerrariumGuideAsync(CancellationToken cancellationToken)
+        {
+            await LoadAsync(cancellationToken);
+            using CancellationTokenSource linkedCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+                cancellationToken, _lifetimeCancellation.Token);
+            await _saveOperationLock.WaitAsync(linkedCancellation.Token);
+            try
+            {
+                if (TerrariumGuideSeen)
+                {
+                    return;
+                }
+
+                GameProgressData progress = CaptureProgress().WithTerrariumGuideSeen();
+                await _saveService.SaveAsync(progress, linkedCancellation.Token);
+                TerrariumGuideSeen = true;
+                if (_pendingTripCommit != null)
+                {
+                    _pendingTripCommit = progress;
+                }
+            }
+            finally
+            {
+                _saveOperationLock.Release();
+            }
+        }
+
+        private GameProgressData CaptureProgress()
+        {
+            return _pendingTripCommit ?? new GameProgressData(
+                _economyService.Balance,
+                _companionService.SelectedCompanion,
+                _resourceInventoryService.CapsuleCount,
+                _resourceInventoryService.FruitAmounts,
+                _lastCommittedTripId, _sparkProgressService.GetAll(), TerrariumGuideSeen,
+                _starterFruitsPending);
         }
 
         private IReadOnlyDictionary<string, int> MergeFruitAmounts(TripResult result)

@@ -7,8 +7,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Habitat_Warm_Wood
-    second: {fileID: 2100000, guid: 576e1fb03d6f4763b3f40c4530efa965, type: 2}
+      name: Habitat_Door_Warm_Hardware
+    second: {fileID: 2100000, guid: 025a14538061424cad668023a30ef09a, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -17,8 +17,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Habitat_Door_Warm_Hardware
-    second: {fileID: 2100000, guid: 025a14538061424cad668023a30ef09a, type: 2}
+      name: Habitat_Warm_Wood
+    second: {fileID: 2100000, guid: 576e1fb03d6f4763b3f40c4530efa965, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -61,7 +61,7 @@ ModelImporter:
     nodeNameCollisionStrategy: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
-    generateSecondaryUV: 0
+    generateSecondaryUV: 1
     useFileUnits: 1
     keepQuads: 0
     weldVertices: 1
@@ -74,11 +74,11 @@ ModelImporter:
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
-    secondaryUVAreaDistortion: 15.000001
+    secondaryUVAreaDistortion: 15
     secondaryUVHardAngle: 88
     secondaryUVMarginMethod: 1
-    secondaryUVMinLightmapResolution: 40
-    secondaryUVMinObjectScale: 1
+    secondaryUVMinLightmapResolution: 10
+    secondaryUVMinObjectScale: 0.5
     secondaryUVPackMargin: 4
     useFileScale: 1
     strictVertexDataChecks: 0

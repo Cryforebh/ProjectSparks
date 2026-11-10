@@ -21,6 +21,8 @@ namespace ProjectSparks.Infrastructure
         [SerializeField] private SparkVisualSettings _sparkVisualSettings;
         [Tooltip("Стартовые обязательные Искры.")]
         [SerializeField] private SparkStarterSettings _sparkStarterSettings;
+        [Tooltip("Общий источник музыки главного меню и Террариума.")]
+        [SerializeField] private AudioSource _menuMusicSource;
 
         public override void InstallBindings()
         {
@@ -76,6 +78,8 @@ namespace ProjectSparks.Infrastructure
                 .AsSingle();
 
             Container.BindInstance(_sparkStarterSettings);
+            Container.BindInterfacesAndSelfTo<GameSettings>().AsSingle();
+            Container.BindInterfacesTo<MenuMusic>().AsSingle().WithArguments(_menuMusicSource);
         }
     }
 }

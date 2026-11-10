@@ -78,6 +78,7 @@ namespace ProjectSparks.Driving
 
         private IVehicleInputSource _input;
         private bool _initialized;
+        private bool _paused;
         private float _blend;
         private float _tone;
         private float _master;
@@ -160,6 +161,7 @@ namespace ProjectSparks.Driving
 
         private void StartLoops()
         {
+            _paused = false;
             _idleSource.volume = 0f;
             _driveSource.volume = 0f;
             _idleSource.pitch = _idlePitchMin;
@@ -183,9 +185,27 @@ namespace ProjectSparks.Driving
                 return;
             }
 
-            bool paused = Time.timeScale <= 0f;
+            if (Time.timeScale <= 0f)
+            {
+                if (!_paused)
+                {
+                    _idleSource.Pause();
+                    _driveSource.Pause();
+                    _paused = true;
+                }
+
+                return;
+            }
+
+            if (_paused)
+            {
+                _idleSource.UnPause();
+                _driveSource.UnPause();
+                _paused = false;
+            }
+
             bool braking = _input != null && _input.BrakeHeld;
-            float throttle = paused || braking || _input == null
+            float throttle = braking || _input == null
                 ? 0f
                 : Mathf.Clamp01(Mathf.Abs(_input.Drive));
 
@@ -196,22 +216,19 @@ namespace ProjectSparks.Driving
 
             // Учитываем уже вычисленное контроллером состояние земли.
             // Пока машина подпрыгивает на мелких неровностях, нагрузку не сбрасываем.
-            if (!paused)
-            {
-                _ungroundedDuration = _controller.IsGrounded
-                    ? 0f
-                    : _ungroundedDuration + Time.deltaTime;
+            _ungroundedDuration = _controller.IsGrounded
+                ? 0f
+                : _ungroundedDuration + Time.deltaTime;
 
-                float airborneTarget = _ungroundedDuration >= _airborneEnterDelay &&
-                    !_controller.IsGrounded ? 1f : 0f;
-                float airborneTransition = airborneTarget > _airborneBlend
-                    ? _airborneTransitionTime
-                    : _landingTransitionTime;
-                _airborneBlend = Mathf.MoveTowards(
-                    _airborneBlend,
-                    airborneTarget,
-                    Time.deltaTime / Mathf.Max(0.01f, airborneTransition));
-            }
+            float airborneTarget = _ungroundedDuration >= _airborneEnterDelay &&
+                !_controller.IsGrounded ? 1f : 0f;
+            float airborneTransition = airborneTarget > _airborneBlend
+                ? _airborneTransitionTime
+                : _landingTransitionTime;
+            _airborneBlend = Mathf.MoveTowards(
+                _airborneBlend,
+                airborneTarget,
+                Time.deltaTime / Mathf.Max(0.01f, airborneTransition));
 
             float speedBlend = _driveBlendBySpeed == null
                 ? speed01
@@ -240,11 +257,11 @@ namespace ProjectSparks.Driving
             float step = 1f - Mathf.Exp(-Mathf.Max(0.1f, _response) * Time.unscaledDeltaTime);
             _blend = Mathf.Lerp(_blend, targetBlend, step);
             _tone = Mathf.Lerp(_tone, targetTone, step);
-            _master = Mathf.Lerp(_master, paused ? 0f : 1f, step);
+            _master = Mathf.Lerp(_master, 1f, step);
 
             // Только действующий Boost, а не удерживаемая кнопка:
             // сила Boost отмечается самим физическим контроллером.
-            bool boostActive = !paused && _controller.IsBoostActive;
+            bool boostActive = _controller.IsBoostActive;
             float boostFadeTime = boostActive ? _boostAttackTime : _boostReleaseTime;
             _boostBlend = Mathf.MoveTowards(
                 _boostBlend,
