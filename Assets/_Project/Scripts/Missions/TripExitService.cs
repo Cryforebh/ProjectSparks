@@ -8,12 +8,12 @@ namespace ProjectSparks.Missions
     public sealed class TripExitService
     {
         private readonly ITripSessionService _session;
-        private readonly ISceneLoader _sceneLoader;
+        private readonly ISceneTransitionService _transition;
 
-        public TripExitService(ITripSessionService session, ISceneLoader sceneLoader)
+        public TripExitService(ITripSessionService session, ISceneTransitionService transition)
         {
             _session = session;
-            _sceneLoader = sceneLoader;
+            _transition = transition;
         }
 
         public bool IsBusy { get; private set; }
@@ -37,7 +37,7 @@ namespace ProjectSparks.Missions
             try
             {
                 // После начала загрузки уничтожение старой сцены не отменяет завершение выхода.
-                await _sceneLoader.LoadAsync(sceneName, CancellationToken.None);
+                await _transition.TransitionAsync(sceneName, string.Empty, cancellationToken);
                 _session.TryCancel();
             }
             finally

@@ -8,7 +8,7 @@ namespace ProjectSparks.Infrastructure
     [DisallowMultipleComponent]
     public sealed class SceneTransitionInstaller : MonoInstaller
     {
-        [Tooltip("Постоянный экран затемнения переходов между сценами.")]
+        [Tooltip("Общий экран загрузки и плавных переходов между сценами.")]
         [SerializeField] private SceneFadeView _fadeView;
 
         public override void InstallBindings()

@@ -25,15 +25,15 @@ namespace ProjectSparks.UI
         [SerializeField] private bool _manageDrivingCursor;
 
         private IPauseService _pauseService;
-        private ISceneLoader _sceneLoader;
+        private ISceneTransitionService _transition;
 
         [Inject]
         private void Construct(
             IPauseService pauseService,
-            ISceneLoader sceneLoader)
+            ISceneTransitionService transition)
         {
             _pauseService = pauseService;
-            _sceneLoader = sceneLoader;
+            _transition = transition;
         }
 
         private void Start()
@@ -100,8 +100,9 @@ namespace ProjectSparks.UI
 
             try
             {
-                await _sceneLoader.LoadAsync(
+                await _transition.TransitionAsync(
                     _mainMenuSceneName,
+                    string.Empty,
                     this.GetCancellationTokenOnDestroy());
             }
             catch (OperationCanceledException)

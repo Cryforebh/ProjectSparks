@@ -20,13 +20,13 @@ namespace ProjectSparks.UI
         [Tooltip("Имя сцены, которая открывается кнопкой запуска игры.")]
         [SerializeField] private string _gameSceneName = "Shelter";
 
-        private ISceneLoader _sceneLoader;
+        private ISceneTransitionService _transition;
         private LevelSelectionService _levelSelection;
 
         [Inject]
-        private void Construct(ISceneLoader sceneLoader, LevelSelectionService levelSelection)
+        private void Construct(ISceneTransitionService transition, LevelSelectionService levelSelection)
         {
-            _sceneLoader = sceneLoader;
+            _transition = transition;
             _levelSelection = levelSelection;
         }
 
@@ -69,8 +69,9 @@ namespace ProjectSparks.UI
 
             try
             {
-                await _sceneLoader.LoadAsync(
+                await _transition.TransitionAsync(
                     _gameSceneName,
+                    string.Empty,
                     this.GetCancellationTokenOnDestroy());
             }
             catch (OperationCanceledException)

@@ -31,7 +31,7 @@ namespace ProjectSparks.Companions
         {
             try
             {
-                await UniTask.WaitUntil(() => _progress.IsLoaded, cancellationToken: _lifetime.Token);
+                await _progress.LoadAsync(_lifetime.Token);
                 _selection.SelectedCompanionChanged += Refresh;
                 _subscribed = true;
                 Refresh(_selection.SelectedCompanion);

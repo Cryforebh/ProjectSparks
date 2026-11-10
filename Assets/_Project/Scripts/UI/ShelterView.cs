@@ -38,7 +38,7 @@ namespace ProjectSparks.UI
         private ICompanionService _companionService;
         private IResourceInventoryService _resourceInventoryService;
         private IProgressService _progressService;
-        private ISceneLoader _sceneLoader;
+        private ISceneTransitionService _transition;
         private bool _isLoadingScene;
         private bool _isReady;
 
@@ -47,12 +47,12 @@ namespace ProjectSparks.UI
             ICompanionService companionService,
             IResourceInventoryService resourceInventoryService,
             IProgressService progressService,
-            ISceneLoader sceneLoader)
+            ISceneTransitionService transition)
         {
             _companionService = companionService;
             _resourceInventoryService = resourceInventoryService;
             _progressService = progressService;
-            _sceneLoader = sceneLoader;
+            _transition = transition;
         }
 
         private void Start()
@@ -177,8 +177,9 @@ namespace ProjectSparks.UI
 
             try
             {
-                await _sceneLoader.LoadAsync(
+                await _transition.TransitionAsync(
                     sceneName,
+                    string.Empty,
                     this.GetCancellationTokenOnDestroy());
             }
             catch (OperationCanceledException)
