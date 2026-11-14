@@ -490,7 +490,8 @@ MonoBehaviour:
   _wheelRadius: 0.38
   _maxVisualSteer: 41
   _highSpeedVisualSteer: 15
-  _maxBodyRoll: 4
+  _maxBodyRoll: 5.5
+  _bodyRollReturnTime: 0.7
 --- !u!114 &7694400296817734484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -566,7 +567,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5586084935404789242}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FrontLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -597,7 +598,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1360501409369066631}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CameraTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -716,7 +717,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8460109860785183622}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: SuspensionPoints
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -751,7 +752,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2464881686439744548}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FrontRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1040,7 +1041,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4888699675212964627}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CargoPoint 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1674,7 +1675,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1283880990399532703}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RearLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1705,7 +1706,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4558065962035687766}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RearRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1736,7 +1737,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9087232794557804149}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CargoPoint 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1835,8 +1836,16 @@ PrefabInstance:
       value: -180
       objectReference: {fileID: 0}
     - target: {fileID: -3818843322298678592, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: -3818843322298678592, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -2983067539022236616, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: -2243719660796139112, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
       propertyPath: m_LocalScale.x
@@ -1862,13 +1871,45 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0.188
       objectReference: {fileID: 0}
+    - target: {fileID: -1592192302464208672, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: -59326757688824702, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 283135514248128277, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
       propertyPath: m_Name
       value: Car_02
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2201897239083245046, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5403870938632657063, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6597641848895168781, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8958139813596638909, guid: d45dd31b9b244bd5b122adda123c52b4, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

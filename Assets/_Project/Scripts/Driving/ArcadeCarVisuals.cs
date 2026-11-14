@@ -30,6 +30,8 @@ namespace ProjectSparks.Driving
         [SerializeField, Range(0f, 45f)] private float _highSpeedVisualSteer = 8f;
         [Tooltip("Максимальный визуальный наклон кузова при повороте.")]
         [SerializeField, Range(0f, 10f)] private float _maxBodyRoll = 3.5f;
+        [Tooltip("Время возвращения в стандарный наклон кузова")]
+        [SerializeField, Min(0.01f)] private float _bodyRollReturnTime = 0.25f;
 
         private Quaternion _bodyInitialRotation;
         private Quaternion _frontLeftInitialRotation;
@@ -41,6 +43,8 @@ namespace ProjectSparks.Driving
         private Vector3[] _bodyRollFollowerInitialPositions = new Vector3[0];
         private Quaternion[] _bodyRollFollowerInitialRotations = new Quaternion[0];
         private float _spinAngle;
+        private float _currentBodyRoll;
+        private float _bodyRollVelocity;
 
         private void Awake()
         {
@@ -72,8 +76,23 @@ namespace ProjectSparks.Driving
             }
 
             float speed01 = Mathf.Clamp01(Mathf.Abs(_controller.ForwardSpeed) / _controller.MaxForwardSpeed);
-            float roll = -_controller.SmoothedSteer * _maxBodyRoll * speed01;
-            Quaternion rollRotation = Quaternion.AngleAxis(roll, Vector3.forward);
+
+            //////////
+            //    Старая логика крена
+            //    float roll = -_controller.SmoothedSteer * _maxBodyRoll * speed01;
+            //    rollRotation = Quaternion.AngleAxis(roll, Vector3.forward);
+            //////////
+
+            float targetRoll = -_controller.SmoothedSteer * _maxBodyRoll * speed01;
+            bool isReturning =
+                Mathf.Abs(targetRoll) < Mathf.Abs(_currentBodyRoll) &&
+                (targetRoll == 0f || Mathf.Sign(targetRoll) == Mathf.Sign(_currentBodyRoll));
+
+            Quaternion rollRotation;
+            _currentBodyRoll = Mathf.SmoothDamp(
+                _currentBodyRoll, targetRoll, ref _bodyRollVelocity, _bodyRollReturnTime * speed01/2);
+            rollRotation = Quaternion.AngleAxis(_currentBodyRoll, Vector3.forward);
+
             Quaternion targetBodyRotation = _bodyInitialRotation * rollRotation;
             _bodyVisual.localRotation = targetBodyRotation;
             Quaternion bodyRollDelta = targetBodyRotation * Quaternion.Inverse(_bodyInitialRotation);
